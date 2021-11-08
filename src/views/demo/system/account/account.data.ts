@@ -5,12 +5,12 @@ import { FormSchema } from '/@/components/Table';
 export const columns: BasicColumn[] = [
   {
     title: '用户名',
-    dataIndex: 'account',
+    dataIndex: 'userName',
     width: 120,
   },
   {
     title: '昵称',
-    dataIndex: 'nickname',
+    dataIndex: 'nickName',
     width: 120,
   },
   {
@@ -21,6 +21,11 @@ export const columns: BasicColumn[] = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
+    width: 180,
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
     width: 180,
   },
   {
@@ -78,7 +83,6 @@ export const accountFormSchema: FormSchema[] = [
     label: '密码',
     component: 'InputPassword',
     required: true,
-    ifShow: false,
   },
   {
     label: '角色',
@@ -91,20 +95,20 @@ export const accountFormSchema: FormSchema[] = [
     },
     required: true,
   },
-  {
-    field: 'dept',
-    label: '所属部门',
-    component: 'TreeSelect',
-    componentProps: {
-      replaceFields: {
-        title: 'deptName',
-        key: 'id',
-        value: 'id',
-      },
-      getPopupContainer: () => document.body,
-    },
-    required: true,
-  },
+  // {
+  //   field: 'dept',
+  //   label: '所属部门',
+  //   component: 'TreeSelect',
+  //   componentProps: {
+  //     replaceFields: {
+  //       title: 'deptName',
+  //       key: 'id',
+  //       value: 'id',
+  //     },
+  //     getPopupContainer: () => document.body,
+  //   },
+  //   required: true,
+  // },
   {
     field: 'nickname',
     label: '昵称',
@@ -115,6 +119,13 @@ export const accountFormSchema: FormSchema[] = [
   {
     label: '邮箱',
     field: 'email',
+    component: 'Input',
+    required: true,
+  },
+
+  {
+    label: '手机',
+    field: 'phone',
     component: 'Input',
     required: true,
   },

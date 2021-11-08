@@ -18,8 +18,8 @@ enum Api {
   DeptList = '/system/getDeptList',
   setRoleStatus = '/system/setRoleStatus',
   MenuList = '/system/getMenuList',
-  RolePageList = '/system/getRoleListByPage',
-  GetAllRoleList = '/system/getAllRoleList',
+  RolePageList = '/system/role/pageList',
+  GetAllRoleList = '/system/role/list',
 }
 
 export const getAccountList = (params: AccountParams) =>
