@@ -40,6 +40,7 @@ const transform: AxiosTransform = {
     if (!isTransformResponse) {
       return res.data;
     }
+
     // 错误的时候返回
 
     const { data } = res;
@@ -52,6 +53,7 @@ const transform: AxiosTransform = {
 
     // 这里逻辑可以根据项目进行修改
     const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS;
+
     if (hasSuccess) {
       return result;
     }
@@ -205,6 +207,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         // baseURL: globSetting.apiUrl,
 
         headers: { 'Content-Type': ContentTypeEnum.JSON },
+        withCredentials: true, // 解决cookie跨域问题，以及node session无法获取问题
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
         // 数据处理方式
@@ -240,11 +243,3 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
   );
 }
 export const defHttp = createAxios();
-
-// other api url
-// export const otherHttp = createAxios({
-//   requestOptions: {
-//     apiUrl: 'xxx',
-//     urlPrefix: 'xxx',
-//   },
-// });

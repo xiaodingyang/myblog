@@ -24,6 +24,18 @@
         :placeholder="t('sys.login.password')"
       />
     </FormItem>
+    <FormItem name="code" class="enter-x">
+      <div class="captcha">
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-html="captcha" class="code-icon" @click="getApiCaptcha"></span>
+        <Input
+          size="large"
+          v-model:value="formData.code"
+          :placeholder="t('sys.login.captcha')"
+          class="fix-auto-fill"
+        />
+      </div>
+    </FormItem>
 
     <ARow class="enter-x">
       <ACol :span="12">
@@ -82,7 +94,7 @@
   </Form>
 </template>
 <script lang="ts" setup>
-  import { reactive, ref, unref, computed } from 'vue';
+  import { reactive, ref, unref, computed, onMounted } from 'vue';
 
   import { Checkbox, Form, Input, Row, Col, Button, Divider } from 'ant-design-vue';
   import {
@@ -100,6 +112,7 @@
   import { useUserStore } from '/@/store/modules/user';
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
+  import { getCaptcha } from '/@/api/sys/user';
   //import { onKeyStroke } from '@vueuse/core';
 
   const ACol = Col;
@@ -117,17 +130,22 @@
   const formRef = ref();
   const loading = ref(false);
   const rememberMe = ref(false);
+  const captcha = ref();
 
   const formData = reactive({
-    account: 'vben',
-    password: '123456',
+    account: 'Xdy',
+    password: '123',
+    code: '',
   });
 
   const { validForm } = useFormValid(formRef);
 
-  //onKeyStroke('Enter', handleLogin);
-
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
+
+  const getApiCaptcha = async () => {
+    const result = await getCaptcha();
+    captcha.value = result;
+  };
 
   async function handleLogin() {
     const data = await validForm();
@@ -136,7 +154,8 @@
       loading.value = true;
       const userInfo = await userStore.login({
         password: data.password,
-        username: data.account,
+        userName: data.account,
+        code: data.code,
         mode: 'none', //不要默认的错误提示
       });
       if (userInfo) {
@@ -156,4 +175,18 @@
       loading.value = false;
     }
   }
+
+  onMounted(() => {
+    getApiCaptcha();
+  });
 </script>
+<style lang="less" scoped>
+  .captcha {
+    display: flex;
+    align-items: center;
+    span {
+      background: #ccc;
+      margin-right: 20px;
+    }
+  }
+</style>

@@ -71,8 +71,8 @@ export default {
     signUpFormTitle: 'Sign up',
     forgetFormTitle: 'Reset password',
 
-    signInTitle: 'Backstage management system',
-    signInDesc: 'Enter your personal details and get started!',
+    signInTitle: 'A hobby of travel, photography program ape',
+    signInDesc: '',
     policy: 'I agree to the xxx Privacy Policy',
     scanSign: `scanning the code to complete the login`,
 
@@ -87,7 +87,7 @@ export default {
     loginSuccessDesc: 'Welcome back',
 
     // placeholder
-    accountPlaceholder: 'Please input username',
+    accountPlaceholder: 'Please input userName',
     passwordPlaceholder: 'Please input password',
     smsPlaceholder: 'Please input sms code',
     mobilePlaceholder: 'Please input mobile',
@@ -100,5 +100,6 @@ export default {
     email: 'Email',
     smsCode: 'SMS code',
     mobile: 'Mobile',
+    captcha: 'captcha',
   },
 };

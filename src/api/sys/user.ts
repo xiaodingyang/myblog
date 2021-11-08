@@ -5,6 +5,7 @@ import { ErrorMessageMode } from '/#/axios';
 
 enum Api {
   Login = '/login',
+  Captcha = '/captcha',
   Logout = '/logout',
   GetUserInfo = '/getUserInfo',
   GetPermCode = '/getPermCode',
@@ -23,6 +24,12 @@ export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') 
       errorMessageMode: mode,
     },
   );
+}
+/**
+ * @description: user login api
+ */
+export function getCaptcha() {
+  return defHttp.get({ url: Api.Captcha });
 }
 
 /**
