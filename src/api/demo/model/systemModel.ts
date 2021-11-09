@@ -6,7 +6,7 @@ export type AccountParams = BasicPageParams & {
 };
 
 export type RoleParams = {
-  roleName?: string;
+  nickName?: string;
   status?: string;
 };
 
@@ -53,7 +53,7 @@ export interface MenuListItem {
 
 export interface RoleListItem {
   id: string;
-  roleName: string;
+  nickName: string;
   roleValue: string;
   status: number;
   orderNo: string;

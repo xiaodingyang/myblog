@@ -166,7 +166,11 @@ export default {
   },
   system: {
     moduleName: 'System management',
-
+    moElseName: {
+      addUser: 'New account number',
+      editUser: 'Edit account number',
+      success: 'New account number success！',
+    },
     account: 'Account management',
     account_detail: 'Account detail',
     password: 'Change password',

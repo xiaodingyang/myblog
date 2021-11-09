@@ -161,6 +161,16 @@ export default {
   },
   system: {
     moduleName: '系统管理',
+    moElseName: {
+      addUser: '新增账号',
+      editUser: '编辑账号',
+      success: '新增用户成功！',
+      look: '查看用户详情',
+      editUser_: '编辑用户资料',
+      delete: '删除此账号',
+      deleteOk: '是否确认删除',
+      massDeletion: '批量删除',
+    },
     account: '账号管理',
     account_detail: '账号详情',
     password: '修改密码',

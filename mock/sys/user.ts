@@ -14,7 +14,7 @@ export function createFakeUserList() {
       homePath: '/dashboard/analysis',
       roles: [
         {
-          roleName: 'Super Admin',
+          nickName: 'Super Admin',
           value: 'super',
         },
       ],
@@ -30,7 +30,7 @@ export function createFakeUserList() {
       homePath: '/dashboard/workbench',
       roles: [
         {
-          roleName: 'Tester',
+          nickName: 'Tester',
           value: 'test',
         },
       ],

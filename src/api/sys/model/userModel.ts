@@ -8,7 +8,7 @@ export interface LoginParams {
 }
 
 export interface RoleInfo {
-  roleName: string;
+  nickName: string;
   value: string;
 }
 

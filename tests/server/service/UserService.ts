@@ -9,7 +9,7 @@ const fakeUserInfo = {
   token: 'fakeToken1',
   roles: [
     {
-      roleName: 'Super Admin',
+      nickName: 'Super Admin',
       value: 'super',
     },
   ],

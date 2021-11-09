@@ -7,15 +7,20 @@
   import { defineComponent, ref, computed, unref } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
+  import { addUser } from '/@/api/demo/system';
   import { accountFormSchema } from './account.data';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { useI18n } from '/@/hooks/web/useI18n';
 
   export default defineComponent({
     name: 'AccountModal',
     components: { BasicModal, BasicForm },
-    emits: ['success', 'register'],
+    emits: ['register'],
     setup(_, { emit }) {
       const isUpdate = ref(true);
       const rowId = ref('');
+      const { createMessage } = useMessage();
+      const { t } = useI18n();
 
       const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
         labelWidth: 100,
@@ -39,16 +44,23 @@
         }
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
+      const getTitle = computed(() =>
+        !unref(isUpdate)
+          ? t('routes.demo.system.moElseName.addUser')
+          : t('routes.demo.system.moElseName.editUser'),
+      );
 
       async function handleSubmit() {
         try {
           const values = await validate();
           setModalProps({ confirmLoading: true });
           // TODO custom api
-          console.log(values);
-          closeModal();
-          emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+          const result = await addUser(values);
+          if (result) {
+            closeModal();
+            createMessage.success(t('routes.demo.system.moElseName.success'));
+            // emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+          }
         } finally {
           setModalProps({ confirmLoading: false });
         }
