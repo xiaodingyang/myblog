@@ -4,22 +4,16 @@ import { h } from 'vue';
 import { Switch } from 'ant-design-vue';
 import { setRoleStatus } from '/@/api/demo/system';
 import { useMessage } from '/@/hooks/web/useMessage';
-
 export const columns: BasicColumn[] = [
   {
     title: '角色名称',
-    dataIndex: 'nickName',
+    dataIndex: 'roleName',
     width: 200,
   },
   {
     title: '角色值',
     dataIndex: 'roleValue',
     width: 180,
-  },
-  {
-    title: '排序',
-    dataIndex: 'sort',
-    width: 50,
   },
   {
     title: '状态',
@@ -38,7 +32,7 @@ export const columns: BasicColumn[] = [
           record.pendingStatus = true;
           const newStatus = checked ? '1' : '0';
           const { createMessage } = useMessage();
-          setRoleStatus(record.id, newStatus)
+          setRoleStatus({ id: record.id, status: newStatus })
             .then(() => {
               record.status = newStatus;
               createMessage.success(`已成功修改角色状态`);
@@ -56,7 +50,6 @@ export const columns: BasicColumn[] = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    width: 180,
   },
   {
     title: '备注',
@@ -66,10 +59,11 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'roleNme',
+    field: 'roleName',
     label: '角色名称',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '64px',
   },
   {
     field: 'status',
@@ -77,17 +71,24 @@ export const searchFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' },
+        { label: '启用', value: '1' },
+        { label: '停用', value: '0' },
       ],
     },
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '56px',
   },
 ];
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'nickName',
+    field: 'id',
+    label: 'id',
+    component: 'Input',
+    ifShow: false,
+  },
+  {
+    field: 'roleName',
     label: '角色名称',
     required: true,
     component: 'Input',
@@ -102,11 +103,11 @@ export const formSchema: FormSchema[] = [
     field: 'status',
     label: '状态',
     component: 'RadioButtonGroup',
-    defaultValue: '0',
+    defaultValue: '1',
     componentProps: {
       options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' },
+        { label: '启用', value: '1' },
+        { label: '停用', value: '0' },
       ],
     },
   },
@@ -117,7 +118,7 @@ export const formSchema: FormSchema[] = [
   },
   {
     label: ' ',
-    field: 'menu',
+    field: 'menuIds',
     slot: 'menu',
     component: 'Input',
   },

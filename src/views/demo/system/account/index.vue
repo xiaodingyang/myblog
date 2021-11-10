@@ -1,14 +1,16 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
-    <BasicTable
-      @register="registerTable"
-      :searchInfo="searchInfo"
-      :rowSelection="{ type: 'checkbox' }"
-    >
+    <BasicTable @register="registerTable" :searchInfo="searchInfo">
       <template #toolbar>
-        <a-button type="error" :disabled="!selects().length" @click="handleDelete">{{
-          t('routes.demo.system.moElseName.massDeletion')
-        }}</a-button>
+        <PopConfirmButton
+          type="error"
+          :disabled="!selects().length"
+          title="确定删除？"
+          ok-text="是"
+          cancel-text="否"
+          @confirm="handleDelete"
+          >{{ t('routes.demo.system.moElseName.massDeletion') }}
+        </PopConfirmButton>
         <a-button type="primary" @click="handleCreate">{{
           t('routes.demo.system.moElseName.addUser')
         }}</a-button>
@@ -18,20 +20,20 @@
           :actions="[
             {
               icon: 'clarity:info-standard-line',
-              tooltip: t('routes.demo.system.moElseName.look'),
+              tooltip: '查看详情',
               onClick: handleView.bind(null, record),
             },
             {
               icon: 'clarity:note-edit-line',
-              tooltip: t('routes.demo.system.moElseName.editUser_'),
+              tooltip: '编辑用户',
               onClick: handleEdit.bind(null, record),
             },
             {
               icon: 'ant-design:delete-outlined',
               color: 'error',
-              tooltip: t('routes.demo.system.moElseName.delete'),
+              tooltip: '删除用户',
               popConfirm: {
-                title: t('routes.demo.system.moElseName.deleteOk'),
+                title: '确定删除？',
                 confirm: handleDelete.bind(null, record),
               },
             },
@@ -39,7 +41,7 @@
         />
       </template>
     </BasicTable>
-    <AccountModal @register="registerModal" />
+    <AccountModal @register="registerModal" @success="handleFormSuccess" />
   </PageWrapper>
 </template>
 <script lang="ts">
@@ -56,10 +58,11 @@
   import { useGo } from '/@/hooks/web/usePage';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { PopConfirmButton } from '/@/components/Button';
 
   export default defineComponent({
     name: 'AccountManagement',
-    components: { BasicTable, PageWrapper, AccountModal, TableAction },
+    components: { BasicTable, PageWrapper, AccountModal, TableAction, PopConfirmButton },
     setup() {
       const go = useGo();
       const { t } = useI18n();
@@ -73,14 +76,17 @@
         rowKey: 'id',
         columns,
         formConfig: {
-          labelWidth: 70,
           schemas: searchFormSchema,
           autoSubmitOnEnter: true,
+          labelAlign: 'right',
         },
+        rowSelection: { type: 'checkbox' },
+        clickToRowSelect: false,
         useSearchForm: true,
         showTableSetting: true,
         bordered: true,
         handleSearchInfoFn(info) {
+          // 可以在查询前做一些操作
           console.log('handleSearchInfoFn', info);
           return info;
         },
@@ -118,19 +124,8 @@
           reload();
         }
       }
-      // function handleSuccess({ isUpdate, values }) {
-      //   if (isUpdate) {
-      //     // 演示不刷新表格直接更新内部数据。
-      //     // 注意：updateTableDataRecord要求表格的rowKey属性为string并且存在于每一行的record的keys中
-      //     const result = updateTableDataRecord(values.id, values);
-      //     console.log('result', result);
-      //   } else {
-      //     reload();
-      //   }
-      // }
 
-      function handleSelect(deptId = '') {
-        searchInfo.deptId = deptId;
+      function handleFormSuccess() {
         reload();
       }
 
@@ -144,12 +139,11 @@
         handleCreate,
         handleEdit,
         handleDelete,
-        handleSuccess,
-        handleSelect,
         handleView,
         searchInfo,
         t,
         selects,
+        handleFormSuccess,
       };
     },
   });

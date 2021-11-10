@@ -8,7 +8,7 @@ export const columns: BasicColumn[] = [
   {
     title: '菜单名称',
     dataIndex: 'menuName',
-    width: 200,
+    width: 150,
     align: 'left',
   },
   {
@@ -22,11 +22,12 @@ export const columns: BasicColumn[] = [
   {
     title: '权限标识',
     dataIndex: 'permission',
-    width: 180,
+    width: 120,
   },
   {
     title: '组件',
     dataIndex: 'component',
+    width: 150,
   },
   {
     title: '排序',
@@ -39,7 +40,7 @@ export const columns: BasicColumn[] = [
     width: 80,
     customRender: ({ record }) => {
       const status = record.status;
-      const enable = ~~status === 0;
+      const enable = ~~status === 1;
       const color = enable ? 'green' : 'red';
       const text = enable ? '启用' : '停用';
       return h(Tag, { color: color }, () => text);
@@ -48,7 +49,7 @@ export const columns: BasicColumn[] = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    width: 180,
+    width: 120,
   },
 ];
 
@@ -61,7 +62,8 @@ export const searchFormSchema: FormSchema[] = [
     field: 'menuName',
     label: '菜单名称',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '64px',
   },
   {
     field: 'status',
@@ -69,11 +71,12 @@ export const searchFormSchema: FormSchema[] = [
     component: 'Select',
     componentProps: {
       options: [
-        { label: '启用', value: '0' },
-        { label: '停用', value: '1' },
+        { label: '启用', value: '1' },
+        { label: '停用', value: '0' },
       ],
     },
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '56px',
   },
 ];
 
@@ -150,11 +153,11 @@ export const formSchema: FormSchema[] = [
     field: 'status',
     label: '状态',
     component: 'RadioButtonGroup',
-    defaultValue: '0',
+    defaultValue: '1',
     componentProps: {
       options: [
-        { label: '启用', value: '0' },
-        { label: '禁用', value: '1' },
+        { label: '启用', value: '1' },
+        { label: '禁用', value: '0' },
       ],
     },
   },
@@ -190,11 +193,11 @@ export const formSchema: FormSchema[] = [
     field: 'show',
     label: '是否显示',
     component: 'RadioButtonGroup',
-    defaultValue: '0',
+    defaultValue: '1',
     componentProps: {
       options: [
-        { label: '是', value: '0' },
-        { label: '否', value: '1' },
+        { label: '是', value: '1' },
+        { label: '否', value: '0' },
       ],
     },
     ifShow: ({ values }) => !isButton(values.type),

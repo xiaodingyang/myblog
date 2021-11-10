@@ -1,4 +1,18 @@
 export default {
+  common: {
+    yes: '是',
+    no: '否',
+    ok: '确定',
+    cancel: '取消',
+    success: '成功',
+    fail: '失败',
+    add: '新增',
+    edit: '编辑',
+    detail: '详情',
+    look: '查看',
+    deleteOk: '是否确认删除',
+    massDeletion: '批量删除',
+  },
   charts: {
     baiduMap: '百度地图',
     aMap: '高德地图',
@@ -161,21 +175,12 @@ export default {
   },
   system: {
     moduleName: '系统管理',
-    moElseName: {
-      addUser: '新增账号',
-      editUser: '编辑账号',
-      success: '新增用户成功！',
-      look: '查看用户详情',
-      editUser_: '编辑用户资料',
-      delete: '删除此账号',
-      deleteOk: '是否确认删除',
-      massDeletion: '批量删除',
-    },
     account: '账号管理',
     account_detail: '账号详情',
     password: '修改密码',
     dept: '部门管理',
     menu: '菜单管理',
+    menuInclude: {},
     role: '角色管理',
   },
   table: {

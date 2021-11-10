@@ -15,12 +15,24 @@
   export default defineComponent({
     name: 'AccountModal',
     components: { BasicModal, BasicForm },
-    emits: ['register'],
+    emits: ['success', 'register'],
     setup(_, { emit }) {
       const isUpdate = ref(true);
       const rowId = ref('');
       const { createMessage } = useMessage();
       const { t } = useI18n();
+
+      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+        resetFields();
+        setModalProps({ confirmLoading: false });
+        isUpdate.value = !!data?.isUpdate;
+        if (unref(isUpdate)) {
+          rowId.value = data.record.id;
+          setFieldsValue({
+            ...data.record,
+          });
+        }
+      });
 
       const [registerForm, { setFieldsValue, updateSchema, resetFields, validate }] = useForm({
         labelWidth: 100,
@@ -31,35 +43,20 @@
         },
       });
 
-      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-        resetFields();
-        setModalProps({ confirmLoading: false });
-        isUpdate.value = !!data?.isUpdate;
-
-        if (unref(isUpdate)) {
-          rowId.value = data.record.id;
-          setFieldsValue({
-            ...data.record,
-          });
-        }
-      });
-
-      const getTitle = computed(() =>
-        !unref(isUpdate)
-          ? t('routes.demo.system.moElseName.addUser')
-          : t('routes.demo.system.moElseName.editUser'),
-      );
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增账号' : '编辑账号'));
 
       async function handleSubmit() {
         try {
           const values = await validate();
+          const id = unref(rowId);
+          const params = id ? { ...values, id } : values;
+          const text = id ? '更新成功' : '新增成功';
           setModalProps({ confirmLoading: true });
-          // TODO custom api
-          const result = await addUser(values);
+          const result = await addUser(params);
           if (result) {
             closeModal();
-            createMessage.success(t('routes.demo.system.moElseName.success'));
-            // emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
+            createMessage.success(text);
+            emit('success', { isUpdate: unref(isUpdate), values: { ...values, id: rowId.value } });
           }
         } finally {
           setModalProps({ confirmLoading: false });

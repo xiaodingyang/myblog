@@ -27,8 +27,9 @@
   import { formSchema } from './role.data';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
   import { BasicTree, TreeItem } from '/@/components/Tree';
-
-  import { getMenuList } from '/@/api/demo/system';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { getMenuList, updateRole } from '/@/api/demo/system';
+  import { useI18n } from '/@/hooks/web/useI18n';
 
   export default defineComponent({
     name: 'RoleDrawer',
@@ -36,7 +37,10 @@
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const isUpdate = ref(true);
+      const rowId = ref('');
       const treeData = ref<TreeItem[]>([]);
+      const { createMessage } = useMessage();
+      const { t } = useI18n();
 
       const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
         labelWidth: 90,
@@ -49,11 +53,14 @@
         setDrawerProps({ confirmLoading: false });
         // 需要在setFieldsValue之前先填充treeData，否则Tree组件可能会报key not exist警告
         if (unref(treeData).length === 0) {
-          treeData.value = (await getMenuList()) as any as TreeItem[];
+          const result = (await getMenuList()) as any as TreeItem[];
+          if (result) {
+            treeData.value = result;
+          }
         }
         isUpdate.value = !!data?.isUpdate;
-
         if (unref(isUpdate)) {
+          rowId.value = data.record.id;
           setFieldsValue({
             ...data.record,
           });
@@ -65,11 +72,16 @@
       async function handleSubmit() {
         try {
           const values = await validate();
+          const id = unref(rowId);
+          const params = id ? { ...values, id } : values;
+          const text = id ? '更新成功' : '新增成功';
           setDrawerProps({ confirmLoading: true });
-          // TODO custom api
-          console.log(values);
-          closeDrawer();
-          emit('success');
+          const result = await updateRole(params);
+          if (result) {
+            createMessage.success(text);
+            closeDrawer();
+            emit('success');
+          }
         } finally {
           setDrawerProps({ confirmLoading: false });
         }

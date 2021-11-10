@@ -30,7 +30,6 @@ function joinParentPath(menus: Menu[], parentPath = '') {
 // Parsing the menu module
 export function transformMenuModule(menuModule: MenuModule): Menu {
   const { menu } = menuModule;
-
   const menuList = [menu];
 
   joinParentPath(menuList);
@@ -55,6 +54,7 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
       const { meta: { title, hideMenu = false } = {} } = node;
+      console.log('node', node);
 
       return {
         ...(node.meta || {}),
@@ -66,6 +66,7 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
       };
     },
   });
+  console.log('list', list);
   joinParentPath(list);
   return cloneDeep(list);
 }

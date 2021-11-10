@@ -30,11 +30,11 @@
   import { defineComponent, nextTick } from 'vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getMenuList } from '/@/api/demo/system';
+  import { getMenuList, deleteMenu } from '/@/api/demo/system';
 
   import { useDrawer } from '/@/components/Drawer';
   import MenuDrawer from './MenuDrawer.vue';
-
+  import { useMessage } from '/@/hooks/web/useMessage';
   import { columns, searchFormSchema } from './menu.data';
 
   export default defineComponent({
@@ -42,6 +42,7 @@
     components: { BasicTable, MenuDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
+      const { createMessage } = useMessage();
       const [registerTable, { reload, expandAll }] = useTable({
         title: '菜单列表',
         api: getMenuList,
@@ -80,8 +81,12 @@
         });
       }
 
-      function handleDelete(record: Recordable) {
-        console.log(record);
+      async function handleDelete(record: Recordable) {
+        const result = await deleteMenu({ id: record.id });
+        if (result) {
+          createMessage.success('删除成功！');
+          reload();
+        }
       }
 
       function handleSuccess() {

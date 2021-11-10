@@ -28,20 +28,19 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { getRoleListByPage } from '/@/api/demo/system';
-
+  import { getRoleListByPage, deleteRole } from '/@/api/demo/system';
   import { useDrawer } from '/@/components/Drawer';
   import RoleDrawer from './RoleDrawer.vue';
-
   import { columns, searchFormSchema } from './role.data';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     name: 'RoleManagement',
     components: { BasicTable, RoleDrawer, TableAction },
     setup() {
       const [registerDrawer, { openDrawer }] = useDrawer();
+      const { createMessage } = useMessage();
       const [registerTable, { reload }] = useTable({
         title: '角色列表',
         api: getRoleListByPage,
@@ -76,8 +75,12 @@
         });
       }
 
-      function handleDelete(record: Recordable) {
-        console.log(record);
+      async function handleDelete(record: Recordable) {
+        const result = await deleteRole({ id: record.id });
+        if (result) {
+          createMessage.success('删除成功！');
+          reload();
+        }
       }
 
       function handleSuccess() {

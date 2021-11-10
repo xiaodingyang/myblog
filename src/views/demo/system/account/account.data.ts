@@ -1,4 +1,5 @@
-import { getAllRoleList, isAccountExist } from '/@/api/demo/system';
+import { values } from 'lodash';
+import { getAllRoleList } from '/@/api/demo/system';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 
@@ -16,7 +17,7 @@ export const columns: BasicColumn[] = [
   {
     title: '邮箱',
     dataIndex: 'email',
-    width: 120,
+    width: 180,
   },
   {
     title: '创建时间',
@@ -30,7 +31,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '角色',
-    dataIndex: 'role',
+    dataIndex: 'roles',
     width: 200,
   },
   {
@@ -44,22 +45,30 @@ export const searchFormSchema: FormSchema[] = [
     field: 'userName',
     label: '用户名',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '50px',
   },
   {
     field: 'nickName',
     label: '昵称',
     component: 'Input',
-    colProps: { span: 8 },
+    colProps: { span: 5 },
+    labelWidth: '56px',
   },
 ];
 
 export const accountFormSchema: FormSchema[] = [
   {
+    field: 'id',
+    label: 'id',
+    component: 'Input',
+    ifShow: false,
+  },
+  {
     field: 'userName',
     label: '用户名',
     component: 'Input',
-    helpMessage: ['本字段演示异步验证', '不能输入带有admin的用户名'],
+    dynamicDisabled: ({ values }) => values.id,
     rules: [
       {
         required: true,
@@ -72,32 +81,20 @@ export const accountFormSchema: FormSchema[] = [
     label: '密码',
     component: 'InputPassword',
     required: true,
+    ifShow: ({ values }) => !values.id,
   },
   {
     label: '角色',
-    field: 'role',
+    field: 'roles',
     component: 'ApiSelect',
     componentProps: {
       api: getAllRoleList,
       labelField: 'roleName',
       valueField: 'roleValue',
+      mode: 'multiple',
     },
     required: true,
   },
-  // {
-  //   field: 'dept',
-  //   label: '所属部门',
-  //   component: 'TreeSelect',
-  //   componentProps: {
-  //     replaceFields: {
-  //       title: 'deptName',
-  //       key: 'id',
-  //       value: 'id',
-  //     },
-  //     getPopupContainer: () => document.body,
-  //   },
-  //   required: true,
-  // },
   {
     field: 'nickName',
     label: '昵称',

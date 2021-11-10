@@ -169,8 +169,15 @@ export default {
     moElseName: {
       addUser: 'New account number',
       editUser: 'Edit account number',
-      success: 'New account number success！',
+      addSuccess: 'New account number success！',
+      updateSuccess: 'Update account number success！',
+      look: 'View user details',
+      editUser_: 'Edit user data',
+      delete: 'Delete this account',
+      deleteOk: 'Verify the deletion',
+      massDeletion: 'Mass deletion',
     },
+
     account: 'Account management',
     account_detail: 'Account detail',
     password: 'Change password',
