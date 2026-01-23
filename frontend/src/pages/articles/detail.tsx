@@ -1,0 +1,294 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, Link, history } from 'umi';
+import { Typography, Tag, Space, Avatar, Divider, Card, Button, Form, Input, message } from 'antd';
+import { useModel } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
+import {
+  ClockCircleOutlined,
+  EyeOutlined,
+  FolderOutlined,
+  TagOutlined,
+  UserOutlined,
+  ArrowLeftOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons';
+import { request } from 'umi';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import dayjs from 'dayjs';
+import Loading from '@/components/Loading';
+import Empty from '@/components/Empty';
+
+const { Title, Text, Paragraph } = Typography;
+const { TextArea } = Input;
+
+const ArticleDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState(true);
+  const [article, setArticle] = useState<API.Article | null>(null);
+  const { themeId: colorThemeId } = useModel('colorModel');
+  const currentColorTheme = getColorThemeById(colorThemeId);
+  const [messages, setMessages] = useState<API.Message[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      setLoading(true);
+      try {
+        const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
+        if (res.code === 0) {
+          setArticle(res.data);
+        } else {
+          message.error(res.message || '文章不存在');
+        }
+      } catch (error) {
+        message.error('获取文章失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchArticle();
+    }
+  }, [id]);
+
+  const handleSubmitMessage = async (values: { nickname: string; email: string; content: string }) => {
+    setSubmitting(true);
+    try {
+      const res = await request<API.Response<API.Message>>('/api/messages', {
+        method: 'POST',
+        data: values,
+      });
+      if (res.code === 0) {
+        message.success('留言提交成功，等待审核');
+        form.resetFields();
+      } else {
+        message.error(res.message || '留言提交失败');
+      }
+    } catch (error) {
+      message.error('留言提交失败');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: article?.title,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      message.success('链接已复制到剪贴板');
+    }
+  };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!article) {
+    return (
+      <div className="py-16">
+        <Empty 
+          description="文章不存在或已删除" 
+          showAction 
+          actionText="返回文章列表"
+          actionLink="/articles"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in">
+      {/* 文章头部 */}
+      <section
+        className="relative py-16 md:py-24 overflow-hidden"
+        style={{
+          background: article.cover
+            ? `linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url(${article.cover}) center/cover no-repeat`
+            : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-6">
+          <Button
+            type="link"
+            icon={<ArrowLeftOutlined />}
+            onClick={() => history.back()}
+            className="!text-white/70 hover:!text-white !pl-0 mb-8"
+          >
+            返回
+          </Button>
+
+          {/* 分类 */}
+          <div className="mb-4">
+            <Link to={`/category/${article.category?._id}`}>
+              <Tag
+                color="pink"
+                className="!px-4 !py-1 !text-sm !border-none"
+                style={{
+                  background: `${currentColorTheme.primary}4d`, // 主题色
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                <FolderOutlined className="mr-2" />
+                {article.category?.name || '未分类'}
+              </Tag>
+            </Link>
+          </div>
+
+          {/* 标题 */}
+          <Title level={1} className="!text-white !mb-6" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
+            {article.title}
+          </Title>
+
+          {/* 元信息 */}
+          <div className="flex flex-wrap items-center gap-6 text-white/70">
+            <Space>
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                src={article.author?.avatar}
+                style={{ background: currentColorTheme.primary }} // 主题色
+              />
+              <span>{article.author?.username || '匿名'}</span>
+            </Space>
+            <Space>
+              <ClockCircleOutlined />
+              <span>{dayjs(article.createdAt).format('YYYY年MM月DD日')}</span>
+            </Space>
+            <Space>
+              <EyeOutlined />
+              <span>{article.views || 0} 阅读</span>
+            </Space>
+          </div>
+
+          {/* 标签 */}
+          {article.tags?.length > 0 && (
+            <div className="mt-6">
+              <Space wrap>
+                {article.tags.map(tag => (
+                  <Link key={tag._id} to={`/tag/${tag._id}`}>
+                    <Tag
+                      className="!border-white/20 !bg-white/10 !text-white/80 hover:!bg-white/20 transition-colors"
+                    >
+                      <TagOutlined className="mr-1" />
+                      {tag.name}
+                    </Tag>
+                  </Link>
+                ))}
+              </Space>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 文章内容 */}
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-6">
+          <Card
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+            }}
+          >
+            <div className="markdown-body">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+              >
+                {article.content}
+              </ReactMarkdown>
+            </div>
+
+            <Divider />
+
+            {/* 分享和操作 */}
+            <div className="flex items-center justify-between">
+              <Space>
+                <Text className="text-gray-500">
+                  最后更新于 {dayjs(article.updatedAt).format('YYYY-MM-DD HH:mm')}
+                </Text>
+              </Space>
+              <Button
+                type="default"
+                icon={<ShareAltOutlined />}
+                onClick={handleShare}
+              >
+                分享
+              </Button>
+            </div>
+          </Card>
+
+          {/* 留言区 */}
+          <Card
+            className="mt-8"
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+            }}
+          >
+            <Title level={4} className="!mb-6">
+              💬 发表评论
+            </Title>
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmitMessage}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Form.Item
+                  name="nickname"
+                  label="昵称"
+                  rules={[{ required: true, message: '请输入昵称' }]}
+                >
+                  <Input placeholder="请输入昵称" size="large" />
+                </Form.Item>
+                <Form.Item
+                  name="email"
+                  label="邮箱"
+                  rules={[
+                    { required: true, message: '请输入邮箱' },
+                    { type: 'email', message: '请输入正确的邮箱格式' },
+                  ]}
+                >
+                  <Input placeholder="请输入邮箱（不会公开）" size="large" />
+                </Form.Item>
+              </div>
+              <Form.Item
+                name="content"
+                label="评论内容"
+                rules={[
+                  { required: true, message: '请输入评论内容' },
+                  { min: 5, message: '评论内容至少5个字符' },
+                ]}
+              >
+                <TextArea
+                  placeholder="写下你的评论..."
+                  rows={4}
+                  showCount
+                  maxLength={500}
+                />
+              </Form.Item>
+              <Form.Item className="!mb-0">
+                <Button type="primary" htmlType="submit" loading={submitting} size="large">
+                  提交评论
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default ArticleDetailPage;

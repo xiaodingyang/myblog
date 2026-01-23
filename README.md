@@ -1,169 +1,258 @@
-<div align="center"> <a href="https://github.com/anncwb/vue-vben-admin"> <img alt="VbenAdmin Logo" width="200" height="200" src="https://anncwb.github.io/anncwb/images/logo.png"> </a> <br> <br>
+# 个人博客系统
 
-[![license](https://img.shields.io/github/license/anncwb/vue-vben-admin.svg)](LICENSE)
+一个基于 **Umi 4 + Ant Design 5 + Express + MongoDB** 的全栈个人博客系统。
 
-<h1>Vue vben admin</h1>
-</div>
+## 🌟 特性
 
-**English** | [中文](./README.zh-CN.md)
+### 前台功能
+- 📝 文章列表、详情展示，支持 Markdown 渲染
+- 🗂️ 文章分类、标签筛选
+- 🔍 文章搜索
+- 💬 留言板
+- 📱 响应式设计，支持移动端
 
-## Introduction
+### 后台功能
+- 📊 数据统计仪表盘
+- ✍️ 文章管理（CRUD、草稿/发布状态）
+- 📁 分类管理
+- 🏷️ 标签管理
+- 💬 留言审核
+- 👤 个人设置
 
-Vue Vben Admin is a free and open source middle and back-end template. Using the latest `vue3`, `vite2`, `TypeScript` and other mainstream technology development, the out-of-the-box middle and back-end front-end solutions can also be used for learning reference.
+## 🛠️ 技术栈
 
-## Feature
+### 前端
+- **框架**: React 18 + Umi 4
+- **UI 库**: Ant Design 5.x
+- **样式**: Tailwind CSS 3.x
+- **状态管理**: Umi Model
+- **Markdown**: react-markdown + remark-gfm
 
-- **State of The Art Development**：Use front-end front-end technology development such as Vue3/vite2
-- **TypeScript**: Application-level JavaScript language
-- **Theming**: Configurable themes
-- **International**：Built-in complete internationalization program
-- **Mock Server** Built-in mock data scheme
-- **Authority** Built-in complete dynamic routing permission generation scheme.
-- **Component** Multiple commonly used components are encapsulated twice
+### 后端
+- **运行时**: Node.js 18+
+- **框架**: Express.js
+- **数据库**: MongoDB + Mongoose
+- **认证**: JWT (jsonwebtoken)
+- **验证**: Joi
+- **文件上传**: Multer
 
-## 预览
-
-- [vue-vben-admin](https://vvbin.cn/next/) - Full version Chinese site
-- [vue-vben-admin-gh-pages](https://anncwb.github.io/vue-vben-admin/) - Full version of the github site
-- [vben-admin-thin-next](https://vvbin.cn/thin/next/) - Simplified Chinese site
-- [vben-admin-thin-gh-pages](https://anncwb.github.io/vben-admin-thin-next/) -Simplified github site
-
-Test account: vben/123456
-
-<p align="center">
-    <img alt="VbenAdmin Logo" width="100%" src="https://anncwb.github.io/anncwb/images/preview1.png">
-    <img alt="VbenAdmin Logo" width="100%" src="https://anncwb.github.io/anncwb/images/preview2.png">
-    <img alt="VbenAdmin Logo" width="100%" src="https://anncwb.github.io/anncwb/images/preview3.png">
-</p>
-
-### Use Gitpod
-
-Open the project in Gitpod (free online dev environment for GitHub) and start coding immediately.
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/anncwb/vue-vben-admin)
-
-## Documentation
-
-[Document](https://vvbin.cn/doc-next/)
-
-## Preparation
-
-- [node](http://nodejs.org/) and [git](https://git-scm.com/) - Project development environment
-- [Vite](https://vitejs.dev/) - Familiar with vite features
-- [Vue3](https://v3.vuejs.org/) - Familiar with Vue basic syntax
-- [TypeScript](https://www.typescriptlang.org/) - Familiar with the basic syntax of `TypeScript`
-- [Es6+](http://es6.ruanyifeng.com/) - Familiar with es6 basic syntax
-- [Vue-Router-Next](https://next.router.vuejs.org/) - Familiar with the basic use of vue-router
-- [Ant-Design-Vue](https://2x.antdv.com/docs/vue/introduce-cn/) - ui basic use
-- [Mock.js](https://github.com/nuysoft/Mock) - mockjs basic syntax
-
-## Install and use
-
-- Get the project code
-
-```bash
-git clone https://github.com/anncwb/vue-vben-admin.git
-```
-
-- Installation dependencies
-
-```bash
-cd vue-vben-admin
-
-yarn install
+## 📁 项目结构
 
 ```
-
-- run
-
-```bash
-yarn serve
+├── frontend/                # 前端项目
+│   ├── src/
+│   │   ├── components/      # 公共组件
+│   │   ├── layouts/         # 布局组件
+│   │   ├── models/          # 全局状态
+│   │   ├── pages/           # 页面组件
+│   │   │   ├── home/        # 首页
+│   │   │   ├── articles/    # 文章
+│   │   │   ├── categories/  # 分类
+│   │   │   ├── tags/        # 标签
+│   │   │   ├── message/     # 留言
+│   │   │   ├── about/       # 关于
+│   │   │   └── admin/       # 后台管理
+│   │   └── app.tsx          # 应用入口
+│   ├── mock/                # Mock 数据
+│   ├── .umirc.ts            # Umi 配置
+│   └── package.json
+│
+├── backend/                 # 后端项目
+│   ├── src/
+│   │   ├── config/          # 配置文件
+│   │   ├── controllers/     # 控制器
+│   │   ├── middlewares/     # 中间件
+│   │   ├── models/          # 数据模型
+│   │   ├── routes/          # 路由
+│   │   ├── scripts/         # 脚本
+│   │   └── index.js         # 入口文件
+│   ├── uploads/             # 文件上传目录
+│   └── package.json
+│
+└── README.md
 ```
 
-- build
+## 🚀 快速开始
+
+### 环境要求
+- Node.js 18+
+- MongoDB 6+
+- pnpm 8+
+
+### 1. 克隆项目
 
 ```bash
-yarn build
+git clone <repository-url>
+cd 博客
 ```
 
-## Change Log
+### 2. 安装依赖
 
-[CHANGELOG](./CHANGELOG.zh_CN.md)
+```bash
+# 前端
+cd frontend
+pnpm install
 
-## Project
+# 后端
+cd ../backend
+pnpm install
+```
 
-- [vue-vben-admin](https://github.com/anncwb/vue-vben-admin) - full version
-- [vue-vben-admin-thin-next](https://github.com/anncwb/vben-admin-thin-next) - Simplified version
+### 3. 配置环境变量
 
-## How to contribute
+```bash
+# 后端配置
+cd backend
+cp .env.example .env
+# 编辑 .env 文件，配置数据库连接等
+```
 
-You are very welcome to join！[Raise an issue](https://github.com/anncwb/vue-vben-admin/issues/new/choose) Or submit a Pull Request。
+### 4. 初始化数据库
 
-**Pull Request:**
+```bash
+cd backend
+node src/scripts/seed.js
+```
 
-1. Fork code!
-2. Create your own branch: `git checkout -b feat/xxxx`
-3. Submit your changes: `git commit -am 'feat(function): add xxxxx'`
-4. Push your branch: `git push origin feat/xxxx`
-5. submit`pull request`
+### 5. 启动项目
 
-## Git Contribution submission specification
+```bash
+# 启动后端 (端口 3000)
+cd backend
+pnpm dev
 
-- reference [vue](https://github.com/vuejs/vue/blob/dev/.github/COMMIT_CONVENTION.md) specification ([Angular](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular))
+# 启动前端 (端口 8000)
+cd frontend
+pnpm dev
+```
 
-  - `feat` Add new features
-  - `fix` Fix the problem/BUG
-  - `style` The code style is related and does not affect the running result
-  - `perf` Optimization/performance improvement
-  - `refactor` Refactor
-  - `revert` Undo edit
-  - `test` Test related
-  - `docs` Documentation/notes
-  - `chore` Dependency update/scaffolding configuration modification etc.
-  - `workflow` Workflow improvements
-  - `ci` Continuous integration
-  - `types` Type definition file changes
-  - `wip` In development
+### 6. 访问项目
 
-## Related warehouse
+- 前台: http://localhost:8000
+- 后台: http://localhost:8000/admin/login
+- 默认账号: admin / admin123
 
-If these plugins are helpful to you, you can give a star support
+## 📝 API 文档
 
-- [vite-plugin-mock](https://github.com/anncwb/vite-plugin-mock) - Used for local and development environment data mock
-- [vite-plugin-html](https://github.com/anncwb/vite-plugin-html) - Used for html template conversion and compression
-- [vite-plugin-style-import](https://github.com/anncwb/vite-plugin-style-import) - Used for component library style introduction on demand
-- [vite-plugin-theme](https://github.com/anncwb/vite-plugin-theme) - Used for online switching of theme colors and other color-related configurations
-- [vite-plugin-imagemin](https://github.com/anncwb/vite-plugin-imagemin) - Used to pack compressed image resources
-- [vite-plugin-compression](https://github.com/anncwb/vite-plugin-compression) - Used to pack input .gz|.brotil files
-- [vite-plugin-svg-icons](https://github.com/anncwb/vite-plugin-svg-icons) - Used to quickly generate svg sprite
+### 认证接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| POST | /api/auth/register | 用户注册 |
+| POST | /api/auth/login | 用户登录 |
+| GET | /api/auth/profile | 获取用户信息 |
+| PUT | /api/auth/profile | 更新用户信息 |
+| PUT | /api/auth/password | 修改密码 |
 
-## Browser support
+### 文章接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/articles | 获取文章列表 |
+| GET | /api/articles/:id | 获取文章详情 |
+| GET | /api/admin/articles | 获取文章列表(后台) |
+| POST | /api/admin/articles | 创建文章 |
+| PUT | /api/admin/articles/:id | 更新文章 |
+| DELETE | /api/admin/articles/:id | 删除文章 |
 
-The `Chrome 80+` browser is recommended for local development
+### 分类接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/categories | 获取分类列表 |
+| POST | /api/admin/categories | 创建分类 |
+| PUT | /api/admin/categories/:id | 更新分类 |
+| DELETE | /api/admin/categories/:id | 删除分类 |
 
-Support modern browsers, not IE
+### 标签接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/tags | 获取标签列表 |
+| POST | /api/admin/tags | 创建标签 |
+| PUT | /api/admin/tags/:id | 更新标签 |
+| DELETE | /api/admin/tags/:id | 删除标签 |
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt=" Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt=" Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| :-: | :-: | :-: | :-: | :-: |
-| not support | last 2 versions | last 2 versions | last 2 versions | last 2 versions |
+### 留言接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/messages | 获取留言列表 |
+| POST | /api/messages | 提交留言 |
+| GET | /api/admin/messages | 获取留言列表(后台) |
+| PUT | /api/admin/messages/:id/review | 审核留言 |
+| DELETE | /api/admin/messages/:id | 删除留言 |
 
-## Maintainer
+### 其他接口
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| POST | /api/upload | 文件上传 |
+| GET | /api/admin/statistics | 获取统计数据 |
 
-[@Vben](https://github.com/anncwb)
+## 🔧 配置说明
 
-## Donate
+### 前端配置 (.umirc.ts)
 
-If you think this project is helpful to you, you can help the author buy a cup of coffee to show your support!
+```typescript
+export default defineConfig({
+  proxy: {
+    '/api': {
+      target: 'http://localhost:3000',
+      changeOrigin: true,
+    },
+  },
+});
+```
 
-![donate](https://anncwb.github.io/anncwb/images/sponsor.png)
+### 后端配置 (.env)
 
-<a style="display: block;width: 100px;height: 50px;line-height: 50px; color: #fff;text-align: center; background: #408aed;border-radius: 4px;" href="https://www.paypal.com/paypalme/cvvben">Paypal Me</a>
+```bash
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/blog
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=7d
+```
 
-## Discord
+## 📦 部署
 
-- [github discussions](https://github.com/anncwb/vue-vben-admin/discussions)
-- [Discord](https://discord.gg/8GuAdwDhj6)
+### 前端部署
 
-## License
+```bash
+cd frontend
+pnpm build
+# 将 dist 目录部署到静态服务器
+```
 
-[MIT © Vben-2020](./LICENSE)
+### 后端部署
+
+```bash
+cd backend
+# 使用 PM2 启动
+pm2 start src/index.js --name blog-api
+```
+
+### Nginx 配置示例
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    # 前端静态文件
+    location / {
+        root /path/to/frontend/dist;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API 代理
+    location /api {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # 上传文件
+    location /uploads {
+        proxy_pass http://127.0.0.1:3000;
+    }
+}
+```
+
+## 📄 License
+
+MIT License
