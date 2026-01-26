@@ -117,12 +117,12 @@ const ArticleDetailPage: React.FC = () => {
             : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
         }}
       >
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
           <Button
             type="link"
             icon={<ArrowLeftOutlined />}
             onClick={() => history.back()}
-            className="!text-white/70 hover:!text-white !pl-0 mb-8"
+            className="!text-white/70 hover:!text-white !pl-0 mb-4 md:mb-8"
           >
             返回
           </Button>
@@ -150,7 +150,7 @@ const ArticleDetailPage: React.FC = () => {
           </Title>
 
           {/* 元信息 */}
-          <div className="flex flex-wrap items-center gap-6 text-white/70">
+          <div className="flex flex-wrap items-center gap-3 md:gap-6 text-white/70 text-sm md:text-base">
             <Space>
               <Avatar
                 size={40}
@@ -191,8 +191,8 @@ const ArticleDetailPage: React.FC = () => {
       </section>
 
       {/* 文章内容 */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-6">
+      <section className="py-8 md:py-12">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
           <Card
             style={{
               borderRadius: 16,
@@ -216,10 +216,12 @@ const ArticleDetailPage: React.FC = () => {
                         customStyle={{
                           margin: '1em 0',
                           borderRadius: '8px',
-                          fontSize: '14px',
+                          fontSize: '12px',
+                          overflowX: 'auto',
                         }}
                         showLineNumbers
                         wrapLines
+                        wrapLongLines
                       >
                         {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>

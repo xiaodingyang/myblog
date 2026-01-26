@@ -30,16 +30,16 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
         }}
         cover={
           article.cover ? (
-            <div className="relative h-48 overflow-hidden">
+            <div className="relative h-40 md:h-48 overflow-hidden">
               <img
                 alt={article.title}
                 src={article.cover}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4">
+              <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4">
                 <Tag 
-                  className="!border-none !text-white !px-3 !py-1 !rounded-lg"
+                  className="!border-none !text-white !px-2 md:!px-3 !py-0.5 md:!py-1 !rounded-lg !text-xs md:!text-sm"
                   style={{ 
                     background: 'rgba(255, 255, 255, 0.2)',
                     backdropFilter: 'blur(8px)',
@@ -54,7 +54,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
             </div>
           ) : (
             <div 
-              className="h-48 flex items-center justify-center"
+              className="h-40 md:h-48 flex items-center justify-center"
               style={{
                 background: currentColorTheme.gradient, // 主题色渐变
               }}
@@ -66,12 +66,12 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
           )
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {/* 标题 */}
           <Title 
-            level={4} 
+            level={5} 
             ellipsis={{ rows: 2 }}
-            className="!mb-0 hover:text-primary transition-colors"
+            className="!mb-0 hover:text-primary transition-colors !text-sm md:!text-base"
             style={{ 
               color: '#1e293b',
               textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -83,7 +83,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
           {/* 摘要 */}
           <Paragraph 
             ellipsis={{ rows: 2 }}
-            className="!mb-0 text-gray-500"
+            className="!mb-0 text-gray-500 !text-xs md:!text-sm"
             style={{
               textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
             }}
@@ -93,47 +93,47 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
 
           {/* 标签 */}
           <div className="flex flex-wrap gap-1">
-            {article.tags?.slice(0, 3).map(tag => (
+            {article.tags?.slice(0, 2).map(tag => (
               <Tag 
                 key={tag._id} 
-                className="!border-gray-200 !bg-gray-50 !text-gray-600"
+                className="!border-gray-200 !bg-gray-50 !text-gray-600 !text-xs"
               >
                 {tag.name}
               </Tag>
             ))}
-            {article.tags?.length > 3 && (
-              <Tag className="!border-gray-200 !bg-gray-50 !text-gray-400">
-                +{article.tags.length - 3}
+            {article.tags?.length > 2 && (
+              <Tag className="!border-gray-200 !bg-gray-50 !text-gray-400 !text-xs">
+                +{article.tags.length - 2}
               </Tag>
             )}
           </div>
 
           {/* 底部信息 */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-2 md:pt-3 border-t border-gray-100">
             <Space size={4}>
               <Avatar 
-                size={24} 
+                size={20} 
                 icon={<UserOutlined />}
                 src={article.author?.avatar}
                 style={{ background: currentColorTheme.primary }} // 主题色
               />
-              <Text className="text-gray-500 text-sm">
+              <Text className="text-gray-500 text-xs md:text-sm">
                 {article.author?.username || '匿名'}
               </Text>
             </Space>
             <Space 
-              className="text-gray-400 text-sm" 
-              split={<span className="mx-1">·</span>}
+              className="text-gray-400 text-xs md:text-sm" 
+              split={<span className="mx-0.5 md:mx-1">·</span>}
               style={{
                 textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
               }}
             >
               <span>
-                <EyeOutlined className="mr-1" />
+                <EyeOutlined className="mr-0.5 md:mr-1" />
                 {article.views || 0}
               </span>
               <span>
-                <ClockCircleOutlined className="mr-1" />
+                <ClockCircleOutlined className="mr-0.5 md:mr-1" />
                 {dayjs(article.createdAt).format('MM-DD')}
               </span>
             </Space>

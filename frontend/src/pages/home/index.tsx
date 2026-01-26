@@ -107,8 +107,8 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      {/* 导航点指示器 */}
-      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 flex flex-col gap-4">
+      {/* 导航点指示器 - 移动端隐藏 */}
+      <div className="hidden md:flex fixed right-4 lg:right-6 top-1/2 transform -translate-y-1/2 z-50 flex-col gap-3">
         {sections.map((_, index) => {
           const isActive = currentSection === index;
           // 根据当前屏幕决定颜色（深色屏用白色，浅色屏用深色）
@@ -190,7 +190,7 @@ const HomePage: React.FC = () => {
           ))}
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
           {/* 左侧文字 */}
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-8 border border-white/10">
@@ -265,7 +265,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* 统计数据 */}
-            <div className="flex justify-center lg:justify-start gap-12 mt-16">
+            <div className="flex justify-center lg:justify-start gap-6 md:gap-12 mt-10 md:mt-16">
               {[
                 { label: '文章', value: articles.length || '0', icon: '📝' },
                 { label: '分类', value: categories.length || '0', icon: '📂' },
@@ -386,15 +386,15 @@ const HomePage: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 w-full">
-          <div className="text-center mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-600 mb-4">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
+          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-orange-100 text-orange-600 mb-3 md:mb-4 text-sm md:text-base">
               <FireOutlined />
               <span className="font-medium">热门推荐</span>
             </div>
             <Title
               level={2}
-              className="!text-4xl lg:!text-5xl !mb-4"
+              className="!text-2xl md:!text-4xl lg:!text-5xl !mb-2 md:!mb-4"
               style={{
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               }}
@@ -414,12 +414,12 @@ const HomePage: React.FC = () => {
           {loading ? (
             <div className="text-center text-gray-400">加载中...</div>
           ) : articles.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
               {/* 主推文章 */}
               <div className="lg:col-span-7">
                 <Link to={`/article/${articles[0]?._id}`} className="block group h-full">
                   <div
-                    className="relative overflow-hidden rounded-3xl h-full min-h-[400px]"
+                    className="relative overflow-hidden rounded-2xl md:rounded-3xl h-full min-h-[280px] md:min-h-[400px]"
                     style={{
                       background: currentColorTheme.gradient, // 主题色渐变
                     }}
@@ -428,15 +428,15 @@ const HomePage: React.FC = () => {
                       <div className="absolute top-10 right-10 w-40 h-40 border-2 border-white rounded-full" />
                       <div className="absolute bottom-10 left-10 w-24 h-24 border-2 border-white rounded-full" />
                     </div>
-                    <div className="relative z-10 p-10 h-full flex flex-col justify-between">
+                    <div className="relative z-10 p-6 md:p-10 h-full flex flex-col justify-between">
                       <div>
-                        <Tag className="!bg-white/20 !border-none !text-white !rounded-full !px-4 !py-1 !text-sm">
+                        <Tag className="!bg-white/20 !border-none !text-white !rounded-full !px-3 md:!px-4 !py-1 !text-xs md:!text-sm">
                           {articles[0]?.category?.name || '未分类'}
                         </Tag>
-                        <Title level={2} className="!text-white !mt-6 !mb-4 !text-3xl lg:!text-4xl group-hover:!underline">
+                        <Title level={2} className="!text-white !mt-4 md:!mt-6 !mb-2 md:!mb-4 !text-xl md:!text-3xl lg:!text-4xl group-hover:!underline">
                           {articles[0]?.title}
                         </Title>
-                        <Paragraph className="!text-white/80 !text-lg !mb-0 line-clamp-3">
+                        <Paragraph className="!text-white/80 !text-sm md:!text-lg !mb-0 line-clamp-2 md:line-clamp-3">
                           {articles[0]?.summary}
                         </Paragraph>
                       </div>
@@ -514,10 +514,10 @@ const HomePage: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 w-full">
-          <div className="text-center mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
+          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4 text-sm md:text-base"
               style={{
                 background: `${currentColorTheme.primary}20`,
                 color: currentColorTheme.primary,
@@ -528,7 +528,7 @@ const HomePage: React.FC = () => {
             </div>
             <Title
               level={2}
-              className="!text-4xl lg:!text-5xl !mb-4"
+              className="!text-2xl md:!text-4xl lg:!text-5xl !mb-2 md:!mb-4"
               style={{
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               }}
@@ -546,7 +546,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {articles.length > 3 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
               {articles.slice(3, 6).map((article, index) => (
                 <Link key={article._id} to={`/article/${article._id}`} className="block group">
                   <div
@@ -683,10 +683,10 @@ const HomePage: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 w-full">
-          <div className="text-center mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
+          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4 text-sm md:text-base"
               style={{
                 background: `${currentColorTheme.primary}20`,
                 color: currentColorTheme.primary,
@@ -697,7 +697,7 @@ const HomePage: React.FC = () => {
             </div>
             <Title
               level={2}
-              className="!text-4xl lg:!text-5xl !mb-4"
+              className="!text-2xl md:!text-4xl lg:!text-5xl !mb-2 md:!mb-4"
               style={{
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               }}
@@ -705,7 +705,7 @@ const HomePage: React.FC = () => {
               探索更多
             </Title>
             <Text
-              className="text-gray-500 text-lg"
+              className="text-gray-500 text-sm md:text-lg"
               style={{
                 textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
               }}
@@ -714,9 +714,9 @@ const HomePage: React.FC = () => {
             </Text>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* 分类 */}
-            <div className="bg-white rounded-3xl p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
+            <div className="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
                 <Title
                   level={3}
@@ -783,7 +783,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* 标签云 */}
-            <div className="bg-white rounded-3xl p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
+            <div className="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
                 <Title
                   level={3}
@@ -867,29 +867,29 @@ const HomePage: React.FC = () => {
           />
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center bg-black/50 backdrop-blur-sm rounded-3xl p-12 shadow-2xl">
-          <div className="mb-8">
-            <span className="text-6xl">👋</span>
+        <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center bg-black/50 backdrop-blur-sm rounded-2xl md:rounded-3xl p-6 md:p-12 shadow-2xl">
+          <div className="mb-4 md:mb-8">
+            <span className="text-4xl md:text-6xl">👋</span>
           </div>
 
           <Title
             level={1}
-            className="!text-white !mb-6"
-            style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 800 }}
+            className="!text-white !mb-4 md:!mb-6"
+            style={{ fontSize: 'clamp(1.5rem, 6vw, 4rem)', fontWeight: 800 }}
           >
             想要了解更多？
           </Title>
 
-          <Paragraph className="!text-gray-400 !text-xl !mb-12 max-w-2xl mx-auto">
+          <Paragraph className="!text-gray-400 !text-base md:!text-xl !mb-8 md:!mb-12 max-w-2xl mx-auto">
             欢迎访问留言板与我交流，或者查看关于页面了解更多信息。
             期待与你的每一次对话！
           </Paragraph>
 
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-3 md:gap-6">
             <Link to="/message">
               <Button
                 size="large"
-                className="!h-16 !px-12 !rounded-full !font-bold !text-lg !border-none"
+                className="!h-12 md:!h-16 !px-6 md:!px-12 !rounded-full !font-bold !text-sm md:!text-lg !border-none"
                 style={{
                   background: currentColorTheme.gradient, // 主题色渐变
                   color: 'white',
@@ -903,7 +903,7 @@ const HomePage: React.FC = () => {
               <Button
                 size="large"
                 ghost
-                className="!h-16 !px-12 !rounded-full !font-bold !text-lg !text-white !border-white/30 hover:!bg-white/10"
+                className="!h-12 md:!h-16 !px-6 md:!px-12 !rounded-full !font-bold !text-sm md:!text-lg !text-white !border-white/30 hover:!bg-white/10"
               >
                 🙋 关于我
               </Button>

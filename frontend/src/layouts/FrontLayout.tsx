@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'umi';
-import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider } from 'antd';
+import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
   HomeOutlined,
@@ -12,6 +12,8 @@ import {
   GithubOutlined,
   MailOutlined,
   SearchOutlined,
+  MenuOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import ParticlesBackground from '@/components/ParticlesBackground';
@@ -30,6 +32,7 @@ const FrontLayout: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentTheme = getThemeById(themeId);
   const currentColorTheme = getColorThemeById(colorThemeId);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // 获取主题背景色 - 现在由毛玻璃背景组件处理，Layout 使用透明背景
   const getBackgroundStyle = () => {
@@ -133,12 +136,15 @@ const FrontLayout: React.FC = () => {
       {/* 头部导航 */}
       <Header 
         className="fixed w-full z-50 px-4 md:px-8 flex items-center justify-between"
-        style={getHeaderStyle()}
+        style={{
+          ...getHeaderStyle(),
+          overflow: 'visible',
+        }}
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 no-underline">
+        <Link to="/" className="flex items-center gap-2 md:gap-3 no-underline shrink-0">
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-bold text-base md:text-lg"
             style={{
               background: currentColorTheme.gradient,
             }}
@@ -150,31 +156,151 @@ const FrontLayout: React.FC = () => {
           </Title>
         </Link>
 
-        {/* 导航菜单 */}
+        {/* PC端导航菜单 */}
         <Menu
           mode="horizontal"
           selectedKeys={[getSelectedKey()]}
           items={menuItems}
-          className={`flex-1 justify-center border-none bg-transparent ${isDarkTheme ? 'home-menu' : ''}`}
+          className={`hidden md:flex flex-1 justify-center border-none bg-transparent ${isDarkTheme ? 'home-menu' : ''}`}
           style={{ minWidth: 0, flex: 1, justifyContent: 'center' }}
         />
 
-        {/* 搜索框 */}
-        <Input
-          placeholder="搜索文章..."
-          prefix={<SearchOutlined className={isDarkTheme ? 'text-white/50' : 'text-gray-400'} />}
-          className={`w-40 md:w-52 ${isDarkTheme ? 'home-search' : ''}`}
-          style={{ 
-            borderRadius: 20,
-          }}
-          onPressEnter={(e) => {
-            const value = (e.target as HTMLInputElement).value;
-            if (value) {
-              window.location.href = `/articles?keyword=${encodeURIComponent(value)}`;
-            }
-          }}
-        />
+        {/* 右侧操作区 */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* 搜索框 - PC端显示 */}
+          <div className="hidden sm:block" style={{ width: 160 }}>
+            <Input
+              placeholder="搜索..."
+              prefix={<SearchOutlined className="text-gray-400" />}
+              className="header-search"
+              onPressEnter={(e) => {
+                const value = (e.target as HTMLInputElement).value;
+                if (value) {
+                  window.location.href = `/articles?keyword=${encodeURIComponent(value)}`;
+                }
+              }}
+            />
+          </div>
+          
+          {/* 移动端搜索按钮 */}
+          <button
+            className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            style={{
+              background: 'rgba(0, 0, 0, 0.05)',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              const keyword = prompt('请输入搜索关键词');
+              if (keyword) {
+                window.location.href = `/articles?keyword=${encodeURIComponent(keyword)}`;
+              }
+            }}
+          >
+            <SearchOutlined style={{ color: headerTextColor, fontSize: 16 }} />
+          </button>
+
+          {/* 移动端菜单按钮 */}
+          <button
+            className="md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            style={{
+              background: 'rgba(0, 0, 0, 0.05)',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <MenuOutlined style={{ color: headerTextColor, fontSize: 18 }} />
+          </button>
+        </div>
       </Header>
+
+      {/* 移动端导航抽屉 */}
+      <Drawer
+        placement="right"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        width={280}
+        closable={false}
+        styles={{
+          body: { padding: 0 },
+          header: { display: 'none' },
+        }}
+      >
+        <div className="h-full flex flex-col" style={{ background: `linear-gradient(180deg, ${currentColorTheme.primary}08 0%, #ffffff 100%)` }}>
+          {/* 抽屉头部 */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <Link to="/" className="flex items-center gap-2 no-underline" onClick={() => setMobileMenuOpen(false)}>
+              <div 
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold"
+                style={{ background: currentColorTheme.gradient }}
+              >
+                B
+              </div>
+              <Title level={5} className="!mb-0" style={{ color: '#1e293b' }}>
+                个人博客
+              </Title>
+            </Link>
+            <button
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(0, 0, 0, 0.05)', border: 'none', cursor: 'pointer' }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <CloseOutlined style={{ fontSize: 14, color: '#64748b' }} />
+            </button>
+          </div>
+
+          {/* 移动端搜索框 */}
+          <div className="p-4">
+            <Input
+              placeholder="搜索文章..."
+              prefix={<SearchOutlined className="text-gray-400" />}
+              style={{ borderRadius: 20 }}
+              onPressEnter={(e) => {
+                const value = (e.target as HTMLInputElement).value;
+                if (value) {
+                  setMobileMenuOpen(false);
+                  window.location.href = `/articles?keyword=${encodeURIComponent(value)}`;
+                }
+              }}
+            />
+          </div>
+
+          {/* 菜单列表 */}
+          <nav className="flex-1 px-2">
+            {menuItems.map((item) => {
+              const isActive = getSelectedKey() === item.key;
+              return (
+                <Link
+                  key={item.key}
+                  to={item.key}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl mb-1 no-underline transition-all"
+                  style={{
+                    background: isActive ? `${currentColorTheme.primary}15` : 'transparent',
+                    color: isActive ? currentColorTheme.primary : '#475569',
+                  }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="font-medium">{item.key === '/' ? '首页' : item.key === '/articles' ? '文章' : item.key === '/categories' ? '分类' : item.key === '/tags' ? '标签' : item.key === '/message' ? '留言' : '关于'}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* 底部信息 */}
+          <div className="p-4 border-t border-gray-100">
+            <div className="flex items-center gap-4 justify-center">
+              <a href="mailto:example@email.com" className="text-gray-400 hover:text-gray-600 transition-colors">
+                <MailOutlined style={{ fontSize: 20 }} />
+              </a>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
+                <GithubOutlined style={{ fontSize: 20 }} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </Drawer>
 
       {/* 主内容区 */}
       <Content 
@@ -197,7 +323,7 @@ const FrontLayout: React.FC = () => {
           background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
           <Row gutter={[48, 32]}>
             <Col xs={24} md={8}>
               <div className="flex items-center gap-3 mb-4">

@@ -282,3 +282,27 @@ body {
   border-color: var(--theme-primary, #ffb3d9) !important;
   box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb, 255, 179, 217), 0.1) !important;
 }
+
+/* 头部搜索框样式修复 */
+.header-search.ant-input-affix-wrapper {
+  width: 100% !important;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  padding: 4px 11px !important;
+}
+
+.header-search .ant-input {
+  background: transparent !important;
+}
+
+.header-search.ant-input-affix-wrapper:hover {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+}
+
+.header-search.ant-input-affix-wrapper:focus,
+.header-search.ant-input-affix-wrapper-focused {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+  box-shadow: 0 0 0 2px rgba(255, 179, 217, 0.2) !important;
+}

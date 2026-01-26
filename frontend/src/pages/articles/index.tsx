@@ -75,13 +75,13 @@ const ArticlesPage: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in py-8">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className="animate-fade-in py-6 md:py-8">
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 md:mb-12">
           <Title 
             level={1} 
-            className="!mb-3 !text-gray-800"
+            className="!mb-2 md:!mb-3 !text-gray-800 !text-2xl md:!text-4xl"
             style={{
               textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
@@ -89,7 +89,7 @@ const ArticlesPage: React.FC = () => {
             文章列表
           </Title>
           <Text 
-            className="text-gray-600 text-lg"
+            className="text-gray-600 text-sm md:text-lg"
             style={{
               textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
             }}
@@ -100,7 +100,7 @@ const ArticlesPage: React.FC = () => {
 
         {/* 内容区域 - 白色背景，覆盖粒子 */}
         <div 
-          className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10"
+          className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg relative z-10"
           style={{ minHeight: 400 }}
         >
           {/* 搜索和筛选 */}
@@ -226,13 +226,17 @@ const ArticlesPage: React.FC = () => {
 
             {/* 分页 */}
             {total > pageSize && (
-              <div className="flex justify-center mt-12">
+              <div className="flex justify-center mt-8 md:mt-12">
                 <Pagination
                   current={page}
                   total={total}
                   pageSize={pageSize}
                   showSizeChanger={false}
-                  showTotal={(total) => `共 ${total} 篇文章`}
+                  showTotal={(total, range) => (
+                    <span className="hidden md:inline">共 {total} 篇文章</span>
+                  )}
+                  size="default"
+                  responsive
                   onChange={(p) => {
                     const newParams = new URLSearchParams(searchParams);
                     newParams.set('page', String(p));

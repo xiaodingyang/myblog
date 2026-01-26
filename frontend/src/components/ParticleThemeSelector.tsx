@@ -50,11 +50,11 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
           </div>
         }
         placement="right"
-        width={320}
+        width={typeof window !== 'undefined' && window.innerWidth < 640 ? '85%' : 320}
         open={open}
         onClose={() => setOpen(false)}
         styles={{
-          body: { padding: 16 },
+          body: { padding: 12 },
         }}
       >
         {/* 粒子主题选择 */}
