@@ -65,7 +65,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 19
+        "register": 31
       },
       "enableBy": "register"
     },
@@ -82,7 +82,7 @@
             0
           ]
         },
-        "register": 13
+        "register": 5
       },
       "enableBy": "register"
     },
@@ -96,10 +96,10 @@
       "time": {
         "hooks": {
           "onStart": [
-            7
+            3
           ]
         },
-        "register": 4
+        "register": 5
       },
       "enableBy": "register"
     },
@@ -116,7 +116,7 @@
             0
           ]
         },
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -129,7 +129,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 13
+        "register": 2
       },
       "enableBy": "register"
     },
@@ -143,10 +143,10 @@
       "time": {
         "hooks": {
           "modifyAppData": [
-            128
+            45
           ]
         },
-        "register": 111
+        "register": 32
       },
       "enableBy": "register"
     },
@@ -159,7 +159,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -179,7 +179,7 @@
             0
           ]
         },
-        "register": 11
+        "register": 2
       },
       "enableBy": "register"
     },
@@ -193,10 +193,10 @@
       "time": {
         "hooks": {
           "onCheck": [
-            1
+            0
           ]
         },
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -209,7 +209,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 4
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -226,7 +226,7 @@
             0
           ]
         },
-        "register": 41
+        "register": 20
       },
       "enableBy": "register"
     },
@@ -238,7 +238,7 @@
       "enableBy": "register",
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 0
       }
     },
     "virtual: config-styles": {
@@ -1078,7 +1078,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1092,10 +1092,10 @@
       "time": {
         "hooks": {
           "onStart": [
-            1
+            0
           ]
         },
-        "register": 75
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1108,7 +1108,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 19
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1121,7 +1121,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 567
+        "register": 119
       },
       "enableBy": "register"
     },
@@ -1134,7 +1134,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 113
+        "register": 83
       },
       "enableBy": "config"
     },
@@ -1147,7 +1147,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 40
+        "register": 24
       },
       "enableBy": "config"
     },
@@ -1177,7 +1177,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 6
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1190,7 +1190,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 10
+        "register": 3
       },
       "enableBy": "config"
     },
@@ -1203,7 +1203,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 90
+        "register": 48
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/mpa/mpa": {
@@ -1215,7 +1215,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -1228,7 +1228,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/overrides/overrides": {
@@ -1253,7 +1253,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1267,10 +1267,10 @@
       "time": {
         "hooks": {
           "modifyConfig": [
-            0
+            2
           ]
         },
-        "register": 6
+        "register": 3
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/polyfill/publicPathPolyfill": {
@@ -1295,7 +1295,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 10
+        "register": 3
       },
       "enableBy": "register"
     },
@@ -1308,7 +1308,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1321,7 +1321,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 0
       },
       "enableBy": "config"
     },
@@ -1334,7 +1334,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 2
       },
       "enableBy": "register"
     },
@@ -1347,7 +1347,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 7
+        "register": 6
       },
       "enableBy": "register"
     },
@@ -1373,7 +1373,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/ssr/ssr": {
@@ -1385,7 +1385,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 8
+        "register": 3
       },
       "enableBy": "config"
     },
@@ -1398,7 +1398,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 14
+        "register": 4
       },
       "enableBy": "register"
     },
@@ -1411,7 +1411,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 5
       },
       "enableBy": "register"
     },
@@ -1424,7 +1424,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 14
+        "register": 6
       },
       "enableBy": "config"
     },
@@ -1437,7 +1437,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -1450,7 +1450,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 28
+        "register": 8
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/monorepo/redirect": {
@@ -1462,7 +1462,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 71
+        "register": 30
       },
       "enableBy": "config"
     },
@@ -1475,7 +1475,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/clickToComponent/clickToComponent": {
@@ -1499,7 +1499,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -1512,7 +1512,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 8
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -1525,7 +1525,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 16
+        "register": 2
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/swc/swc": {
@@ -1541,7 +1541,7 @@
             0
           ]
         },
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1554,7 +1554,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 5
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/mako/mako": {
@@ -1566,7 +1566,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -1579,7 +1579,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/hmrGuardian/hmrGuardian": {
@@ -1591,7 +1591,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 17
+        "register": 3
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/routePreloadOnLoad/routePreloadOnLoad": {
@@ -1603,7 +1603,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 103
+        "register": 37
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/features/forget/forget": {
@@ -1615,7 +1615,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 2
       },
       "enableBy": "config"
     },
@@ -1628,7 +1628,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 15
+        "register": 3
       },
       "enableBy": "register"
     },
@@ -1641,7 +1641,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 6
       },
       "enableBy": "register"
     },
@@ -1654,7 +1654,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 148
+        "register": 52
       },
       "enableBy": "register"
     },
@@ -1667,7 +1667,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 135
+        "register": 66
       }
     },
     "./node_modules/.pnpm/@umijs+preset-umi@4.6.24_@types+react@18.3.27_less-loader@12.3.0_less@4.5.1_resolve-url-loade_y47k23bgsyg5tnodzjcvg6wp2y/node_modules/@umijs/preset-umi/dist/commands/help": {
@@ -1679,7 +1679,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1692,7 +1692,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 5
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1705,7 +1705,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1718,7 +1718,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1731,7 +1731,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1744,7 +1744,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 4
+        "register": 3
       },
       "enableBy": "register"
     },
@@ -1822,7 +1822,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1835,7 +1835,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 0
       },
       "enableBy": "register"
     },
@@ -1861,7 +1861,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1874,7 +1874,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1900,7 +1900,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 9
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1913,7 +1913,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 64
+        "register": 29
       },
       "enableBy": "register"
     },
@@ -1926,7 +1926,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 2
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1939,7 +1939,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 14
+        "register": 4
       },
       "enableBy": "register"
     },
@@ -1952,7 +1952,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 3
+        "register": 1
       },
       "enableBy": "register"
     },
@@ -1966,7 +1966,7 @@
       "time": {
         "hooks": {
           "modifyConfig": [
-            12
+            6
           ],
           "modifyAppData": [
             0
@@ -1975,7 +1975,7 @@
             0
           ]
         },
-        "register": 26
+        "register": 15
       }
     },
     "./node_modules/@umijs/plugins/dist/initial-state": {
@@ -1987,7 +1987,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 5
+        "register": 1
       },
       "enableBy": "config"
     },
@@ -2000,7 +2000,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 14
+        "register": 8
       },
       "enableBy": "config"
     },
@@ -2013,7 +2013,7 @@
       "config": {},
       "time": {
         "hooks": {},
-        "register": 1
+        "register": 2
       },
       "enableBy": "config"
     }
@@ -2132,7 +2132,11 @@
     ],
     "proxy": {
       "/api": {
-        "target": "http://localhost:3000",
+        "target": "http://43.129.200.177",
+        "changeOrigin": true
+      },
+      "/uploads": {
+        "target": "http://43.129.200.177",
         "changeOrigin": true
       }
     },
@@ -2275,7 +2279,11 @@
     ],
     "proxy": {
       "/api": {
-        "target": "http://localhost:3000",
+        "target": "http://43.129.200.177",
+        "changeOrigin": true
+      },
+      "/uploads": {
+        "target": "http://43.129.200.177",
         "changeOrigin": true
       }
     },
@@ -3348,7 +3356,7 @@
       "parentId": "12",
       "id": "16",
       "absPath": "/admin/articles/create",
-      "__content": "import React, { useEffect, useState } from 'react';\nimport { useNavigate } from 'umi';\nimport {\n  Typography,\n  Form,\n  Input,\n  Select,\n  Button,\n  Card,\n  Row,\n  Col,\n  Upload,\n  Space,\n  message,\n  Switch,\n} from 'antd';\nimport {\n  ArrowLeftOutlined,\n  PlusOutlined,\n  SaveOutlined,\n  SendOutlined,\n} from '@ant-design/icons';\nimport { request } from 'umi';\nimport type { UploadFile } from 'antd/es/upload/interface';\n\nconst { Title, Text } = Typography;\nconst { TextArea } = Input;\nconst { Option } = Select;\n\nconst CreateArticlePage: React.FC = () => {\n  const navigate = useNavigate();\n  const [form] = Form.useForm();\n  const [loading, setLoading] = useState(false);\n  const [categories, setCategories] = useState<API.Category[]>([]);\n  const [tags, setTags] = useState<API.Tag[]>([]);\n  const [coverList, setCoverList] = useState<UploadFile[]>([]);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        const [categoriesRes, tagsRes] = await Promise.all([\n          request<API.Response<API.Category[]>>('/api/categories'),\n          request<API.Response<API.Tag[]>>('/api/tags'),\n        ]);\n        if (categoriesRes.code === 0) setCategories(categoriesRes.data);\n        if (tagsRes.code === 0) setTags(tagsRes.data);\n      } catch (error) {\n        // ignore\n      }\n    };\n    fetchData();\n  }, []);\n\n  const handleSubmit = async (values: any, status: 'draft' | 'published') => {\n    setLoading(true);\n    try {\n      const data = {\n        ...values,\n        status,\n        cover: coverList[0]?.response?.data?.url || coverList[0]?.url || '',\n      };\n\n      const res = await request<API.Response<API.Article>>('/api/admin/articles', {\n        method: 'POST',\n        data,\n      });\n\n      if (res.code === 0) {\n        message.success(status === 'published' ? '发布成功' : '保存成功');\n        navigate('/admin/articles');\n      } else {\n        message.error(res.message || '保存失败');\n      }\n    } catch (error) {\n      message.error('保存失败');\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  const handleSaveDraft = () => {\n    form.validateFields(['title', 'content']).then((values) => {\n      handleSubmit(form.getFieldsValue(), 'draft');\n    });\n  };\n\n  const handlePublish = () => {\n    form.validateFields().then((values) => {\n      handleSubmit(values, 'published');\n    });\n  };\n\n  const uploadProps = {\n    name: 'file',\n    action: '/api/upload',\n    headers: {\n      Authorization: `Bearer ${localStorage.getItem('token')}`,\n    },\n    listType: 'picture-card' as const,\n    fileList: coverList,\n    maxCount: 1,\n    onChange: ({ fileList }: { fileList: UploadFile[] }) => {\n      setCoverList(fileList);\n    },\n    beforeUpload: (file: File) => {\n      const isImage = file.type.startsWith('image/');\n      if (!isImage) {\n        message.error('只能上传图片文件');\n        return Upload.LIST_IGNORE;\n      }\n      const isLt5M = file.size / 1024 / 1024 < 5;\n      if (!isLt5M) {\n        message.error('图片大小不能超过 5MB');\n        return Upload.LIST_IGNORE;\n      }\n      return true;\n    },\n  };\n\n  return (\n    <div className=\"animate-fade-in\">\n      <div className=\"flex items-center justify-between mb-6\">\n        <div className=\"flex items-center gap-4\">\n          <Button\n            type=\"text\"\n            icon={<ArrowLeftOutlined />}\n            onClick={() => navigate('/admin/articles')}\n          >\n            返回\n          </Button>\n          <div>\n            <Title level={3} className=\"!mb-0\">\n              新建文章\n            </Title>\n          </div>\n        </div>\n        <Space>\n          <Button icon={<SaveOutlined />} onClick={handleSaveDraft} loading={loading}>\n            保存草稿\n          </Button>\n          <Button type=\"primary\" icon={<SendOutlined />} onClick={handlePublish} loading={loading}>\n            发布文章\n          </Button>\n        </Space>\n      </div>\n\n      <Form\n        form={form}\n        layout=\"vertical\"\n        initialValues={{\n          status: 'draft',\n        }}\n      >\n        <Row gutter={24}>\n          <Col xs={24} lg={16}>\n            <Card\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"title\"\n                label=\"文章标题\"\n                rules={[{ required: true, message: '请输入文章标题' }]}\n              >\n                <Input placeholder=\"请输入文章标题\" size=\"large\" />\n              </Form.Item>\n\n              <Form.Item\n                name=\"summary\"\n                label=\"文章摘要\"\n              >\n                <TextArea\n                  placeholder=\"请输入文章摘要（可选，用于列表展示）\"\n                  rows={3}\n                  showCount\n                  maxLength={200}\n                />\n              </Form.Item>\n\n              <Form.Item\n                name=\"content\"\n                label=\"文章内容\"\n                rules={[{ required: true, message: '请输入文章内容' }]}\n              >\n                <TextArea\n                  placeholder=\"请输入 Markdown 格式的文章内容\"\n                  rows={20}\n                  className=\"font-mono\"\n                />\n              </Form.Item>\n            </Card>\n          </Col>\n\n          <Col xs={24} lg={8}>\n            <Card\n              title=\"文章设置\"\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"category\"\n                label=\"文章分类\"\n                rules={[{ required: true, message: '请选择文章分类' }]}\n              >\n                <Select placeholder=\"请选择分类\" allowClear>\n                  {categories.map(cat => (\n                    <Option key={cat._id} value={cat._id}>\n                      {cat.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item\n                name=\"tags\"\n                label=\"文章标签\"\n              >\n                <Select\n                  mode=\"multiple\"\n                  placeholder=\"请选择标签\"\n                  allowClear\n                  maxTagCount={5}\n                >\n                  {tags.map(tag => (\n                    <Option key={tag._id} value={tag._id}>\n                      {tag.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item label=\"封面图片\">\n                <Upload {...uploadProps}>\n                  {coverList.length < 1 && (\n                    <div>\n                      <PlusOutlined />\n                      <div className=\"mt-2\">上传封面</div>\n                    </div>\n                  )}\n                </Upload>\n                <Text className=\"text-gray-400 text-xs\">\n                  建议尺寸 1200x630，支持 jpg/png，大小不超过 5MB\n                </Text>\n              </Form.Item>\n            </Card>\n          </Col>\n        </Row>\n      </Form>\n    </div>\n  );\n};\n\nexport default CreateArticlePage;\n",
+      "__content": "import React, { useEffect, useState } from 'react';\nimport { useNavigate } from 'umi';\nimport {\n  Typography,\n  Form,\n  Input,\n  Select,\n  Button,\n  Card,\n  Row,\n  Col,\n  Upload,\n  Space,\n  message,\n  Switch,\n} from 'antd';\nimport {\n  ArrowLeftOutlined,\n  PlusOutlined,\n  SaveOutlined,\n  SendOutlined,\n  ThunderboltOutlined,\n  ReloadOutlined,\n} from '@ant-design/icons';\nimport { request } from 'umi';\nimport type { UploadFile } from 'antd/es/upload/interface';\n\nconst { Title, Text } = Typography;\nconst { TextArea } = Input;\nconst { Option } = Select;\n\n// 技术关键词映射表，用于生成更精准的封面图\nconst TECH_KEYWORDS: Record<string, string[]> = {\n  'react': ['react', 'javascript', 'frontend', 'code'],\n  'vue': ['vue', 'javascript', 'frontend', 'code'],\n  'javascript': ['javascript', 'code', 'programming'],\n  'typescript': ['typescript', 'code', 'programming'],\n  'node': ['nodejs', 'server', 'backend', 'code'],\n  'python': ['python', 'code', 'programming'],\n  'java': ['java', 'code', 'programming'],\n  'docker': ['docker', 'container', 'server'],\n  'mongodb': ['database', 'server', 'data'],\n  'mysql': ['database', 'server', 'data'],\n  'redis': ['database', 'server', 'cache'],\n  'nginx': ['server', 'network', 'web'],\n  'linux': ['linux', 'server', 'terminal'],\n  'git': ['git', 'code', 'version control'],\n  'css': ['css', 'design', 'frontend', 'web'],\n  'html': ['html', 'web', 'frontend', 'code'],\n  '前端': ['frontend', 'web', 'code', 'design'],\n  '后端': ['backend', 'server', 'code', 'database'],\n  '部署': ['server', 'cloud', 'devops'],\n  '数据库': ['database', 'data', 'server'],\n  '算法': ['algorithm', 'code', 'mathematics'],\n  '设计': ['design', 'ui', 'creative'],\n  '人工智能': ['artificial intelligence', 'ai', 'technology'],\n  'ai': ['artificial intelligence', 'ai', 'robot'],\n};\n\n// 从标题中提取搜索关键词\nconst extractKeywords = (title: string): string => {\n  const lowerTitle = title.toLowerCase();\n  \n  // 尝试匹配技术关键词\n  for (const [key, values] of Object.entries(TECH_KEYWORDS)) {\n    if (lowerTitle.includes(key)) {\n      return values[Math.floor(Math.random() * values.length)];\n    }\n  }\n  \n  // 默认使用 technology + coding 相关关键词\n  const defaultKeywords = ['technology', 'coding', 'computer', 'programming', 'digital'];\n  return defaultKeywords[Math.floor(Math.random() * defaultKeywords.length)];\n};\n\nconst CreateArticlePage: React.FC = () => {\n  const navigate = useNavigate();\n  const [form] = Form.useForm();\n  const [loading, setLoading] = useState(false);\n  const [categories, setCategories] = useState<API.Category[]>([]);\n  const [tags, setTags] = useState<API.Tag[]>([]);\n  const [coverList, setCoverList] = useState<UploadFile[]>([]);\n  const [generatingCover, setGeneratingCover] = useState(false);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        const [categoriesRes, tagsRes] = await Promise.all([\n          request<API.Response<API.Category[]>>('/api/categories'),\n          request<API.Response<API.Tag[]>>('/api/tags'),\n        ]);\n        if (categoriesRes.code === 0) setCategories(categoriesRes.data);\n        if (tagsRes.code === 0) setTags(tagsRes.data);\n      } catch (error) {\n        // ignore\n      }\n    };\n    fetchData();\n  }, []);\n\n  const handleSubmit = async (values: any, status: 'draft' | 'published') => {\n    setLoading(true);\n    try {\n      const data = {\n        ...values,\n        status,\n        cover: coverList[0]?.response?.data?.url || coverList[0]?.url || '',\n      };\n\n      const res = await request<API.Response<API.Article>>('/api/admin/articles', {\n        method: 'POST',\n        data,\n      });\n\n      if (res.code === 0) {\n        message.success(status === 'published' ? '发布成功' : '保存成功');\n        navigate('/admin/articles');\n      } else {\n        message.error(res.message || '保存失败');\n      }\n    } catch (error) {\n      message.error('保存失败');\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  const handleSaveDraft = () => {\n    form.validateFields(['title', 'content']).then((values) => {\n      handleSubmit(form.getFieldsValue(), 'draft');\n    });\n  };\n\n  const handlePublish = () => {\n    form.validateFields().then((values) => {\n      handleSubmit(values, 'published');\n    });\n  };\n\n  // 自动生成封面图\n  const generateCover = async () => {\n    const title = form.getFieldValue('title');\n    if (!title) {\n      message.warning('请先输入文章标题');\n      return;\n    }\n    \n    setGeneratingCover(true);\n    try {\n      const keyword = extractKeywords(title);\n      const timestamp = Date.now();\n      \n      // 使用 picsum.photos 生成随机封面图\n      const seed = Math.floor(Math.random() * 1000);\n      const imageUrl = `https://picsum.photos/seed/${seed}/1200/630`;\n      \n      // 设置封面\n      setCoverList([{\n        uid: `-${timestamp}`,\n        name: `cover-${keyword}.jpg`,\n        status: 'done',\n        url: imageUrl,\n      }]);\n      \n      message.success(`已生成封面图`);\n    } catch (error) {\n      message.error('生成封面失败，请重试');\n    } finally {\n      setGeneratingCover(false);\n    }\n  };\n\n  const uploadProps = {\n    name: 'file',\n    action: '/api/upload',\n    headers: {\n      Authorization: `Bearer ${localStorage.getItem('token')}`,\n    },\n    listType: 'picture-card' as const,\n    fileList: coverList,\n    maxCount: 1,\n    onChange: ({ fileList }: { fileList: UploadFile[] }) => {\n      setCoverList(fileList);\n    },\n    beforeUpload: (file: File) => {\n      const isImage = file.type.startsWith('image/');\n      if (!isImage) {\n        message.error('只能上传图片文件');\n        return Upload.LIST_IGNORE;\n      }\n      const isLt5M = file.size / 1024 / 1024 < 5;\n      if (!isLt5M) {\n        message.error('图片大小不能超过 5MB');\n        return Upload.LIST_IGNORE;\n      }\n      return true;\n    },\n  };\n\n  return (\n    <div className=\"animate-fade-in\">\n      <div className=\"flex items-center justify-between mb-6\">\n        <div className=\"flex items-center gap-4\">\n          <Button\n            type=\"text\"\n            icon={<ArrowLeftOutlined />}\n            onClick={() => navigate('/admin/articles')}\n          >\n            返回\n          </Button>\n          <div>\n            <Title level={3} className=\"!mb-0\">\n              新建文章\n            </Title>\n          </div>\n        </div>\n        <Space>\n          <Button icon={<SaveOutlined />} onClick={handleSaveDraft} loading={loading}>\n            保存草稿\n          </Button>\n          <Button type=\"primary\" icon={<SendOutlined />} onClick={handlePublish} loading={loading}>\n            发布文章\n          </Button>\n        </Space>\n      </div>\n\n      <Form\n        form={form}\n        layout=\"vertical\"\n        initialValues={{\n          status: 'draft',\n        }}\n      >\n        <Row gutter={24}>\n          <Col xs={24} lg={16}>\n            <Card\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"title\"\n                label=\"文章标题\"\n                rules={[{ required: true, message: '请输入文章标题' }]}\n              >\n                <Input placeholder=\"请输入文章标题\" size=\"large\" />\n              </Form.Item>\n\n              <Form.Item\n                name=\"summary\"\n                label=\"文章摘要\"\n              >\n                <TextArea\n                  placeholder=\"请输入文章摘要（可选，用于列表展示）\"\n                  rows={3}\n                  showCount\n                  maxLength={200}\n                />\n              </Form.Item>\n\n              <Form.Item\n                name=\"content\"\n                label=\"文章内容\"\n                rules={[{ required: true, message: '请输入文章内容' }]}\n              >\n                <TextArea\n                  placeholder=\"请输入 Markdown 格式的文章内容\"\n                  rows={20}\n                  className=\"font-mono\"\n                />\n              </Form.Item>\n            </Card>\n          </Col>\n\n          <Col xs={24} lg={8}>\n            <Card\n              title=\"文章设置\"\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"category\"\n                label=\"文章分类\"\n                rules={[{ required: true, message: '请选择文章分类' }]}\n              >\n                <Select placeholder=\"请选择分类\" allowClear>\n                  {categories.map(cat => (\n                    <Option key={cat._id} value={cat._id}>\n                      {cat.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item\n                name=\"tags\"\n                label=\"文章标签\"\n              >\n                <Select\n                  mode=\"multiple\"\n                  placeholder=\"请选择标签\"\n                  allowClear\n                  maxTagCount={5}\n                >\n                  {tags.map(tag => (\n                    <Option key={tag._id} value={tag._id}>\n                      {tag.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item label=\"封面图片\">\n                <div className=\"mb-3\">\n                  <Space>\n                    <Button\n                      type=\"primary\"\n                      ghost\n                      icon={<ThunderboltOutlined />}\n                      onClick={generateCover}\n                      loading={generatingCover}\n                    >\n                      自动生成\n                    </Button>\n                    {coverList.length > 0 && (\n                      <Button\n                        icon={<ReloadOutlined />}\n                        onClick={generateCover}\n                        loading={generatingCover}\n                      >\n                        换一张\n                      </Button>\n                    )}\n                  </Space>\n                </div>\n                <Upload {...uploadProps}>\n                  {coverList.length < 1 && (\n                    <div>\n                      <PlusOutlined />\n                      <div className=\"mt-2\">上传封面</div>\n                    </div>\n                  )}\n                </Upload>\n                <Text className=\"text-gray-400 text-xs\">\n                  点击\"自动生成\"根据标题获取封面，或手动上传（1200x630，jpg/png，≤5MB）\n                </Text>\n              </Form.Item>\n            </Card>\n          </Col>\n        </Row>\n      </Form>\n    </div>\n  );\n};\n\nexport default CreateArticlePage;\n",
       "__isJSFile": true,
       "__absFile": "/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/pages/admin/articles/create.tsx"
     },
@@ -3358,7 +3366,7 @@
       "parentId": "12",
       "id": "17",
       "absPath": "/admin/articles/edit/:id",
-      "__content": "import React, { useEffect, useState } from 'react';\nimport { useNavigate, useParams } from 'umi';\nimport {\n  Typography,\n  Form,\n  Input,\n  Select,\n  Button,\n  Card,\n  Row,\n  Col,\n  Upload,\n  Space,\n  message,\n} from 'antd';\nimport {\n  ArrowLeftOutlined,\n  SaveOutlined,\n  SendOutlined,\n} from '@ant-design/icons';\nimport { request } from 'umi';\nimport type { UploadFile } from 'antd/es/upload/interface';\nimport Loading from '@/components/Loading';\n\nconst { Title } = Typography;\nconst { TextArea } = Input;\nconst { Option } = Select;\n\nconst EditArticlePage: React.FC = () => {\n  const navigate = useNavigate();\n  const { id } = useParams<{ id: string }>();\n  const [form] = Form.useForm();\n  const [loading, setLoading] = useState(true);\n  const [saving, setSaving] = useState(false);\n  const [categories, setCategories] = useState<API.Category[]>([]);\n  const [tags, setTags] = useState<API.Tag[]>([]);\n  const [coverList, setCoverList] = useState<UploadFile[]>([]);\n  const [article, setArticle] = useState<API.Article | null>(null);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      setLoading(true);\n      try {\n        const [articleRes, categoriesRes, tagsRes] = await Promise.all([\n          request<API.Response<API.Article>>(`/api/admin/articles/${id}`),\n          request<API.Response<API.Category[]>>('/api/categories'),\n          request<API.Response<API.Tag[]>>('/api/tags'),\n        ]);\n\n        if (articleRes.code === 0) {\n          const article = articleRes.data;\n          setArticle(article);\n          form.setFieldsValue({\n            title: article.title,\n            summary: article.summary,\n            content: article.content,\n            category: article.category?._id,\n            tags: article.tags?.map(t => t._id),\n          });\n          if (article.cover) {\n            setCoverList([{\n              uid: '-1',\n              name: 'cover',\n              status: 'done',\n              url: article.cover,\n            }]);\n          }\n        } else {\n          message.error('文章不存在');\n          navigate('/admin/articles');\n        }\n\n        if (categoriesRes.code === 0) setCategories(categoriesRes.data);\n        if (tagsRes.code === 0) setTags(tagsRes.data);\n      } catch (error) {\n        message.error('获取文章失败');\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    if (id) fetchData();\n  }, [id, navigate, form]);\n\n  const handleSubmit = async (values: any, status: 'draft' | 'published') => {\n    setSaving(true);\n    try {\n      const data = {\n        ...values,\n        status,\n        cover: coverList[0]?.response?.data?.url || coverList[0]?.url || '',\n      };\n\n      const res = await request<API.Response<API.Article>>(`/api/admin/articles/${id}`, {\n        method: 'PUT',\n        data,\n      });\n\n      if (res.code === 0) {\n        message.success('保存成功');\n        navigate('/admin/articles');\n      } else {\n        message.error(res.message || '保存失败');\n      }\n    } catch (error) {\n      message.error('保存失败');\n    } finally {\n      setSaving(false);\n    }\n  };\n\n  const handleSaveDraft = () => {\n    form.validateFields(['title', 'content']).then(() => {\n      handleSubmit(form.getFieldsValue(), 'draft');\n    });\n  };\n\n  const handlePublish = () => {\n    form.validateFields().then((values) => {\n      handleSubmit(values, 'published');\n    });\n  };\n\n  const uploadProps = {\n    name: 'file',\n    action: '/api/upload',\n    headers: {\n      Authorization: `Bearer ${localStorage.getItem('token')}`,\n    },\n    listType: 'picture-card' as const,\n    fileList: coverList,\n    maxCount: 1,\n    onChange: ({ fileList }: { fileList: UploadFile[] }) => {\n      setCoverList(fileList);\n    },\n    beforeUpload: (file: File) => {\n      const isImage = file.type.startsWith('image/');\n      if (!isImage) {\n        message.error('只能上传图片文件');\n        return Upload.LIST_IGNORE;\n      }\n      const isLt5M = file.size / 1024 / 1024 < 5;\n      if (!isLt5M) {\n        message.error('图片大小不能超过 5MB');\n        return Upload.LIST_IGNORE;\n      }\n      return true;\n    },\n  };\n\n  if (loading) {\n    return <Loading />;\n  }\n\n  return (\n    <div className=\"animate-fade-in\">\n      <div className=\"flex items-center justify-between mb-6\">\n        <div className=\"flex items-center gap-4\">\n          <Button\n            type=\"text\"\n            icon={<ArrowLeftOutlined />}\n            onClick={() => navigate('/admin/articles')}\n          >\n            返回\n          </Button>\n          <div>\n            <Title level={3} className=\"!mb-0\">\n              编辑文章\n            </Title>\n          </div>\n        </div>\n        <Space>\n          <Button icon={<SaveOutlined />} onClick={handleSaveDraft} loading={saving}>\n            保存草稿\n          </Button>\n          <Button type=\"primary\" icon={<SendOutlined />} onClick={handlePublish} loading={saving}>\n            {article?.status === 'published' ? '更新文章' : '发布文章'}\n          </Button>\n        </Space>\n      </div>\n\n      <Form form={form} layout=\"vertical\">\n        <Row gutter={24}>\n          <Col xs={24} lg={16}>\n            <Card\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"title\"\n                label=\"文章标题\"\n                rules={[{ required: true, message: '请输入文章标题' }]}\n              >\n                <Input placeholder=\"请输入文章标题\" size=\"large\" />\n              </Form.Item>\n\n              <Form.Item name=\"summary\" label=\"文章摘要\">\n                <TextArea\n                  placeholder=\"请输入文章摘要（可选，用于列表展示）\"\n                  rows={3}\n                  showCount\n                  maxLength={200}\n                />\n              </Form.Item>\n\n              <Form.Item\n                name=\"content\"\n                label=\"文章内容\"\n                rules={[{ required: true, message: '请输入文章内容' }]}\n              >\n                <TextArea\n                  placeholder=\"请输入 Markdown 格式的文章内容\"\n                  rows={20}\n                  className=\"font-mono\"\n                />\n              </Form.Item>\n            </Card>\n          </Col>\n\n          <Col xs={24} lg={8}>\n            <Card\n              title=\"文章设置\"\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"category\"\n                label=\"文章分类\"\n                rules={[{ required: true, message: '请选择文章分类' }]}\n              >\n                <Select placeholder=\"请选择分类\" allowClear>\n                  {categories.map(cat => (\n                    <Option key={cat._id} value={cat._id}>\n                      {cat.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item name=\"tags\" label=\"文章标签\">\n                <Select\n                  mode=\"multiple\"\n                  placeholder=\"请选择标签\"\n                  allowClear\n                  maxTagCount={5}\n                >\n                  {tags.map(tag => (\n                    <Option key={tag._id} value={tag._id}>\n                      {tag.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item label=\"封面图片\">\n                <Upload {...uploadProps}>\n                  {coverList.length < 1 && (\n                    <div>\n                      <span>+</span>\n                      <div className=\"mt-2\">上传封面</div>\n                    </div>\n                  )}\n                </Upload>\n              </Form.Item>\n            </Card>\n          </Col>\n        </Row>\n      </Form>\n    </div>\n  );\n};\n\nexport default EditArticlePage;\n",
+      "__content": "import React, { useEffect, useState } from 'react';\nimport { useNavigate, useParams } from 'umi';\nimport {\n  Typography,\n  Form,\n  Input,\n  Select,\n  Button,\n  Card,\n  Row,\n  Col,\n  Upload,\n  Space,\n  message,\n} from 'antd';\nimport {\n  ArrowLeftOutlined,\n  SaveOutlined,\n  SendOutlined,\n  ThunderboltOutlined,\n  ReloadOutlined,\n  PlusOutlined,\n} from '@ant-design/icons';\nimport { request } from 'umi';\nimport type { UploadFile } from 'antd/es/upload/interface';\nimport Loading from '@/components/Loading';\n\nconst { Title, Text } = Typography;\nconst { TextArea } = Input;\nconst { Option } = Select;\n\n// 技术关键词映射表\nconst TECH_KEYWORDS: Record<string, string[]> = {\n  'react': ['react', 'javascript', 'frontend', 'code'],\n  'vue': ['vue', 'javascript', 'frontend', 'code'],\n  'javascript': ['javascript', 'code', 'programming'],\n  'typescript': ['typescript', 'code', 'programming'],\n  'node': ['nodejs', 'server', 'backend', 'code'],\n  'python': ['python', 'code', 'programming'],\n  'java': ['java', 'code', 'programming'],\n  'docker': ['docker', 'container', 'server'],\n  'mongodb': ['database', 'server', 'data'],\n  'mysql': ['database', 'server', 'data'],\n  'redis': ['database', 'server', 'cache'],\n  'nginx': ['server', 'network', 'web'],\n  'linux': ['linux', 'server', 'terminal'],\n  'git': ['git', 'code', 'version control'],\n  'css': ['css', 'design', 'frontend', 'web'],\n  'html': ['html', 'web', 'frontend', 'code'],\n  '前端': ['frontend', 'web', 'code', 'design'],\n  '后端': ['backend', 'server', 'code', 'database'],\n  '部署': ['server', 'cloud', 'devops'],\n  '数据库': ['database', 'data', 'server'],\n  '算法': ['algorithm', 'code', 'mathematics'],\n  '设计': ['design', 'ui', 'creative'],\n  '人工智能': ['artificial intelligence', 'ai', 'technology'],\n  'ai': ['artificial intelligence', 'ai', 'robot'],\n};\n\n// 从标题中提取搜索关键词\nconst extractKeywords = (title: string): string => {\n  const lowerTitle = title.toLowerCase();\n  for (const [key, values] of Object.entries(TECH_KEYWORDS)) {\n    if (lowerTitle.includes(key)) {\n      return values[Math.floor(Math.random() * values.length)];\n    }\n  }\n  const defaultKeywords = ['technology', 'coding', 'computer', 'programming', 'digital'];\n  return defaultKeywords[Math.floor(Math.random() * defaultKeywords.length)];\n};\n\nconst EditArticlePage: React.FC = () => {\n  const navigate = useNavigate();\n  const { id } = useParams<{ id: string }>();\n  const [form] = Form.useForm();\n  const [loading, setLoading] = useState(true);\n  const [saving, setSaving] = useState(false);\n  const [categories, setCategories] = useState<API.Category[]>([]);\n  const [tags, setTags] = useState<API.Tag[]>([]);\n  const [coverList, setCoverList] = useState<UploadFile[]>([]);\n  const [article, setArticle] = useState<API.Article | null>(null);\n  const [generatingCover, setGeneratingCover] = useState(false);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      setLoading(true);\n      try {\n        const [articleRes, categoriesRes, tagsRes] = await Promise.all([\n          request<API.Response<API.Article>>(`/api/admin/articles/${id}`),\n          request<API.Response<API.Category[]>>('/api/categories'),\n          request<API.Response<API.Tag[]>>('/api/tags'),\n        ]);\n\n        if (articleRes.code === 0) {\n          const article = articleRes.data;\n          setArticle(article);\n          form.setFieldsValue({\n            title: article.title,\n            summary: article.summary,\n            content: article.content,\n            category: article.category?._id,\n            tags: article.tags?.map(t => t._id),\n          });\n          if (article.cover) {\n            setCoverList([{\n              uid: '-1',\n              name: 'cover',\n              status: 'done',\n              url: article.cover,\n            }]);\n          }\n        } else {\n          message.error('文章不存在');\n          navigate('/admin/articles');\n        }\n\n        if (categoriesRes.code === 0) setCategories(categoriesRes.data);\n        if (tagsRes.code === 0) setTags(tagsRes.data);\n      } catch (error) {\n        message.error('获取文章失败');\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    if (id) fetchData();\n  }, [id, navigate, form]);\n\n  const handleSubmit = async (values: any, status: 'draft' | 'published') => {\n    setSaving(true);\n    try {\n      const data = {\n        ...values,\n        status,\n        cover: coverList[0]?.response?.data?.url || coverList[0]?.url || '',\n      };\n\n      const res = await request<API.Response<API.Article>>(`/api/admin/articles/${id}`, {\n        method: 'PUT',\n        data,\n      });\n\n      if (res.code === 0) {\n        message.success('保存成功');\n        navigate('/admin/articles');\n      } else {\n        message.error(res.message || '保存失败');\n      }\n    } catch (error) {\n      message.error('保存失败');\n    } finally {\n      setSaving(false);\n    }\n  };\n\n  const handleSaveDraft = () => {\n    form.validateFields(['title', 'content']).then(() => {\n      handleSubmit(form.getFieldsValue(), 'draft');\n    });\n  };\n\n  const handlePublish = () => {\n    form.validateFields().then((values) => {\n      handleSubmit(values, 'published');\n    });\n  };\n\n  // 自动生成封面图\n  const generateCover = async () => {\n    const title = form.getFieldValue('title');\n    if (!title) {\n      message.warning('请先输入文章标题');\n      return;\n    }\n    \n    setGeneratingCover(true);\n    try {\n      const keyword = extractKeywords(title);\n      const timestamp = Date.now();\n      \n      // 使用 picsum.photos 生成随机封面图\n      const seed = Math.floor(Math.random() * 1000);\n      const imageUrl = `https://picsum.photos/seed/${seed}/1200/630`;\n      \n      setCoverList([{\n        uid: `-${timestamp}`,\n        name: `cover-${keyword}.jpg`,\n        status: 'done',\n        url: imageUrl,\n      }]);\n      \n      message.success(`已生成封面图`);\n    } catch (error) {\n      message.error('生成封面失败，请重试');\n    } finally {\n      setGeneratingCover(false);\n    }\n  };\n\n  const uploadProps = {\n    name: 'file',\n    action: '/api/upload',\n    headers: {\n      Authorization: `Bearer ${localStorage.getItem('token')}`,\n    },\n    listType: 'picture-card' as const,\n    fileList: coverList,\n    maxCount: 1,\n    onChange: ({ fileList }: { fileList: UploadFile[] }) => {\n      setCoverList(fileList);\n    },\n    beforeUpload: (file: File) => {\n      const isImage = file.type.startsWith('image/');\n      if (!isImage) {\n        message.error('只能上传图片文件');\n        return Upload.LIST_IGNORE;\n      }\n      const isLt5M = file.size / 1024 / 1024 < 5;\n      if (!isLt5M) {\n        message.error('图片大小不能超过 5MB');\n        return Upload.LIST_IGNORE;\n      }\n      return true;\n    },\n  };\n\n  if (loading) {\n    return <Loading />;\n  }\n\n  return (\n    <div className=\"animate-fade-in\">\n      <div className=\"flex items-center justify-between mb-6\">\n        <div className=\"flex items-center gap-4\">\n          <Button\n            type=\"text\"\n            icon={<ArrowLeftOutlined />}\n            onClick={() => navigate('/admin/articles')}\n          >\n            返回\n          </Button>\n          <div>\n            <Title level={3} className=\"!mb-0\">\n              编辑文章\n            </Title>\n          </div>\n        </div>\n        <Space>\n          <Button icon={<SaveOutlined />} onClick={handleSaveDraft} loading={saving}>\n            保存草稿\n          </Button>\n          <Button type=\"primary\" icon={<SendOutlined />} onClick={handlePublish} loading={saving}>\n            {article?.status === 'published' ? '更新文章' : '发布文章'}\n          </Button>\n        </Space>\n      </div>\n\n      <Form form={form} layout=\"vertical\">\n        <Row gutter={24}>\n          <Col xs={24} lg={16}>\n            <Card\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"title\"\n                label=\"文章标题\"\n                rules={[{ required: true, message: '请输入文章标题' }]}\n              >\n                <Input placeholder=\"请输入文章标题\" size=\"large\" />\n              </Form.Item>\n\n              <Form.Item name=\"summary\" label=\"文章摘要\">\n                <TextArea\n                  placeholder=\"请输入文章摘要（可选，用于列表展示）\"\n                  rows={3}\n                  showCount\n                  maxLength={200}\n                />\n              </Form.Item>\n\n              <Form.Item\n                name=\"content\"\n                label=\"文章内容\"\n                rules={[{ required: true, message: '请输入文章内容' }]}\n              >\n                <TextArea\n                  placeholder=\"请输入 Markdown 格式的文章内容\"\n                  rows={20}\n                  className=\"font-mono\"\n                />\n              </Form.Item>\n            </Card>\n          </Col>\n\n          <Col xs={24} lg={8}>\n            <Card\n              title=\"文章设置\"\n              style={{\n                borderRadius: 12,\n                border: 'none',\n                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',\n              }}\n            >\n              <Form.Item\n                name=\"category\"\n                label=\"文章分类\"\n                rules={[{ required: true, message: '请选择文章分类' }]}\n              >\n                <Select placeholder=\"请选择分类\" allowClear>\n                  {categories.map(cat => (\n                    <Option key={cat._id} value={cat._id}>\n                      {cat.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item name=\"tags\" label=\"文章标签\">\n                <Select\n                  mode=\"multiple\"\n                  placeholder=\"请选择标签\"\n                  allowClear\n                  maxTagCount={5}\n                >\n                  {tags.map(tag => (\n                    <Option key={tag._id} value={tag._id}>\n                      {tag.name}\n                    </Option>\n                  ))}\n                </Select>\n              </Form.Item>\n\n              <Form.Item label=\"封面图片\">\n                <div className=\"mb-3\">\n                  <Space>\n                    <Button\n                      type=\"primary\"\n                      ghost\n                      icon={<ThunderboltOutlined />}\n                      onClick={generateCover}\n                      loading={generatingCover}\n                    >\n                      自动生成\n                    </Button>\n                    {coverList.length > 0 && (\n                      <Button\n                        icon={<ReloadOutlined />}\n                        onClick={generateCover}\n                        loading={generatingCover}\n                      >\n                        换一张\n                      </Button>\n                    )}\n                  </Space>\n                </div>\n                <Upload {...uploadProps}>\n                  {coverList.length < 1 && (\n                    <div>\n                      <PlusOutlined />\n                      <div className=\"mt-2\">上传封面</div>\n                    </div>\n                  )}\n                </Upload>\n                <Text className=\"text-gray-400 text-xs\">\n                  点击\"自动生成\"根据标题获取封面，或手动上传\n                </Text>\n              </Form.Item>\n            </Card>\n          </Col>\n        </Row>\n      </Form>\n    </div>\n  );\n};\n\nexport default EditArticlePage;\n",
       "__isJSFile": true,
       "__absFile": "/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/pages/admin/articles/edit.tsx"
     },

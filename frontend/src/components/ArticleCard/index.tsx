@@ -39,11 +39,12 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4">
                 <Tag 
-                  color="pink" 
-                  className="!border-none"
+                  className="!border-none !text-white !px-3 !py-1 !rounded-lg"
                   style={{ 
-                    background: 'rgba(22, 119, 255, 0.9)',
-                    backdropFilter: 'blur(4px)',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
                   }}
                 >
                   <FolderOutlined className="mr-1" />

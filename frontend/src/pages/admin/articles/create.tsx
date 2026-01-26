@@ -29,49 +29,6 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
-// 技术关键词映射表，用于生成更精准的封面图
-const TECH_KEYWORDS: Record<string, string[]> = {
-  'react': ['react', 'javascript', 'frontend', 'code'],
-  'vue': ['vue', 'javascript', 'frontend', 'code'],
-  'javascript': ['javascript', 'code', 'programming'],
-  'typescript': ['typescript', 'code', 'programming'],
-  'node': ['nodejs', 'server', 'backend', 'code'],
-  'python': ['python', 'code', 'programming'],
-  'java': ['java', 'code', 'programming'],
-  'docker': ['docker', 'container', 'server'],
-  'mongodb': ['database', 'server', 'data'],
-  'mysql': ['database', 'server', 'data'],
-  'redis': ['database', 'server', 'cache'],
-  'nginx': ['server', 'network', 'web'],
-  'linux': ['linux', 'server', 'terminal'],
-  'git': ['git', 'code', 'version control'],
-  'css': ['css', 'design', 'frontend', 'web'],
-  'html': ['html', 'web', 'frontend', 'code'],
-  '前端': ['frontend', 'web', 'code', 'design'],
-  '后端': ['backend', 'server', 'code', 'database'],
-  '部署': ['server', 'cloud', 'devops'],
-  '数据库': ['database', 'data', 'server'],
-  '算法': ['algorithm', 'code', 'mathematics'],
-  '设计': ['design', 'ui', 'creative'],
-  '人工智能': ['artificial intelligence', 'ai', 'technology'],
-  'ai': ['artificial intelligence', 'ai', 'robot'],
-};
-
-// 从标题中提取搜索关键词
-const extractKeywords = (title: string): string => {
-  const lowerTitle = title.toLowerCase();
-  
-  // 尝试匹配技术关键词
-  for (const [key, values] of Object.entries(TECH_KEYWORDS)) {
-    if (lowerTitle.includes(key)) {
-      return values[Math.floor(Math.random() * values.length)];
-    }
-  }
-  
-  // 默认使用 technology + coding 相关关键词
-  const defaultKeywords = ['technology', 'coding', 'computer', 'programming', 'digital'];
-  return defaultKeywords[Math.floor(Math.random() * defaultKeywords.length)];
-};
 
 const CreateArticlePage: React.FC = () => {
   const navigate = useNavigate();
@@ -139,29 +96,22 @@ const CreateArticlePage: React.FC = () => {
 
   // 自动生成封面图
   const generateCover = async () => {
-    const title = form.getFieldValue('title');
-    if (!title) {
-      message.warning('请先输入文章标题');
-      return;
-    }
-    
     setGeneratingCover(true);
     try {
-      const keyword = extractKeywords(title);
-      // 使用 Unsplash Source API 获取随机图片
-      // 添加时间戳确保每次获取不同图片
+      // 使用 waifu.pics API 获取随机动漫图片
+      const res = await fetch('https://api.waifu.pics/sfw/waifu');
+      const data = await res.json();
       const timestamp = Date.now();
-      const imageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(keyword)}&t=${timestamp}`;
-      
+
       // 设置封面
       setCoverList([{
         uid: `-${timestamp}`,
-        name: `cover-${keyword}.jpg`,
+        name: `cover-anime.jpg`,
         status: 'done',
-        url: imageUrl,
+        url: data.url,
       }]);
-      
-      message.success(`已根据"${keyword}"生成封面图`);
+
+      message.success('已生成动漫封面图');
     } catch (error) {
       message.error('生成封面失败，请重试');
     } finally {

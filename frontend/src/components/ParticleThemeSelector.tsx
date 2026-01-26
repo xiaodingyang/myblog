@@ -18,18 +18,26 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
 
   return (
     <>
-      {/* 悬浮触发按钮 */}
+      {/* 悬浮触发按钮 - 毛玻璃风格 */}
       <Tooltip title="主题设置" placement="left">
         <button
           onClick={() => setOpen(true)}
-          className="fixed right-4 bottom-20 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110"
+          className="fixed right-4 bottom-20 z-50 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 group"
           style={{
-            background: currentColorTheme.gradient,
-            border: 'none',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: `1px solid rgba(255, 255, 255, 0.5)`,
+            boxShadow: `0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px ${currentColorTheme.primary}20`,
             cursor: 'pointer',
           }}
         >
-          <span className="text-xl">{currentTheme.icon}</span>
+          <span 
+            className="text-lg transition-transform duration-300 group-hover:rotate-12"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+          >
+            {currentTheme.icon}
+          </span>
         </button>
       </Tooltip>
 
