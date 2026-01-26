@@ -58,10 +58,14 @@ export default defineConfig({
     { path: '/*', component: '@/pages/404' },
   ],
   
-  // 代理配置 - 将 /api 请求转发到后端
+  // 代理配置 - 将 /api 请求转发到服务器后端
   proxy: {
     '/api': {
-      target: 'http://localhost:3000',
+      target: 'http://43.129.200.177',
+      changeOrigin: true,
+    },
+    '/uploads': {
+      target: 'http://43.129.200.177',
       changeOrigin: true,
     },
   },
