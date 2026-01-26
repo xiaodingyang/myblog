@@ -17,14 +17,57 @@ import {
   ArrowLeftOutlined,
   SaveOutlined,
   SendOutlined,
+  ThunderboltOutlined,
+  ReloadOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import type { UploadFile } from 'antd/es/upload/interface';
 import Loading from '@/components/Loading';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
+// 技术关键词映射表
+const TECH_KEYWORDS: Record<string, string[]> = {
+  'react': ['react', 'javascript', 'frontend', 'code'],
+  'vue': ['vue', 'javascript', 'frontend', 'code'],
+  'javascript': ['javascript', 'code', 'programming'],
+  'typescript': ['typescript', 'code', 'programming'],
+  'node': ['nodejs', 'server', 'backend', 'code'],
+  'python': ['python', 'code', 'programming'],
+  'java': ['java', 'code', 'programming'],
+  'docker': ['docker', 'container', 'server'],
+  'mongodb': ['database', 'server', 'data'],
+  'mysql': ['database', 'server', 'data'],
+  'redis': ['database', 'server', 'cache'],
+  'nginx': ['server', 'network', 'web'],
+  'linux': ['linux', 'server', 'terminal'],
+  'git': ['git', 'code', 'version control'],
+  'css': ['css', 'design', 'frontend', 'web'],
+  'html': ['html', 'web', 'frontend', 'code'],
+  '前端': ['frontend', 'web', 'code', 'design'],
+  '后端': ['backend', 'server', 'code', 'database'],
+  '部署': ['server', 'cloud', 'devops'],
+  '数据库': ['database', 'data', 'server'],
+  '算法': ['algorithm', 'code', 'mathematics'],
+  '设计': ['design', 'ui', 'creative'],
+  '人工智能': ['artificial intelligence', 'ai', 'technology'],
+  'ai': ['artificial intelligence', 'ai', 'robot'],
+};
+
+// 从标题中提取搜索关键词
+const extractKeywords = (title: string): string => {
+  const lowerTitle = title.toLowerCase();
+  for (const [key, values] of Object.entries(TECH_KEYWORDS)) {
+    if (lowerTitle.includes(key)) {
+      return values[Math.floor(Math.random() * values.length)];
+    }
+  }
+  const defaultKeywords = ['technology', 'coding', 'computer', 'programming', 'digital'];
+  return defaultKeywords[Math.floor(Math.random() * defaultKeywords.length)];
+};
 
 const EditArticlePage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +79,7 @@ const EditArticlePage: React.FC = () => {
   const [tags, setTags] = useState<API.Tag[]>([]);
   const [coverList, setCoverList] = useState<UploadFile[]>([]);
   const [article, setArticle] = useState<API.Article | null>(null);
+  const [generatingCover, setGeneratingCover] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,6 +163,35 @@ const EditArticlePage: React.FC = () => {
     form.validateFields().then((values) => {
       handleSubmit(values, 'published');
     });
+  };
+
+  // 自动生成封面图
+  const generateCover = async () => {
+    const title = form.getFieldValue('title');
+    if (!title) {
+      message.warning('请先输入文章标题');
+      return;
+    }
+    
+    setGeneratingCover(true);
+    try {
+      const keyword = extractKeywords(title);
+      const timestamp = Date.now();
+      const imageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(keyword)}&t=${timestamp}`;
+      
+      setCoverList([{
+        uid: `-${timestamp}`,
+        name: `cover-${keyword}.jpg`,
+        status: 'done',
+        url: imageUrl,
+      }]);
+      
+      message.success(`已根据"${keyword}"生成封面图`);
+    } catch (error) {
+      message.error('生成封面失败，请重试');
+    } finally {
+      setGeneratingCover(false);
+    }
   };
 
   const uploadProps = {
@@ -259,14 +332,39 @@ const EditArticlePage: React.FC = () => {
               </Form.Item>
 
               <Form.Item label="封面图片">
+                <div className="mb-3">
+                  <Space>
+                    <Button
+                      type="primary"
+                      ghost
+                      icon={<ThunderboltOutlined />}
+                      onClick={generateCover}
+                      loading={generatingCover}
+                    >
+                      自动生成
+                    </Button>
+                    {coverList.length > 0 && (
+                      <Button
+                        icon={<ReloadOutlined />}
+                        onClick={generateCover}
+                        loading={generatingCover}
+                      >
+                        换一张
+                      </Button>
+                    )}
+                  </Space>
+                </div>
                 <Upload {...uploadProps}>
                   {coverList.length < 1 && (
                     <div>
-                      <span>+</span>
+                      <PlusOutlined />
                       <div className="mt-2">上传封面</div>
                     </div>
                   )}
                 </Upload>
+                <Text className="text-gray-400 text-xs">
+                  点击"自动生成"根据标题获取封面，或手动上传
+                </Text>
               </Form.Item>
             </Card>
           </Col>
