@@ -2,6 +2,7 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   title: '个人博客',
+  esbuildMinifyIIFE: true,
   
   // 启用内置插件
   plugins: [

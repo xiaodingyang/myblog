@@ -16,6 +16,8 @@ import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
@@ -202,6 +204,35 @@ const ArticleDetailPage: React.FC = () => {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
+                components={{
+                  code({ node, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    const isInline = !match && !className;
+                    return !isInline ? (
+                      <SyntaxHighlighter
+                        style={vscDarkPlus}
+                        language={match ? match[1] : 'text'}
+                        PreTag="div"
+                        customStyle={{
+                          margin: '1em 0',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                        }}
+                        showLineNumbers
+                        wrapLines
+                      >
+                        {String(children).replace(/\n$/, '')}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <code 
+                        className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  },
+                }}
               >
                 {article.content}
               </ReactMarkdown>
