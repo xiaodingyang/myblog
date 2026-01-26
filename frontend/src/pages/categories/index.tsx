@@ -48,10 +48,21 @@ const CategoriesPage: React.FC = () => {
           }}>
             <FolderOutlined className="text-3xl text-white" />
           </div>
-          <Title level={1} className="!mb-3 !text-gray-800">
+          <Title 
+            level={1} 
+            className="!mb-3 !text-gray-800"
+            style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
             文章分类
           </Title>
-          <Text className="text-gray-600 text-lg">
+          <Text 
+            className="text-gray-600 text-lg"
+            style={{
+              textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+            }}
+          >
             共 {categories.length} 个分类
           </Text>
         </div>
@@ -84,12 +95,21 @@ const CategoriesPage: React.FC = () => {
                         <FolderOutlined className="text-2xl text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <Title level={4} className="!mb-2">
+                        <Title 
+                          level={4} 
+                          className="!mb-2"
+                          style={{
+                            textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                          }}
+                        >
                           {category.name}
                         </Title>
                         <Paragraph
                           ellipsis={{ rows: 2 }}
                           className="!mb-3 text-gray-500"
+                          style={{
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                          }}
                         >
                           {category.description || '暂无描述'}
                         </Paragraph>

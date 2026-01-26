@@ -79,10 +79,21 @@ const ArticlesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
         <div className="text-center mb-12">
-          <Title level={1} className="!mb-3 !text-gray-800">
+          <Title 
+            level={1} 
+            className="!mb-3 !text-gray-800"
+            style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
             文章列表
           </Title>
-          <Text className="text-gray-600 text-lg">
+          <Text 
+            className="text-gray-600 text-lg"
+            style={{
+              textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+            }}
+          >
             共 {total} 篇文章，记录技术成长的点滴
           </Text>
         </div>

@@ -4,7 +4,7 @@
   "private": true,
   "description": "个人博客前端 - Umi 4 + Ant Design 5 + Tailwind CSS",
   "scripts": {
-    "dev": "umi dev",
+    "dev": "PORT=8001 umi dev",
     "build": "umi build",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx src --fix"
@@ -12,6 +12,9 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@ant-design/pro-components": "^2.6.43",
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "antd": "^5.12.5",
     "dayjs": "^1.11.10",
     "react": "^18.2.0",
@@ -20,6 +23,7 @@
     "rehype-highlight": "^7.0.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
+    "three": "^0.182.0",
     "umi": "^4.0.91"
   },
   "devDependencies": {

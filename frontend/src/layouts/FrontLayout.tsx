@@ -16,6 +16,7 @@ import {
 import { useModel } from 'umi';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import ParticleThemeSelector from '@/components/ParticleThemeSelector';
+import GlassBackground from '@/components/GlassBackground';
 import { getThemeById } from '@/config/particleThemes';
 import { getColorThemeById } from '@/config/colorThemes';
 
@@ -30,21 +31,10 @@ const FrontLayout: React.FC = () => {
   const currentTheme = getThemeById(themeId);
   const currentColorTheme = getColorThemeById(colorThemeId);
   
-  // 获取主题背景色
+  // 获取主题背景色 - 现在由毛玻璃背景组件处理，Layout 使用透明背景
   const getBackgroundStyle = () => {
-    // 首页时，背景色由各个section自己控制，Layout不设置背景色
-    if (isHomePage) {
-      return { background: 'transparent' };
-    }
-    // 非首页时，使用主题背景色
-    if (currentTheme.backgroundGradient) {
-      return { background: currentTheme.backgroundGradient };
-    }
-    if (currentTheme.backgroundColor) {
-      return { background: currentTheme.backgroundColor };
-    }
-    // 默认背景
-    return { background: '#ffffff' };
+    // 所有页面都使用透明背景，让毛玻璃背景组件处理背景效果
+    return { background: 'transparent' };
   };
   
   // 获取头部样式
@@ -109,7 +99,10 @@ const FrontLayout: React.FC = () => {
         '--theme-gradient': currentColorTheme.gradient,
       } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string }}
     >
-      {/* 粒子背景 */}
+      {/* 毛玻璃背景层 - 先渲染，作为底层背景 */}
+      <GlassBackground isDark={isDarkTheme} />
+      
+      {/* 粒子背景 - 在毛玻璃之上，确保粒子可见 */}
       <ParticlesBackground isDark={isDarkTheme} />
       
       {/* 粒子主题选择器 */}
@@ -166,7 +159,7 @@ const FrontLayout: React.FC = () => {
         className={isHomePage ? 'pt-16 h-[calc(100vh-64px)] overflow-hidden' : 'pt-16'}
         style={{
           position: 'relative',
-          zIndex: isHomePage ? 10 : 1,
+          zIndex: isHomePage ? 10 : 2, // 确保内容在毛玻璃背景之上
         }}
       >
         <div className={isHomePage ? 'h-full' : 'min-h-[calc(100vh-64px-200px)]'}>

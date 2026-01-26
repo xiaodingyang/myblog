@@ -1,4 +1,5 @@
 import type { ISourceOptions } from '@tsparticles/engine';
+import { colorThemes } from './colorThemes';
 
 export interface ParticleTheme {
   id: string;
@@ -18,7 +19,7 @@ export interface ParticleTheme {
 const baseConfig: Partial<ISourceOptions> = {
   fullScreen: {
     enable: true,
-    zIndex: 1,
+    zIndex: 1, // 粒子在毛玻璃之上，确保可见
   },
   background: {
     color: {
@@ -27,6 +28,11 @@ const baseConfig: Partial<ISourceOptions> = {
   },
   fpsLimit: 120,
   detectRetina: true,
+};
+
+// 获取所有主题色的主色数组
+const getAllThemeColors = (): string[] => {
+  return colorThemes.map(theme => theme.primary);
 };
 
 // 主题1: 星空连线（原主题）
@@ -38,59 +44,65 @@ const starlineTheme: ParticleTheme = {
   backgroundGradient: 'linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
   headerBackground: 'rgba(15, 23, 42, 0.9)',
   headerTextColor: '#fff',
-  options: (isDark: boolean) => ({
-    ...baseConfig,
-    interactivity: {
-      detectsOn: 'window',
-      events: {
-        onClick: { enable: true, mode: 'push' },
-        onHover: { enable: true, mode: 'grab' },
-        resize: { enable: true },
-      },
-      modes: {
-        push: { quantity: 6 },
-        grab: {
-          distance: 200,
-          links: { opacity: 1, color: isDark ? '#ffb3d9' : '#ff91c7' }, // 淡粉色
+  options: (isDark: boolean) => {
+    // 获取所有主题色
+    const allColors = getAllThemeColors();
+    
+    return {
+      ...baseConfig,
+      interactivity: {
+        detectsOn: 'window',
+        events: {
+          onClick: { enable: true, mode: 'push' },
+          onHover: { enable: true, mode: 'grab' },
+          resize: { enable: true },
+        },
+        modes: {
+          push: { quantity: 6 },
+          grab: {
+            distance: 200,
+            links: { 
+              opacity: 1, 
+              color: allColors, // 从所有主题色中随机选择
+            },
+          },
         },
       },
-    },
-    particles: {
-      color: {
-        value: isDark
-          ? ['#ffb3d9', '#ff91c7', '#ffc0e5', '#ffd6e8', '#ffe0f0', '#ffebf5'] // 淡粉色系
-          : ['#ffb3d9', '#ff91c7', '#ffc0e5', '#ffd6e8', '#ffe0f0', '#ffebf5'], // 淡粉色系
+      particles: {
+        color: {
+          value: allColors, // 从所有主题色中随机选择
+        },
+        links: {
+          color: allColors, // 从所有主题色中随机选择
+          distance: 150,
+          enable: true,
+          opacity: 0.5,
+          width: 1,
+        },
+        move: {
+          direction: 'none',
+          enable: true,
+          outModes: { default: 'out' },
+          random: false,
+          speed: 2,
+          straight: false,
+        },
+        number: {
+          density: { enable: true, width: 1920, height: 1080 },
+          value: 100,
+        },
+        opacity: { value: 0.7 },
+        shape: { type: 'circle' },
+        size: { value: { min: 2, max: 6 } },
+        shadow: {
+          blur: 8,
+          color: { value: allColors }, // 从所有主题色中随机选择
+          enable: true,
+          offset: { x: 0, y: 0 },
+        },
       },
-      links: {
-        color: isDark ? '#ffb3d9' : '#ff91c7', // 淡粉色
-        distance: 150,
-        enable: true,
-        opacity: 0.5,
-        width: 1,
-      },
-      move: {
-        direction: 'none',
-        enable: true,
-        outModes: { default: 'out' },
-        random: false,
-        speed: 2,
-        straight: false,
-      },
-      number: {
-        density: { enable: true, width: 1920, height: 1080 },
-        value: 100,
-      },
-      opacity: { value: 0.7 },
-      shape: { type: 'circle' },
-      size: { value: { min: 2, max: 6 } },
-      shadow: {
-        blur: 8,
-        color: { value: isDark ? '#ffb3d9' : '#ff91c7' }, // 淡粉色
-        enable: true,
-        offset: { x: 0, y: 0 },
-      },
-    },
-  }),
+    };
+  },
 };
 
 // 主题2: 雪花飘落

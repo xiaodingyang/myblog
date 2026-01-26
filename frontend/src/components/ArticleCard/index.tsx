@@ -71,7 +71,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
             level={4} 
             ellipsis={{ rows: 2 }}
             className="!mb-0 hover:text-primary transition-colors"
-            style={{ color: '#1e293b' }}
+            style={{ 
+              color: '#1e293b',
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+            }}
           >
             {article.title}
           </Title>
@@ -80,6 +83,9 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
           <Paragraph 
             ellipsis={{ rows: 2 }}
             className="!mb-0 text-gray-500"
+            style={{
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+            }}
           >
             {article.summary || '暂无摘要'}
           </Paragraph>
@@ -114,7 +120,13 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
                 {article.author?.username || '匿名'}
               </Text>
             </Space>
-            <Space className="text-gray-400 text-sm" split={<span className="mx-1">·</span>}>
+            <Space 
+              className="text-gray-400 text-sm" 
+              split={<span className="mx-1">·</span>}
+              style={{
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+              }}
+            >
               <span>
                 <EyeOutlined className="mr-1" />
                 {article.views || 0}

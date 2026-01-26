@@ -94,10 +94,21 @@ const AboutPage: React.FC = () => {
                 <UserOutlined />
               </div>
               <div className="text-center md:text-left flex-1">
-                <Title level={2} className="!mb-1">
+                <Title 
+                  level={2} 
+                  className="!mb-1"
+                  style={{
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
                   博客作者
                 </Title>
-                <Text className="text-gray-500 text-lg">
+                <Text 
+                  className="text-gray-500 text-lg"
+                  style={{
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                  }}
+                >
                   全栈开发工程师 / 技术爱好者
                 </Text>
               </div>
@@ -135,7 +146,12 @@ const AboutPage: React.FC = () => {
 
             <Divider />
 
-            <Paragraph className="text-gray-600 text-base leading-relaxed">
+            <Paragraph 
+              className="text-gray-600 text-base leading-relaxed"
+              style={{
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+              }}
+            >
               👋 你好！我是一名热爱技术的全栈开发工程师。
               <br /><br />
               热衷于探索新技术，享受解决复杂问题带来的成就感。相信代码可以改变世界，也相信分享可以让世界更美好。
@@ -167,8 +183,22 @@ const AboutPage: React.FC = () => {
                 {skills.map(skill => (
                   <div key={skill.name}>
                     <div className="flex justify-between mb-1">
-                      <Text strong>{skill.name}</Text>
-                      <Text className="text-gray-400">{skill.level}%</Text>
+                      <Text 
+                        strong
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        {skill.name}
+                      </Text>
+                      <Text 
+                        className="text-gray-400"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        {skill.level}%
+                      </Text>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -208,10 +238,29 @@ const AboutPage: React.FC = () => {
                     <div className="pb-2">
                       <div className="flex items-center gap-2 mb-1">
                         <Tag color="pink">{exp.year}</Tag>
-                        <Text strong>{exp.title}</Text>
+                        <Text 
+                          strong
+                          style={{
+                            textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                          }}
+                        >
+                          {exp.title}
+                        </Text>
                       </div>
-                      <Text className="text-gray-500 text-sm">{exp.company}</Text>
-                      <Paragraph className="!mb-0 mt-2 text-gray-600 text-sm">
+                      <Text 
+                        className="text-gray-500 text-sm"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        {exp.company}
+                      </Text>
+                      <Paragraph 
+                        className="!mb-0 mt-2 text-gray-600 text-sm"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
                         {exp.description}
                       </Paragraph>
                     </div>

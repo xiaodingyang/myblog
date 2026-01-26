@@ -97,7 +97,7 @@ const HomePage: React.FC = () => {
   const sectionHeight = 'calc(100vh - 64px)';
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="h-full overflow-y-auto relative"
       style={{
@@ -117,7 +117,7 @@ const HomePage: React.FC = () => {
             <button
               key={index}
               onClick={() => scrollToSection(index)}
-              style={{ 
+              style={{
                 outline: 'none',
                 width: 12,
                 height: 12,
@@ -126,12 +126,12 @@ const HomePage: React.FC = () => {
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 transform: isActive ? 'scale(1.3)' : 'scale(1)',
-                background: isActive 
+                background: isActive
                   ? isDarkSection ? '#fff' : '#1f2937'
                   : isDarkSection ? 'rgba(255,255,255,0.3)' : 'rgba(107,114,128,0.5)',
-                boxShadow: isActive 
-                  ? isDarkSection 
-                    ? '0 0 12px rgba(255,255,255,0.6)' 
+                boxShadow: isActive
+                  ? isDarkSection
+                    ? '0 0 12px rgba(255,255,255,0.6)'
                     : '0 0 12px rgba(0,0,0,0.3)'
                   : 'none',
               }}
@@ -141,7 +141,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* ========== 第一屏：Hero ========== */}
-      <section 
+      <section
         className="w-full relative flex items-center justify-center overflow-hidden"
         style={{
           height: sectionHeight,
@@ -155,7 +155,7 @@ const HomePage: React.FC = () => {
         {/* 动态背景 */}
         <div className="absolute inset-0">
           {/* 网格背景 */}
-          <div 
+          <div
             className="absolute inset-0 opacity-5"
             style={{
               backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
@@ -164,11 +164,11 @@ const HomePage: React.FC = () => {
             }}
           />
           {/* 渐变光晕 */}
-          <div 
+          <div
             className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-30 blur-3xl"
             style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
           />
-          <div 
+          <div
             className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
             style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
           />
@@ -197,11 +197,11 @@ const HomePage: React.FC = () => {
               <RocketOutlined className="text-yellow-400 text-lg" />
               <span className="text-white/90 text-sm font-medium">探索技术的无限可能</span>
             </div>
-            
-            <Title 
+
+            <Title
               level={1}
               className="!text-white !mb-8"
-              style={{ 
+              style={{
                 fontSize: 'clamp(3rem, 8vw, 5rem)',
                 fontWeight: 800,
                 lineHeight: 1.1,
@@ -210,7 +210,7 @@ const HomePage: React.FC = () => {
             >
               代码改变世界
               <br />
-              <span 
+              <span
                 style={{
                   background: `linear-gradient(90deg, ${currentColorTheme.primary}, ${currentColorTheme.primary}dd, ${currentColorTheme.primary}bb)`, // 主题色渐变
                   WebkitBackgroundClip: 'text',
@@ -221,15 +221,15 @@ const HomePage: React.FC = () => {
                 记录成长轨迹
               </span>
             </Title>
-            
+
             <Paragraph className="!text-gray-400 !text-xl !mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               在这里分享编程技术、学习心得与项目经验。
               <br />每一行代码都是通往未来的阶梯。
             </Paragraph>
-            
+
             <div className="flex flex-wrap justify-center lg:justify-start gap-5">
               <Link to="/articles">
-                <Button 
+                <Button
                   size="large"
                   className="!h-14 !px-10 !rounded-full !font-bold !text-base !border-none"
                   style={{
@@ -251,7 +251,7 @@ const HomePage: React.FC = () => {
                 </Button>
               </Link>
               <Link to="/about">
-                <Button 
+                <Button
                   size="large"
                   ghost
                   className="!h-14 !px-10 !rounded-full !font-bold !text-base !text-white !border-white/30 hover:!bg-white/10"
@@ -260,7 +260,7 @@ const HomePage: React.FC = () => {
                 </Button>
               </Link>
             </div>
-            
+
             {/* 统计数据 */}
             <div className="flex justify-center lg:justify-start gap-12 mt-16">
               {[
@@ -268,19 +268,40 @@ const HomePage: React.FC = () => {
                 { label: '分类', value: categories.length || '0', icon: '📂' },
                 { label: '标签', value: tags.length || '0', icon: '🏷️' },
               ].map((item, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-4xl font-bold text-white mb-1">{item.value}</div>
-                  <div className="text-gray-500 text-sm">{item.icon} {item.label}</div>
+                <div
+                  key={i}
+                  className="text-center"
+                  style={{
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2)',
+                  }}
+                >
+                  <div
+                    className="text-4xl font-bold text-white mb-1"
+                    style={{
+                      textShadow: '0 2px 12px rgba(0, 0, 0, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3)',
+                    }}
+                  >
+                    {item.value}
+                  </div>
+                  <div
+                    className="text-gray-500 text-sm"
+                    style={{
+                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2)',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                    }}
+                  >
+                    {item.icon} {item.label}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          
+
           {/* 右侧装饰 */}
           <div className="flex-1 hidden lg:block">
             <div className="relative">
               {/* 代码块装饰 */}
-              <div 
+              <div
                 className="relative bg-gray-900/80 rounded-2xl p-8 backdrop-blur-sm border border-white/10"
                 style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.5)' }}
               >
@@ -307,9 +328,9 @@ const HomePage: React.FC = () => {
                 </pre>
               </div>
               {/* 浮动卡片 */}
-              <div 
+              <div
                 className="absolute -top-6 -right-6 rounded-2xl p-5 text-white"
-                style={{ 
+                style={{
                   background: currentColorTheme.gradient,
                   boxShadow: `0 15px 50px ${currentColorTheme.primary}66`,
                 }}
@@ -321,31 +342,38 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* 向下滚动提示 */}
-        <div 
+        <div
           onClick={() => scrollToSection(1)}
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
           style={{ animation: 'bounce 2s infinite' }}
         >
           <div className="flex flex-col items-center gap-3">
-            <span className="text-white/50 text-sm font-medium">向下滚动</span>
-            <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
+            <span
+              className="text-white/50 text-sm font-medium"
+              style={{
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              向下滚动
+            </span>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
               stroke="rgba(255,255,255,0.5)"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M12 5v14M5 12l7 7 7-7"/>
+              <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
           </div>
         </div>
       </section>
 
       {/* ========== 第二屏：精选文章 ========== */}
-      <section 
+      <section
         className="w-full relative flex items-center justify-center"
         style={{
           height: sectionHeight,
@@ -362,10 +390,23 @@ const HomePage: React.FC = () => {
               <FireOutlined />
               <span className="font-medium">热门推荐</span>
             </div>
-            <Title level={2} className="!text-4xl lg:!text-5xl !mb-4">
+            <Title
+              level={2}
+              className="!text-4xl lg:!text-5xl !mb-4"
+              style={{
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              }}
+            >
               精选文章
             </Title>
-            <Text className="text-gray-500 text-lg">探索最受欢迎的技术内容</Text>
+            <Text
+              className="text-gray-500 text-lg"
+              style={{
+                textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              探索最受欢迎的技术内容
+            </Text>
           </div>
 
           {loading ? (
@@ -375,7 +416,7 @@ const HomePage: React.FC = () => {
               {/* 主推文章 */}
               <div className="lg:col-span-7">
                 <Link to={`/article/${articles[0]?._id}`} className="block group h-full">
-                  <div 
+                  <div
                     className="relative overflow-hidden rounded-3xl h-full min-h-[400px]"
                     style={{
                       background: currentColorTheme.gradient, // 主题色渐变
@@ -411,12 +452,12 @@ const HomePage: React.FC = () => {
                   </div>
                 </Link>
               </div>
-              
+
               {/* 次推文章 */}
               <div className="lg:col-span-5 flex flex-col gap-6">
                 {articles.slice(1, 3).map((article, index) => (
                   <Link key={article._id} to={`/article/${article._id}`} className="block group flex-1">
-                    <div 
+                    <div
                       className="relative overflow-hidden rounded-3xl h-full min-h-[185px]"
                       style={{
                         background: index === 0
@@ -460,7 +501,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ========== 第三屏：最新发布 ========== */}
-      <section 
+      <section
         className="w-full relative flex items-center justify-center"
         style={{
           height: sectionHeight,
@@ -473,7 +514,7 @@ const HomePage: React.FC = () => {
       >
         <div className="max-w-6xl mx-auto px-6 w-full">
           <div className="text-center mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <div 
+            <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
               style={{
                 background: `${currentColorTheme.primary}20`,
@@ -483,17 +524,30 @@ const HomePage: React.FC = () => {
               <ClockCircleOutlined />
               <span className="font-medium">最新动态</span>
             </div>
-            <Title level={2} className="!text-4xl lg:!text-5xl !mb-4">
+            <Title
+              level={2}
+              className="!text-4xl lg:!text-5xl !mb-4"
+              style={{
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              }}
+            >
               最新发布
             </Title>
-            <Text className="text-gray-500 text-lg">持续更新的技术分享</Text>
+            <Text
+              className="text-gray-500 text-lg"
+              style={{
+                textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              持续更新的技术分享
+            </Text>
           </div>
 
           {articles.length > 3 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {articles.slice(3, 6).map((article, index) => (
                 <Link key={article._id} to={`/article/${article._id}`} className="block group">
-                  <div 
+                  <div
                     className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
                     style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
                   >
@@ -506,7 +560,7 @@ const HomePage: React.FC = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (
-                        <div 
+                        <div
                           className="w-full h-full flex items-center justify-center"
                           style={{
                             background: `linear-gradient(135deg, hsl(${(index * 60) % 360}, 70%, 60%) 0%, hsl(${(index * 60 + 40) % 360}, 70%, 50%) 100%)`,
@@ -522,28 +576,36 @@ const HomePage: React.FC = () => {
                         </Tag>
                       </div>
                     </div>
-                    
+
                     {/* 内容 */}
                     <div className="p-6">
-                      <Title 
-                        level={5} 
+                      <Title
+                        level={5}
                         className="!mb-3 transition-colors line-clamp-2"
-                        style={{ '--hover-color': currentColorTheme.primary } as React.CSSProperties & { '--hover-color': string }}
+                        style={{
+                          '--hover-color': currentColorTheme.primary,
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        } as React.CSSProperties & { '--hover-color': string }}
                         onMouseEnter={(e) => e.currentTarget.style.color = currentColorTheme.primary}
                         onMouseLeave={(e) => e.currentTarget.style.color = ''}
                       >
                         {article.title}
                       </Title>
-                      <Paragraph className="!text-gray-500 !mb-4 !text-sm line-clamp-2">
+                      <Paragraph
+                        className="!text-gray-500 !mb-4 !text-sm line-clamp-2"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
                         {article.summary || '暂无摘要'}
                       </Paragraph>
-                      
+
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                         <Space className="text-gray-400 text-xs">
                           <span><EyeOutlined /> {article.views || 0}</span>
                           <span><ClockCircleOutlined /> {dayjs(article.createdAt).format('MM-DD')}</span>
                         </Space>
-                        <span 
+                        <span
                           className="text-sm font-medium group-hover:underline"
                           style={{ color: currentColorTheme.primary }}
                         >
@@ -559,7 +621,7 @@ const HomePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {articles.map((article, index) => (
                 <Link key={article._id} to={`/article/${article._id}`} className="block group">
-                  <div 
+                  <div
                     className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
                     style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
                   >
@@ -567,7 +629,7 @@ const HomePage: React.FC = () => {
                       {article.cover ? (
                         <img src={article.cover} alt={article.title} className="w-full h-full object-cover" />
                       ) : (
-                        <div 
+                        <div
                           className="w-full h-full flex items-center justify-center"
                           style={{
                             background: `linear-gradient(135deg, hsl(${(index * 60) % 360}, 70%, 60%) 0%, hsl(${(index * 60 + 40) % 360}, 70%, 50%) 100%)`,
@@ -578,16 +640,26 @@ const HomePage: React.FC = () => {
                       )}
                     </div>
                     <div className="p-6">
-                      <Title 
-                        level={5} 
+                      <Title
+                        level={5}
                         className="!mb-2 line-clamp-2"
-                        style={{ '--hover-color': currentColorTheme.primary } as React.CSSProperties & { '--hover-color': string }}
+                        style={{
+                          '--hover-color': currentColorTheme.primary,
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        } as React.CSSProperties & { '--hover-color': string }}
                         onMouseEnter={(e) => e.currentTarget.style.color = currentColorTheme.primary}
                         onMouseLeave={(e) => e.currentTarget.style.color = ''}
                       >
                         {article.title}
                       </Title>
-                      <Text className="text-gray-400 text-sm">{dayjs(article.createdAt).format('YYYY-MM-DD')}</Text>
+                      <Text
+                        className="text-gray-400 text-sm"
+                        style={{
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        {dayjs(article.createdAt).format('YYYY-MM-DD')}
+                      </Text>
                     </div>
                   </div>
                 </Link>
@@ -598,7 +670,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ========== 第四屏：分类与标签 ========== */}
-      <section 
+      <section
         className="w-full relative flex items-center justify-center"
         style={{
           height: sectionHeight,
@@ -611,7 +683,7 @@ const HomePage: React.FC = () => {
       >
         <div className="max-w-6xl mx-auto px-6 w-full">
           <div className="text-center mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <div 
+            <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
               style={{
                 background: `${currentColorTheme.primary}20`,
@@ -621,22 +693,41 @@ const HomePage: React.FC = () => {
               <TagsOutlined />
               <span className="font-medium">内容导航</span>
             </div>
-            <Title level={2} className="!text-4xl lg:!text-5xl !mb-4">
+            <Title
+              level={2}
+              className="!text-4xl lg:!text-5xl !mb-4"
+              style={{
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              }}
+            >
               探索更多
             </Title>
-            <Text className="text-gray-500 text-lg">按分类和标签浏览内容</Text>
+            <Text
+              className="text-gray-500 text-lg"
+              style={{
+                textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              按分类和标签浏览内容
+            </Text>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* 分类 */}
             <div className="bg-white rounded-3xl p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
-                <Title level={3} className="!mb-0 !text-2xl">
+                <Title
+                  level={3}
+                  className="!mb-0 !text-2xl"
+                  style={{
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                  }}
+                >
                   <FolderOutlined className="mr-2" style={{ color: currentColorTheme.primary }} />
                   文章分类
                 </Title>
-                <Link 
-                  to="/categories" 
+                <Link
+                  to="/categories"
                   className="hover:underline font-medium"
                   style={{ color: currentColorTheme.primary }}
                 >
@@ -648,7 +739,7 @@ const HomePage: React.FC = () => {
                   <Link key={cat._id} to={`/category/${cat._id}`}>
                     <div className="flex items-center justify-between p-5 rounded-2xl hover:bg-gray-50 transition-colors group cursor-pointer">
                       <div className="flex items-center gap-4">
-                        <div 
+                        <div
                           className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl"
                           style={{
                             background: `linear-gradient(135deg, hsl(${index * 50}, 70%, 55%) 0%, hsl(${index * 50 + 30}, 70%, 45%) 100%)`,
@@ -657,14 +748,22 @@ const HomePage: React.FC = () => {
                           <FolderOutlined />
                         </div>
                         <div>
-                          <div 
+                          <div
                             className="font-semibold text-lg transition-colors"
+                            style={{
+                              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                            }}
                             onMouseEnter={(e) => e.currentTarget.style.color = currentColorTheme.primary}
                             onMouseLeave={(e) => e.currentTarget.style.color = ''}
                           >
                             {cat.name}
                           </div>
-                          <div className="text-gray-400 text-sm mt-1 line-clamp-1">
+                          <div
+                            className="text-gray-400 text-sm mt-1 line-clamp-1"
+                            style={{
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                            }}
+                          >
                             {cat.description || '暂无描述'}
                           </div>
                         </div>
@@ -684,12 +783,18 @@ const HomePage: React.FC = () => {
             {/* 标签云 */}
             <div className="bg-white rounded-3xl p-8" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
-                <Title level={3} className="!mb-0 !text-2xl">
+                <Title
+                  level={3}
+                  className="!mb-0 !text-2xl"
+                  style={{
+                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                  }}
+                >
                   <TagsOutlined className="mr-2" style={{ color: currentColorTheme.primary }} />
                   热门标签
                 </Title>
-                <Link 
-                  to="/tags" 
+                <Link
+                  to="/tags"
                   className="hover:underline font-medium"
                   style={{ color: currentColorTheme.primary }}
                 >
@@ -718,7 +823,7 @@ const HomePage: React.FC = () => {
                   ];
                   return (
                     <Link key={tag._id} to={`/tag/${tag._id}`}>
-                      <span 
+                      <span
                         className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${colors[index % colors.length]}`}
                       >
                         # {tag.name}
@@ -737,7 +842,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ========== 第五屏：CTA ========== */}
-      <section 
+      <section
         className="w-full relative flex items-center justify-center"
         style={{
           height: sectionHeight,
@@ -750,11 +855,11 @@ const HomePage: React.FC = () => {
       >
         {/* 背景装饰 */}
         <div className="absolute inset-0 overflow-hidden">
-          <div 
+          <div
             className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
             style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
           />
-          <div 
+          <div
             className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full opacity-20 blur-3xl"
             style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
           />
@@ -764,24 +869,24 @@ const HomePage: React.FC = () => {
           <div className="mb-8">
             <span className="text-6xl">👋</span>
           </div>
-          
-          <Title 
-            level={1} 
+
+          <Title
+            level={1}
             className="!text-white !mb-6"
             style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 800 }}
           >
             想要了解更多？
           </Title>
-          
+
           <Paragraph className="!text-gray-400 !text-xl !mb-12 max-w-2xl mx-auto">
             欢迎访问留言板与我交流，或者查看关于页面了解更多信息。
             期待与你的每一次对话！
           </Paragraph>
-          
+
           <div className="flex flex-wrap justify-center gap-6">
             <Link to="/message">
-              <Button 
-                size="large" 
+              <Button
+                size="large"
                 className="!h-16 !px-12 !rounded-full !font-bold !text-lg !border-none"
                 style={{
                   background: currentColorTheme.gradient, // 主题色渐变
@@ -793,7 +898,7 @@ const HomePage: React.FC = () => {
               </Button>
             </Link>
             <Link to="/about">
-              <Button 
+              <Button
                 size="large"
                 ghost
                 className="!h-16 !px-12 !rounded-full !font-bold !text-lg !text-white !border-white/30 hover:!bg-white/10"
@@ -806,7 +911,13 @@ const HomePage: React.FC = () => {
 
         {/* 底部信息 - 相对于 section 定位 */}
         <div className="absolute bottom-8 left-0 right-0 text-center z-10">
-          <Text className="text-gray-500 text-sm">
+          <Text
+            className="text-gray-500 text-sm"
+            style={{
+              textShadow: '0 1px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2)',
+              color: 'rgba(255, 255, 255, 0.8)',
+            }}
+          >
             © 2026 个人博客. All rights reserved.
           </Text>
         </div>
