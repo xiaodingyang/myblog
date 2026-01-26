@@ -221,91 +221,64 @@ body {
   background-clip: text;
 }
 
-/* ========== 首页深色导航菜单样式 ========== */
-.home-menu.ant-menu-horizontal {
+/* 动态渐变文字 - 使用 CSS 变量支持动态主题色 */
+.gradient-text-dynamic {
+  --gradient-color: #ffb3d9;
+  background: linear-gradient(90deg, var(--gradient-color), var(--gradient-color), var(--gradient-color)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block;
+}
+
+/* ========== 导航菜单样式 ========== */
+.ant-menu-horizontal {
   background: transparent !important;
   border-bottom: none !important;
 }
 
-.home-menu .ant-menu-item,
-.home-menu .ant-menu-item a,
-.home-menu .ant-menu-item .anticon {
-  color: rgba(255, 255, 255, 0.7) !important;
+.ant-menu-horizontal .ant-menu-item,
+.ant-menu-horizontal .ant-menu-item a,
+.ant-menu-horizontal .ant-menu-item .anticon {
+  color: rgba(30, 41, 59, 0.7) !important;
   transition: all 0.3s ease;
 }
 
-.home-menu .ant-menu-item:hover,
-.home-menu .ant-menu-item:hover a,
-.home-menu .ant-menu-item:hover .anticon {
-  color: #fff !important;
+.ant-menu-horizontal .ant-menu-item:hover,
+.ant-menu-horizontal .ant-menu-item:hover a,
+.ant-menu-horizontal .ant-menu-item:hover .anticon {
+  color: var(--theme-primary, #ffb3d9) !important;
 }
 
-.home-menu .ant-menu-item-selected,
-.home-menu .ant-menu-item-selected a,
-.home-menu .ant-menu-item-selected .anticon {
-  color: #fff !important;
+.ant-menu-horizontal .ant-menu-item-selected,
+.ant-menu-horizontal .ant-menu-item-selected a,
+.ant-menu-horizontal .ant-menu-item-selected .anticon {
+  color: var(--theme-primary, #ffb3d9) !important;
+  font-weight: 600;
 }
 
-/* 隐藏菜单下划线 */
+/* 菜单选中项下划线使用主题色 */
+.ant-menu-horizontal .ant-menu-item-selected::after {
+  border-bottom-color: var(--theme-primary, #ffb3d9) !important;
+}
+
+/* 首页特殊样式 */
+.home-menu.ant-menu-horizontal {
+  background: transparent !important;
+}
+
 .home-menu .ant-menu-item::after,
 .home-menu .ant-menu-item-selected::after {
   display: none !important;
   border-bottom: none !important;
 }
 
-.home-menu.ant-menu-horizontal>.ant-menu-item::after,
-.home-menu.ant-menu-horizontal>.ant-menu-item-selected::after {
-  display: none !important;
-  border: none !important;
-}
 
 
-
-.home-search .ant-input::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.home-search .ant-input-prefix,
-.home-search .anticon {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.home-search .ant-input,
-.home-search .ant-input-wrapper,
-.home-search .ant-input-affix-wrapper,
-.home-search .ant-input-outlined {
-  outline: none !important;
-  /* box-shadow: none !important; */
-}
-
-.home-search .ant-input:hover,
-.home-search .ant-input-affix-wrapper:hover,
-.home-search .ant-input-outlined:hover {
-  border-color: transparent !important;
-  background: transparent !important;
-  outline: none !important;
-  /* box-shadow: none !important; */
-}
-
-.ant-input:focus,
-.ant-input-affix-wrapper-focused,
-.ant-input-outlined,
-.ant-input-outlined:focus {
-  border-color: transparent !important;
-  background: transparent !important;
-  outline: none !important;
-  /* box-shadow: none !important; */
-}
-
-/* 首页滚动条样式 - 深色主题 */
-.home-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.home-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.home-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+/* 搜索框聚焦时使用主题色 */
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+  box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb, 255, 179, 217), 0.1) !important;
 }

@@ -211,11 +211,9 @@ const HomePage: React.FC = () => {
               代码改变世界
               <br />
               <span
+                className="gradient-text-dynamic"
                 style={{
-                  background: `linear-gradient(90deg, ${currentColorTheme.primary}, ${currentColorTheme.primary}dd, ${currentColorTheme.primary}bb)`, // 主题色渐变
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  ['--gradient-color' as any]: currentColorTheme.primary,
                 }}
               >
                 记录成长轨迹
@@ -253,8 +251,13 @@ const HomePage: React.FC = () => {
               <Link to="/about">
                 <Button
                   size="large"
-                  ghost
-                  className="!h-14 !px-10 !rounded-full !font-bold !text-base !text-white !border-white/30 hover:!bg-white/10"
+                  className="!h-14 !px-10 !rounded-full !font-bold !text-base !border-0"
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.25)',
+                    backdropFilter: 'blur(12px)',
+                    color: '#fff',
+                    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
+                  }}
                 >
                   <CodeOutlined /> 关于作者
                 </Button>
@@ -347,27 +350,26 @@ const HomePage: React.FC = () => {
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
           style={{ animation: 'bounce 2s infinite' }}
         >
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2">
             <span
-              className="text-white/50 text-sm font-medium"
+              className="text-sm font-medium px-4 py-1.5 rounded-full"
               style={{
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3)',
+                background: 'rgba(0, 0, 0, 0.2)',
+                backdropFilter: 'blur(8px)',
+                color: 'rgba(255, 255, 255, 0.9)',
               }}
             >
               向下滚动
             </span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(0, 0, 0, 0.2)',
+                backdropFilter: 'blur(8px)',
+              }}
             >
-              <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
+              <ArrowDownOutlined style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 14 }} />
+            </div>
           </div>
         </div>
       </section>

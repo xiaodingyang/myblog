@@ -17,10 +17,10 @@ export const colorThemes: ColorTheme[] = [
   },
   {
     id: 'rose',
-    name: '玫瑰金',
+    name: '樱桃红',
     primary: '#f43f5e',
     gradient: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
-    description: '优雅的玫瑰金色',
+    description: '活力的樱桃红色',
   },
   {
     id: 'lavender',

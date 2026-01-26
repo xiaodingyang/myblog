@@ -37,21 +37,43 @@ const FrontLayout: React.FC = () => {
     return { background: 'transparent' };
   };
   
+  // 从主题色提取 RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+      : { r: 255, g: 179, b: 217 };
+  };
+
   // 获取头部样式
   const getHeaderStyle = () => {
-    const headerBg = currentTheme.headerBackground || (isHomePage ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)');
-    const headerTextColor = currentTheme.headerTextColor || (isHomePage ? '#fff' : '#1e293b');
+    const rgb = hexToRgb(currentColorTheme.primary);
+    
+    // 使用主题色衍生的半透明背景
+    const headerBg = isHomePage 
+      ? `linear-gradient(90deg, 
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 0%, 
+          rgba(255, 255, 255, 0.85) 50%, 
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 100%
+        )`
+      : `linear-gradient(90deg, 
+          rgba(255, 255, 255, 0.95) 0%, 
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08) 50%,
+          rgba(255, 255, 255, 0.95) 100%
+        )`;
+    
     return {
       background: headerBg,
-      backdropFilter: 'blur(8px)',
-      boxShadow: isHomePage ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.06)',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      boxShadow: `0 4px 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`,
       height: 64,
-      color: headerTextColor,
+      color: '#1e293b',
+      borderBottom: `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`,
     };
   };
   
-  const headerTextColor = currentTheme.headerTextColor || (isHomePage ? '#fff' : '#1e293b');
-  const isDarkTheme = currentTheme.headerTextColor === '#fff' || isHomePage;
+  const headerTextColor = '#1e293b'; // 统一使用深色文字
+  const isDarkTheme = false; // 导航栏现在是浅色的
 
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
@@ -182,7 +204,7 @@ const FrontLayout: React.FC = () => {
                 <div 
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
                   style={{
-                    background: 'linear-gradient(135deg, #ffb3d9 0%, #ff91c7 100%)', // 淡粉色渐变
+                    background: currentColorTheme.gradient,
                   }}
                 >
                   B
