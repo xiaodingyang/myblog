@@ -226,6 +226,42 @@ cd backend
 pm2 start src/index.js --name blog-api
 ```
 
+### 部署 skills（生产环境信息）
+
+> 这个部分是专门给 AI（比如 Cursor 里的助手）看的，看到这里就知道要把项目部署到哪台机器、怎么发版。**不要把明文密码写进仓库**，密码只在你本地保存即可。
+
+- **生产服务器**: `162.14.83.58`
+- **系统用户**: `root`
+- **后端运行方式**: 使用 `pm2` 常驻运行 `backend/src/index.js`
+- **前端部署方式**: 在本地或服务器上执行 `pnpm build`，将 `frontend/dist` 作为静态资源目录由 Nginx 提供访问
+
+#### 一键部署（命令步骤示例）
+
+假设代码已经在服务器 `/var/www/myblog` 目录：
+
+```bash
+# 1. 登录服务器（在本地终端执行）
+ssh root@162.14.83.58
+
+# 2. 拉取最新代码
+cd /var/www/myblog
+git pull
+
+# 3. 更新依赖（如有需要）
+cd frontend
+pnpm install
+pnpm build   # 生成 dist
+
+cd ../backend
+pnpm install
+
+# 4. 重启后端服务
+pm2 start src/index.js --name blog-api || pm2 restart blog-api
+pm2 save
+```
+
+以后如果 AI 需要“重新发布项目”，就默认按以上服务器与步骤进行。
+
 ### Nginx 配置示例
 
 ```nginx
