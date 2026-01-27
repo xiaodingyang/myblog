@@ -96,9 +96,9 @@ const ArticleDetailPage: React.FC = () => {
   if (!article) {
     return (
       <div className="py-16">
-        <Empty 
-          description="文章不存在或已删除" 
-          showAction 
+        <Empty
+          description="文章不存在或已删除"
+          showAction
           actionText="返回文章列表"
           actionLink="/articles"
         />
@@ -226,7 +226,7 @@ const ArticleDetailPage: React.FC = () => {
                         {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>
                     ) : (
-                      <code 
+                      <code
                         className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
                         {...props}
                       >

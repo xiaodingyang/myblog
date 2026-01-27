@@ -100,7 +100,6 @@ const SettingsPage: React.FC = () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
-    listType: 'picture-circle' as const,
     fileList: avatarList,
     maxCount: 1,
     showUploadList: false,
@@ -141,24 +140,27 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <div className="flex items-center gap-6 mb-6">
-              <div className="relative">
-                <Avatar
-                  size={80}
-                  icon={<UserOutlined />}
-                  src={avatarList[0]?.response?.data?.url || avatarList[0]?.url || initialState?.currentUser?.avatar}
-                  style={{
-                    background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
-                  }}
-                />
-                <Upload {...uploadProps}>
+              <Upload {...uploadProps}>
+                <div className="relative cursor-pointer group">
+                  <Avatar
+                    size={80}
+                    icon={<UserOutlined />}
+                    src={avatarList[0]?.response?.data?.url || avatarList[0]?.url || initialState?.currentUser?.avatar}
+                    style={{
+                      background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
+                    }}
+                  />
                   <div
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer text-white"
-                    style={{ transform: 'translate(25%, 25%)' }}
+                    className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-white text-xs"
+                    style={{ 
+                      background: '#1677ff',
+                      border: '2px solid #fff',
+                    }}
                   >
                     <CameraOutlined />
                   </div>
-                </Upload>
-              </div>
+                </div>
+              </Upload>
               <div>
                 <Text strong className="text-lg block">
                   {initialState?.currentUser?.username}

@@ -20,7 +20,10 @@ import {
   ThunderboltOutlined,
   ReloadOutlined,
   PlusOutlined,
+  DownOutlined,
 } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Dropdown } from 'antd';
 import { request } from 'umi';
 import type { UploadFile } from 'antd/es/upload/interface';
 import Loading from '@/components/Loading';
@@ -126,29 +129,100 @@ const EditArticlePage: React.FC = () => {
     });
   };
 
+  // 封面主题配置
+  const coverThemes = {
+    anime: {
+      name: '动漫',
+      fetch: async () => {
+        const res = await fetch('https://api.waifu.pics/sfw/waifu');
+        const data = await res.json();
+        return data.url;
+      },
+    },
+    landscape: {
+      name: '风景',
+      fetch: async () => {
+        const random = Math.floor(Math.random() * 1000);
+        return `https://picsum.photos/seed/${random}/1200/630`;
+      },
+    },
+    cat: {
+      name: '猫咪',
+      fetch: async () => {
+        const res = await fetch('https://api.thecatapi.com/v1/images/search?size=med');
+        const data = await res.json();
+        return data[0].url;
+      },
+    },
+    dog: {
+      name: '狗狗',
+      fetch: async () => {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random');
+        const data = await res.json();
+        return data.message;
+      },
+    },
+    neko: {
+      name: '猫娘',
+      fetch: async () => {
+        const res = await fetch('https://api.waifu.pics/sfw/neko');
+        const data = await res.json();
+        return data.url;
+      },
+    },
+    megumin: {
+      name: '惠惠',
+      fetch: async () => {
+        const res = await fetch('https://api.waifu.pics/sfw/megumin');
+        const data = await res.json();
+        return data.url;
+      },
+    },
+    grayscale: {
+      name: '黑白',
+      fetch: async () => {
+        const random = Math.floor(Math.random() * 1000);
+        return `https://picsum.photos/seed/${random}/1200/630?grayscale`;
+      },
+    },
+    blur: {
+      name: '模糊',
+      fetch: async () => {
+        const random = Math.floor(Math.random() * 1000);
+        return `https://picsum.photos/seed/${random}/1200/630?blur=2`;
+      },
+    },
+  };
+
   // 自动生成封面图
-  const generateCover = async () => {
+  const generateCover = async (theme: keyof typeof coverThemes = 'anime') => {
     setGeneratingCover(true);
     try {
-      // 使用 waifu.pics API 获取随机动漫图片
-      const res = await fetch('https://api.waifu.pics/sfw/waifu');
-      const data = await res.json();
+      const themeConfig = coverThemes[theme];
+      const url = await themeConfig.fetch();
       const timestamp = Date.now();
 
       setCoverList([{
         uid: `-${timestamp}`,
-        name: `cover-anime.jpg`,
+        name: `cover-${theme}.jpg`,
         status: 'done',
-        url: data.url,
+        url: url,
       }]);
 
-      message.success('已生成动漫封面图');
+      message.success(`已生成${themeConfig.name}风格封面`);
     } catch (error) {
       message.error('生成封面失败，请重试');
     } finally {
       setGeneratingCover(false);
     }
   };
+
+  // 封面主题菜单
+  const coverThemeMenuItems: MenuProps['items'] = Object.entries(coverThemes).map(([key, value]) => ({
+    key,
+    label: value.name,
+    onClick: () => generateCover(key as keyof typeof coverThemes),
+  }));
 
   const uploadProps = {
     name: 'file',
@@ -290,23 +364,31 @@ const EditArticlePage: React.FC = () => {
               <Form.Item label="封面图片">
                 <div className="mb-3">
                   <Space>
-                    <Button
-                      type="primary"
-                      ghost
-                      icon={<ThunderboltOutlined />}
-                      onClick={generateCover}
-                      loading={generatingCover}
+                    <Dropdown
+                      menu={{ items: coverThemeMenuItems }}
+                      trigger={['click']}
                     >
-                      自动生成
-                    </Button>
-                    {coverList.length > 0 && (
                       <Button
-                        icon={<ReloadOutlined />}
-                        onClick={generateCover}
+                        type="primary"
+                        ghost
+                        icon={<ThunderboltOutlined />}
                         loading={generatingCover}
                       >
-                        换一张
+                        自动生成 <DownOutlined />
                       </Button>
+                    </Dropdown>
+                    {coverList.length > 0 && (
+                      <Dropdown
+                        menu={{ items: coverThemeMenuItems }}
+                        trigger={['click']}
+                      >
+                        <Button
+                          icon={<ReloadOutlined />}
+                          loading={generatingCover}
+                        >
+                          换一张 <DownOutlined />
+                        </Button>
+                      </Dropdown>
                     )}
                   </Space>
                 </div>
@@ -319,7 +401,7 @@ const EditArticlePage: React.FC = () => {
                   )}
                 </Upload>
                 <Text className="text-gray-400 text-xs">
-                  点击"自动生成"根据标题获取封面，或手动上传
+                  选择主题自动生成封面，或手动上传
                 </Text>
               </Form.Item>
             </Card>

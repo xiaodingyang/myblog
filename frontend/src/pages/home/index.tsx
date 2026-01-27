@@ -200,7 +200,7 @@ const HomePage: React.FC = () => {
 
             <Title
               level={1}
-              className="!text-white !mb-8"
+              className="!mb-8"
               style={{
                 fontSize: 'clamp(3rem, 8vw, 5rem)',
                 fontWeight: 800,
@@ -208,12 +208,30 @@ const HomePage: React.FC = () => {
                 letterSpacing: '-0.03em',
               }}
             >
-              代码改变世界
+              <span className="gradient-text-white">
+                代码改变世界
+              </span>
               <br />
               <span
                 className="gradient-text-dynamic"
                 style={{
                   ['--gradient-color' as any]: currentColorTheme.primary,
+                  ['--gradient-color-end' as any]: (() => {
+                    // 根据主题色提供配对的渐变结束色
+                    const gradientEndColors: Record<string, string> = {
+                      pink: '#ffd700',      // 金黄色
+                      rose: '#ff8a65',      // 珊瑚橙
+                      lavender: '#60a5fa',  // 天蓝色
+                      ocean: '#a78bfa',     // 薰衣草紫
+                      mint: '#34d399',      // 翠绿色
+                      amber: '#fbbf24',     // 琥珀黄
+                      coral: '#fca5a5',     // 浅珊瑚
+                      violet: '#c084fc',    // 浅紫色
+                      cyan: '#22d3ee',      // 亮青色
+                      peach: '#fda4af',     // 浅桃红
+                    };
+                    return gradientEndColors[colorThemeId] || '#ffd700';
+                  })(),
                 }}
               >
                 记录成长轨迹
@@ -318,11 +336,13 @@ const HomePage: React.FC = () => {
                     <span className="text-purple-400">const</span>{' '}
                     <span style={{ color: currentColorTheme.primary }}>developer</span> = {'{'}
                     {'\n'}  <span className="text-green-400">name</span>:{' '}
-                    <span className="text-yellow-400">"博客作者"</span>,
+                    <span className="text-yellow-400">"肖定阳"</span>,
+                    {'\n'}  <span className="text-green-400">experience</span>:{' '}
+                    <span className="text-yellow-400">"8年"</span>,
                     {'\n'}  <span className="text-green-400">skills</span>: [
                     {'\n'}    <span className="text-yellow-400">"React"</span>,
-                    {'\n'}    <span className="text-yellow-400">"TypeScript"</span>,
-                    {'\n'}    <span className="text-yellow-400">"Node.js"</span>
+                    {'\n'}    <span className="text-yellow-400">"Vue"</span>,
+                    {'\n'}    <span className="text-yellow-400">"TypeScript"</span>
                     {'\n'}  ],
                     {'\n'}  <span className="text-green-400">passion</span>:{' '}
                     <span className="text-yellow-400">"∞"</span>

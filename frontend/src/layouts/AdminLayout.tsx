@@ -126,13 +126,13 @@ const AdminLayout: React.FC = () => {
         {/* Logo */}
         <div className="h-16 flex items-center justify-center border-b border-gray-700">
           <Link to="/admin/dashboard" className="flex items-center gap-3 no-underline">
-            <div 
+            <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
               style={{
                 background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
               }}
             >
-              B
+              肖
             </div>
             {!collapsed && (
               <Title level={5} className="!mb-0 !text-white">

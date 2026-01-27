@@ -151,9 +151,10 @@ const MessagesPage: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 220,
+      fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0}>
           <Button
             type="link"
             size="small"
@@ -162,7 +163,7 @@ const MessagesPage: React.FC = () => {
           >
             查看
           </Button>
-          {record.status === 'pending' && (
+          {record.status === 'pending' ? (
             <>
               <Button
                 type="link"
@@ -183,17 +184,18 @@ const MessagesPage: React.FC = () => {
                 拒绝
               </Button>
             </>
+          ) : (
+            <Popconfirm
+              title="确定要删除这条留言吗？"
+              onConfirm={() => handleDelete(record._id)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button type="link" size="small" danger icon={<DeleteOutlined />}>
+                删除
+              </Button>
+            </Popconfirm>
           )}
-          <Popconfirm
-            title="确定要删除这条留言吗？"
-            onConfirm={() => handleDelete(record._id)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
-              删除
-            </Button>
-          </Popconfirm>
         </Space>
       ),
     },
@@ -234,6 +236,7 @@ const MessagesPage: React.FC = () => {
           dataSource={messages}
           rowKey="_id"
           loading={loading}
+          scroll={{ x: 900 }}
           pagination={{
             current: page,
             pageSize,

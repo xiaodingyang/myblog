@@ -61,11 +61,11 @@ export default defineConfig({
   // 代理配置 - 将 /api 请求转发到服务器后端
   proxy: {
     '/api': {
-      target: 'http://43.129.200.177',
+      target: 'http://162.14.83.58',
       changeOrigin: true,
     },
     '/uploads': {
-      target: 'http://43.129.200.177',
+      target: 'http://162.14.83.58',
       changeOrigin: true,
     },
   },

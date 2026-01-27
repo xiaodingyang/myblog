@@ -224,7 +224,18 @@ body {
 /* 动态渐变文字 - 使用 CSS 变量支持动态主题色 */
 .gradient-text-dynamic {
   --gradient-color: #ffb3d9;
-  background: linear-gradient(90deg, var(--gradient-color), var(--gradient-color), var(--gradient-color)) !important;
+  --gradient-color-end: #ffd700;
+  background: linear-gradient(90deg, var(--gradient-color) 0%, var(--gradient-color-end) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block;
+}
+
+/* 白色渐变文字 - 用于深色背景上的标题 */
+.gradient-text-white {
+  background: linear-gradient(90deg, #ffffff 0%, #e0e7ff 50%, #c7d2fe 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
