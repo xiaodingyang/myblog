@@ -3,6 +3,13 @@ import { defineConfig } from 'umi';
 export default defineConfig({
   title: '个人博客',
   esbuildMinifyIIFE: true,
+  // 浏览器标签栏图标（favicon）
+  // 使用 SVG 版本的博客 logo 作为标签栏图标
+  // 文件路径：frontend/public/favicon.svg
+  // 放到 frontend/public 目录下
+  links: [
+    { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+  ],
   
   // 启用内置插件
   plugins: [

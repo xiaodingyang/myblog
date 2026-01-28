@@ -19,6 +19,7 @@ import { useModel } from 'umi';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import ParticleThemeSelector from '@/components/ParticleThemeSelector';
 import GlassBackground from '@/components/GlassBackground';
+import GradientText from '@/components/GradientText';
 import { getThemeById } from '@/config/particleThemes';
 import { getColorThemeById } from '@/config/colorThemes';
 
@@ -141,27 +142,27 @@ const FrontLayout: React.FC = () => {
             overflow: 'visible',
           }}
         >
-          {/* Logo */}
+          {/* Logo - 复用底部的实现，避免渐变条问题 */}
           <Link to="/" className="flex items-center gap-2 md:gap-3 no-underline shrink-0">
             <div
               className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-bold text-base md:text-lg"
               style={{
-                background: currentColorTheme.gradient,
+                backgroundImage: currentColorTheme.gradient,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '100% 100%',
+                backgroundColor: 'transparent',
               }}
             >
               风
             </div>
-            <span 
-              className="hidden md:block font-bold text-xl"
-              style={{ 
-                background: `linear-gradient(135deg, ${currentColorTheme.primary} 0%, #ff6b6b 50%, #ffd700 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              若风
-            </span>
+            <GradientText
+              text="若风"
+              gradientId="logo-header-gradient"
+              from="#ffffff"
+              mid={currentColorTheme.primary}
+              to="#ffd700"
+              className="hidden md:block font-bold text-2xl"
+            />
           </Link>
 
           {/* PC端导航菜单 */}
@@ -241,7 +242,12 @@ const FrontLayout: React.FC = () => {
               <Link to="/" className="flex items-center gap-2 no-underline" onClick={() => setMobileMenuOpen(false)}>
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold"
-                  style={{ background: currentColorTheme.gradient }}
+                  style={{
+                    backgroundImage: currentColorTheme.gradient,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '100% 100%',
+                    backgroundColor: 'transparent',
+                  }}
                 >
                   风
                 </div>
@@ -346,22 +352,22 @@ const FrontLayout: React.FC = () => {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
                       style={{
-                        background: currentColorTheme.gradient,
+                        backgroundImage: currentColorTheme.gradient,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '100% 100%',
+                        backgroundColor: 'transparent',
                       }}
                     >
                       风
                     </div>
-                    <span 
-                      className="font-bold text-xl"
-                      style={{ 
-                        background: `linear-gradient(135deg, #fff 0%, ${currentColorTheme.primary} 50%, #ffd700 100%)`,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                      }}
-                    >
-                      若风
-                    </span>
+                    <GradientText
+                      text="若风"
+                      gradientId="logo-footer-gradient"
+                      from="#ffffff"
+                      mid={currentColorTheme.primary}
+                      to="#ffd700"
+                      className="font-bold text-2xl"
+                    />
                   </div>
                   <Paragraph className="text-gray-400 text-sm">
                     8年前端开发经验，专注 React/Vue/TypeScript。记录技术成长，分享学习心得。

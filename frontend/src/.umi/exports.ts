@@ -5,16 +5,16 @@
 export { defineApp } from './core/defineApp'
 export type { RuntimeConfig } from './core/defineApp'
 // plugins
-export { Provider, useModel } from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/.umi/plugin-model';
-export { useRequest, UseRequestProvider, request, getRequestInstance } from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/.umi/plugin-request';
+export { Provider, useModel } from '/Users/ruofeng/Desktop/work/myblog/frontend/src/.umi/plugin-model';
+export { useRequest, UseRequestProvider, request, getRequestInstance } from '/Users/ruofeng/Desktop/work/myblog/frontend/src/.umi/plugin-request';
 // plugins types.d.ts
-export * from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/.umi/plugin-antd/types.d';
-export * from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/src/.umi/plugin-request/types.d';
+export * from '/Users/ruofeng/Desktop/work/myblog/frontend/src/.umi/plugin-antd/types.d';
+export * from '/Users/ruofeng/Desktop/work/myblog/frontend/src/.umi/plugin-request/types.d';
 // @umijs/renderer-*
-export { createBrowserHistory, createHashHistory, createMemoryHistory, Helmet, HelmetProvider, createSearchParams, generatePath, matchPath, matchRoutes, Navigate, NavLink, Outlet, resolvePath, useLocation, useMatch, useNavigate, useOutlet, useOutletContext, useParams, useResolvedPath, useRoutes, useSearchParams, useAppData, useClientLoaderData, useLoaderData, useRouteProps, useSelectedRoutes, useServerLoaderData, renderClient, __getRoot, Link, useRouteData, __useFetcher, withRouter } from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/node_modules/.pnpm/@umijs+renderer-react@4.6.24_react-dom@18.3.1_react@18.3.1/node_modules/@umijs/renderer-react';
-export type { History, ClientLoader } from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/node_modules/.pnpm/@umijs+renderer-react@4.6.24_react-dom@18.3.1_react@18.3.1/node_modules/@umijs/renderer-react'
+export { createBrowserHistory, createHashHistory, createMemoryHistory, Helmet, HelmetProvider, createSearchParams, generatePath, matchPath, matchRoutes, Navigate, NavLink, Outlet, resolvePath, useLocation, useMatch, useNavigate, useOutlet, useOutletContext, useParams, useResolvedPath, useRoutes, useSearchParams, useAppData, useClientLoaderData, useLoaderData, useRouteProps, useSelectedRoutes, useServerLoaderData, renderClient, __getRoot, Link, useRouteData, __useFetcher, withRouter } from '/Users/ruofeng/Desktop/work/myblog/frontend/node_modules/.pnpm/@umijs+renderer-react@4.6.25_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/@umijs/renderer-react';
+export type { History, ClientLoader } from '/Users/ruofeng/Desktop/work/myblog/frontend/node_modules/.pnpm/@umijs+renderer-react@4.6.25_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/@umijs/renderer-react'
 // umi/client/client/plugin
-export { ApplyPluginsType, PluginManager } from '/Users/xiaodingyang/肖定阳的文档/项目文档/myblog/frontend/node_modules/.pnpm/umi@4.6.24_@babel+core@7.28.6_@types+react@18.3.27_eslint@8.57.1_less-loader@12.3.0_less@4.5._bmliyqjsdcfsd6mrropfesnhey/node_modules/umi/client/client/plugin.js';
+export { ApplyPluginsType, PluginManager } from '/Users/ruofeng/Desktop/work/myblog/frontend/node_modules/.pnpm/umi@4.6.25_@babel+core@7.28.6_@types+node@25.0.10_@types+react@18.3.27_eslint@8.57.1_le_0cdd3394ee93a7d8299d483942dee559/node_modules/umi/client/client/plugin.js';
 export { history, createHistory } from './core/history';
 export { terminal } from './core/terminal';
 // react ssr
