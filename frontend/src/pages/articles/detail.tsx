@@ -119,23 +119,28 @@ const ArticleDetailPage: React.FC = () => {
       >
         <div className="max-w-4xl mx-auto px-4 md:px-6">
           <Button
-            type="link"
-            icon={<ArrowLeftOutlined />}
+            type="text"
             onClick={() => history.back()}
-            className="!text-white/70 hover:!text-white !pl-0 mb-4 md:mb-8"
+            className="group mb-4 md:mb-8 !px-0"
+            style={{ background: 'transparent' }}
           >
-            返回
+            <span
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm text-white/80 bg-white/5 border border-white/15 backdrop-blur-md shadow-sm group-hover:bg-white/12 group-hover:text-white group-hover:border-white/30 transition-all"
+            >
+              <ArrowLeftOutlined className="text-xs md:text-sm" />
+              返回上一页
+            </span>
           </Button>
 
           {/* 分类 */}
           <div className="mb-4">
             <Link to={`/category/${article.category?._id}`}>
               <Tag
-                color="pink"
-                className="!px-4 !py-1 !text-sm !border-none"
+                className="!px-5 !py-1.5 !text-sm !border-none !rounded-full !text-white/90 shadow-md hover:shadow-lg transition-all hover:!text-white"
                 style={{
-                  background: `${currentColorTheme.primary}4d`, // 主题色
-                  backdropFilter: 'blur(4px)',
+                  background: `linear-gradient(135deg, ${currentColorTheme.primary}dd, rgba(255, 255, 255, 0.28))`,
+                  backdropFilter: 'blur(12px)',
+                  boxShadow: '0 12px 30px rgba(15, 23, 42, 0.55)',
                 }}
               >
                 <FolderOutlined className="mr-2" />
