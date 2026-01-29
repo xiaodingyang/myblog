@@ -33,6 +33,11 @@ set -e
 echo "📁 进入项目目录 ..."
 cd /var/www/myblog
 
+echo "🧹 清理构建缓存 ..."
+rm -rf frontend/src/.umi-production
+rm -rf frontend/src/.umi
+git checkout -- . 2>/dev/null || true
+
 echo "📥 拉取最新代码 ..."
 git pull
 
