@@ -33,14 +33,17 @@ export const request = {
         errorHandler: (error: any) => {
             if (error.response) {
                 const { status, data } = error.response;
-                if (status === 401) {
+                // 先显示后端返回的错误信息
+                const errorMessage = data?.message || `请求错误: ${status}`;
+                message.error(errorMessage);
+                
+                // 如果是 401 且不在登录页，才跳转到登录页
+                if (status === 401 && !window.location.pathname.includes('/admin/login')) {
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
-                    message.error('登录已过期，请重新登录');
                     window.location.href = '/admin/login';
                     return;
                 }
-                message.error(data?.message || `请求错误: ${status}`);
             } else if (error.request) {
                 message.error('网络错误，请检查网络连接');
             } else {

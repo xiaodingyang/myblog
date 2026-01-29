@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, history } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import { Typography, Row, Col, Button, Pagination, Tag } from 'antd';
+import { Typography, Row, Col, Pagination, Tag } from 'antd';
 import { ArrowLeftOutlined, TagOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import ArticleCard from '@/components/ArticleCard';
@@ -70,14 +70,20 @@ const TagDetailPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* 页面标题 */}
         <div className="mb-8">
-          <Button
-            type="link"
-            icon={<ArrowLeftOutlined />}
+          <button
             onClick={() => history.back()}
-            className="!pl-0 mb-4"
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-4 transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              color: '#666',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+            }}
           >
+            <ArrowLeftOutlined className="transition-transform duration-300 group-hover:-translate-x-1" />
             返回
-          </Button>
+          </button>
           <div className="flex items-center gap-4">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center"

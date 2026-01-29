@@ -24,7 +24,7 @@ import { request } from 'umi';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 const ArticlesPage: React.FC = () => {
@@ -207,23 +207,7 @@ const ArticlesPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Title level={3} className="!mb-1">
-            文章管理
-          </Title>
-          <Text className="text-gray-500">
-            共 {total} 篇文章
-          </Text>
-        </div>
-        <Link to="/admin/articles/create">
-          <Button type="primary" icon={<PlusOutlined />}>
-            新建文章
-          </Button>
-        </Link>
-      </div>
-
-      {/* 搜索筛选 */}
+      {/* 搜索筛选和新建按钮 */}
       <Card
         className="mb-4"
         style={{
@@ -233,30 +217,37 @@ const ArticlesPage: React.FC = () => {
         }}
         bodyStyle={{ padding: 16 }}
       >
-        <Space wrap>
-          <Input
-            placeholder="搜索文章标题"
-            prefix={<SearchOutlined className="text-gray-400" />}
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onPressEnter={handleSearch}
-            style={{ width: 200 }}
-            allowClear
-          />
-          <Select
-            placeholder="文章状态"
-            value={status || undefined}
-            onChange={setStatus}
-            style={{ width: 120 }}
-            allowClear
-          >
-            <Option value="published">已发布</Option>
-            <Option value="draft">草稿</Option>
-          </Select>
-          <Button type="primary" onClick={handleSearch}>
-            搜索
-          </Button>
-        </Space>
+        <div className="flex items-center justify-between">
+          <Space wrap>
+            <Input
+              placeholder="搜索文章标题"
+              prefix={<SearchOutlined className="text-gray-400" />}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onPressEnter={handleSearch}
+              style={{ width: 200 }}
+              allowClear
+            />
+            <Select
+              placeholder="文章状态"
+              value={status || undefined}
+              onChange={setStatus}
+              style={{ width: 120 }}
+              allowClear
+            >
+              <Option value="published">已发布</Option>
+              <Option value="draft">草稿</Option>
+            </Select>
+            <Button type="primary" onClick={handleSearch}>
+              搜索
+            </Button>
+          </Space>
+          <Link to="/admin/articles/create">
+            <Button type="primary" icon={<PlusOutlined />}>
+              新建文章
+            </Button>
+          </Link>
+        </div>
       </Card>
 
       {/* 文章列表 */}

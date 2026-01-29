@@ -118,36 +118,19 @@ const ArticleDetailPage: React.FC = () => {
         }}
       >
         <div className="max-w-4xl mx-auto px-4 md:px-6">
-          <Button
-            type="text"
+          {/* 返回按钮 - 玻璃质感 */}
+          <button
             onClick={() => history.back()}
-            className="group mb-4 md:mb-8 !px-0"
-            style={{ background: 'transparent' }}
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/80 mb-6 md:mb-8 transition-all duration-300 hover:text-white hover:scale-105"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
           >
-            <span
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm text-white/80 bg-white/5 border border-white/15 backdrop-blur-md shadow-sm group-hover:bg-white/12 group-hover:text-white group-hover:border-white/30 transition-all"
-            >
-              <ArrowLeftOutlined className="text-xs md:text-sm" />
-              返回上一页
-            </span>
-          </Button>
-
-          {/* 分类 */}
-          <div className="mb-4">
-            <Link to={`/category/${article.category?._id}`}>
-              <Tag
-                className="!px-5 !py-1.5 !text-sm !border-none !rounded-full !text-white/90 shadow-md hover:shadow-lg transition-all hover:!text-white"
-                style={{
-                  background: `linear-gradient(135deg, ${currentColorTheme.primary}dd, rgba(255, 255, 255, 0.28))`,
-                  backdropFilter: 'blur(12px)',
-                  boxShadow: '0 12px 30px rgba(15, 23, 42, 0.55)',
-                }}
-              >
-                <FolderOutlined className="mr-2" />
-                {article.category?.name || '未分类'}
-              </Tag>
-            </Link>
-          </div>
+            <ArrowLeftOutlined className="transition-transform duration-300 group-hover:-translate-x-1" />
+            返回
+          </button>
 
           {/* 标题 */}
           <Title level={1} className="!text-white !mb-6" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
@@ -175,23 +158,33 @@ const ArticleDetailPage: React.FC = () => {
             </Space>
           </div>
 
-          {/* 标签 */}
-          {article.tags?.length > 0 && (
-            <div className="mt-6">
-              <Space wrap>
-                {article.tags.map(tag => (
-                  <Link key={tag._id} to={`/tag/${tag._id}`}>
-                    <Tag
-                      className="!border-white/20 !bg-white/10 !text-white/80 hover:!bg-white/20 transition-colors"
-                    >
-                      <TagOutlined className="mr-1" />
-                      {tag.name}
-                    </Tag>
-                  </Link>
-                ))}
-              </Space>
-            </div>
-          )}
+          {/* 分类 & 标签 */}
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {/* 分类 */}
+            <Link to={`/category/${article.category?._id}`}>
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90 transition-all duration-300 hover:text-white hover:bg-white/20"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                }}
+              >
+                <FolderOutlined />
+                {article.category?.name || '未分类'}
+              </span>
+            </Link>
+            {/* 标签 */}
+            {article.tags?.map(tag => (
+              <Link key={tag._id} to={`/tag/${tag._id}`}>
+                <Tag
+                  className="!border-white/20 !bg-white/10 !text-white/80 hover:!bg-white/20 transition-colors !m-0"
+                >
+                  <TagOutlined className="mr-1" />
+                  {tag.name}
+                </Tag>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

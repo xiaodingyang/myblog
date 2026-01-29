@@ -23,7 +23,7 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({ isDark = true
       setInit(true);
     }).catch((error) => {
       console.error('Failed to initialize particles engine:', error);
-      setInit(true); // 即使失败也设置 init 为 true，避免一直显示空白
+      setInit(true);
     });
   }, []);
 
@@ -53,7 +53,7 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({ isDark = true
   return (
     <Particles
       id="tsparticles"
-      key={themeId} // 切换主题时强制重新渲染
+      key={themeId}
       particlesLoaded={particlesLoaded}
       options={options}
     />

@@ -259,13 +259,18 @@ const EditArticlePage: React.FC = () => {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button
-            type="text"
-            icon={<ArrowLeftOutlined />}
+          <button
             onClick={() => navigate('/admin/articles')}
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all duration-300 hover:scale-105"
+            style={{
+              background: 'rgba(0, 0, 0, 0.04)',
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              color: '#666',
+            }}
           >
+            <ArrowLeftOutlined className="transition-transform duration-300 group-hover:-translate-x-1" />
             返回
-          </Button>
+          </button>
           <div>
             <Title level={3} className="!mb-0">
               编辑文章

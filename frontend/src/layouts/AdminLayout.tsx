@@ -132,7 +132,7 @@ const AdminLayout: React.FC = () => {
                 background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
               }}
             >
-              肖
+              若
             </div>
             {!collapsed && (
               <Title level={5} className="!mb-0 !text-white">

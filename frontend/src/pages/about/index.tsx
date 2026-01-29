@@ -159,12 +159,6 @@ const AboutPage: React.FC = () => {
                 <br /><br />
                 曾就职于上海携程、精锐教育等公司，参与过多个大型项目的开发。
                 擅长 React、Vue、TypeScript 等前端技术栈，对前端工程化、性能优化有丰富经验。
-                <br /><br />
-                热爱互联网行业，业余时间活跃于 GitHub、掘金等技术社区。
-                掘金账号「<a href="https://juejin.cn/user/712139266339694" target="_blank" rel="noreferrer" className="text-primary hover:underline">风居住de街道</a>」，
-                文章展现量 26w+，浏览量 4w+。
-                <br /><br />
-                工作认真负责，学习能力强，具备良好的团队合作精神。这个博客是我记录技术成长、分享学习心得的地方，希望能对你有所帮助。
               </Paragraph>
             </div>
           </Card>

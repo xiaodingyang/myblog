@@ -203,26 +203,36 @@ const MessagesPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Title level={3} className="!mb-1">
+      {/* 标题和筛选 */}
+      <Card
+        className="mb-4"
+        style={{
+          borderRadius: 12,
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+        }}
+        bodyStyle={{ padding: 16 }}
+      >
+        <div className="flex items-center justify-between">
+          <Title level={4} className="!mb-0">
             留言管理
+            <Text className="text-gray-400 text-base font-normal ml-3">共 {total} 条留言</Text>
           </Title>
-          <Text className="text-gray-500">共 {total} 条留言</Text>
+          <Select
+            placeholder="筛选状态"
+            value={status || undefined}
+            onChange={setStatus}
+            style={{ width: 120 }}
+            allowClear
+          >
+            <Option value="pending">待审核</Option>
+            <Option value="approved">已通过</Option>
+            <Option value="rejected">已拒绝</Option>
+          </Select>
         </div>
-        <Select
-          placeholder="筛选状态"
-          value={status || undefined}
-          onChange={setStatus}
-          style={{ width: 120 }}
-          allowClear
-        >
-          <Option value="pending">待审核</Option>
-          <Option value="approved">已通过</Option>
-          <Option value="rejected">已拒绝</Option>
-        </Select>
-      </div>
+      </Card>
 
+      {/* 留言列表 */}
       <Card
         style={{
           borderRadius: 12,

@@ -514,9 +514,27 @@ const HomePage: React.FC = () => {
 
           <div className="text-center mt-10">
             <Link to="/articles">
-              <Button type="link" className="!text-lg !font-medium">
-                查看全部文章 <ArrowRightOutlined />
-              </Button>
+              <button
+                className="group inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                style={{
+                  background: 'transparent',
+                  border: `2px solid ${currentColorTheme.primary}`,
+                  color: currentColorTheme.primary,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = currentColorTheme.gradient;
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = currentColorTheme.primary;
+                  e.currentTarget.style.borderColor = currentColorTheme.primary;
+                }}
+              >
+                查看全部文章
+                <ArrowRightOutlined className="transition-transform duration-300 group-hover:translate-x-1" />
+              </button>
             </Link>
           </div>
         </div>

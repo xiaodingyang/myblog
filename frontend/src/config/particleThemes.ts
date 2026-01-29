@@ -19,7 +19,7 @@ export interface ParticleTheme {
 const baseConfig: Partial<ISourceOptions> = {
   fullScreen: {
     enable: true,
-    zIndex: 1, // 粒子在毛玻璃之上，确保可见
+    zIndex: 0, // 粒子层级，内容需要用更高的 z-index
   },
   background: {
     color: {

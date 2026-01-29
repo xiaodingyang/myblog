@@ -3,13 +3,18 @@ import { useNavigate, useModel } from 'umi';
 import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { request } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
+import ParticleThemeSelector from '@/components/ParticleThemeSelector';
+import ParticlesBackground from '@/components/ParticlesBackground';
 
 const { Title, Text } = Typography;
 
 const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { setInitialState } = useModel('@@initialState');
+  const { themeId: colorThemeId } = useModel('colorModel');
   const [loading, setLoading] = useState(false);
+  const currentColorTheme = getColorThemeById(colorThemeId);
 
   useEffect(() => {
     // 如果已登录，跳转到后台首页
@@ -40,7 +45,7 @@ const AdminLoginPage: React.FC = () => {
         message.error(res.message || '登录失败');
       }
     } catch (error: any) {
-      message.error(error.message || '登录失败');
+      // 错误已由全局 errorHandler 处理，这里不再重复提示
     } finally {
       setLoading(false);
     }
@@ -48,21 +53,16 @@ const AdminLoginPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
+      className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
       style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
       }}
     >
-      {/* 装饰背景 */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* 粒子背景 */}
+      <ParticlesBackground isDark />
 
       <Card
-        className="w-full max-w-md relative"
+        className="w-full max-w-md relative z-10"
         style={{
           borderRadius: 24,
           border: 'none',
@@ -74,7 +74,7 @@ const AdminLoginPage: React.FC = () => {
           <div
             className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-2xl"
             style={{
-              background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
+              background: currentColorTheme.gradient,
             }}
           >
             B
@@ -122,19 +122,19 @@ const AdminLoginPage: React.FC = () => {
               htmlType="submit"
               loading={loading}
               block
-              className="!h-12 !rounded-xl !font-medium"
+              className="!h-12 !rounded-xl !font-medium !border-0"
+              style={{
+                backgroundImage: currentColorTheme.gradient,
+              }}
             >
               登 录
             </Button>
           </Form.Item>
         </Form>
-
-        <div className="text-center">
-          <Text className="text-gray-400 text-sm">
-            默认账号：admin / admin123
-          </Text>
-        </div>
       </Card>
+
+      {/* 主题选择器 */}
+      <ParticleThemeSelector isDark />
     </div>
   );
 };

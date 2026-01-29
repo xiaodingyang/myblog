@@ -172,18 +172,28 @@ const CategoriesPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Title level={3} className="!mb-1">
+      {/* 标题和新建按钮 */}
+      <Card
+        className="mb-4"
+        style={{
+          borderRadius: 12,
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+        }}
+        bodyStyle={{ padding: 16 }}
+      >
+        <div className="flex items-center justify-between">
+          <Title level={4} className="!mb-0">
             分类管理
+            <Text className="text-gray-400 text-base font-normal ml-3">共 {categories.length} 个分类</Text>
           </Title>
-          <Text className="text-gray-500">共 {categories.length} 个分类</Text>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+            新建分类
+          </Button>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          新建分类
-        </Button>
-      </div>
+      </Card>
 
+      {/* 分类列表 */}
       <Card
         style={{
           borderRadius: 12,

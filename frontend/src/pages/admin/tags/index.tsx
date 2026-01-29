@@ -167,18 +167,28 @@ const TagsPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Title level={3} className="!mb-1">
+      {/* 标题和新建按钮 */}
+      <Card
+        className="mb-4"
+        style={{
+          borderRadius: 12,
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+        }}
+        bodyStyle={{ padding: 16 }}
+      >
+        <div className="flex items-center justify-between">
+          <Title level={4} className="!mb-0">
             标签管理
+            <Text className="text-gray-400 text-base font-normal ml-3">共 {tags.length} 个标签</Text>
           </Title>
-          <Text className="text-gray-500">共 {tags.length} 个标签</Text>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+            新建标签
+          </Button>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          新建标签
-        </Button>
-      </div>
+      </Card>
 
+      {/* 标签列表 */}
       <Card
         style={{
           borderRadius: 12,
