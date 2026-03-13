@@ -1,6 +1,5 @@
 import React from 'react';
 import { useModel } from 'umi';
-import { getThemeById } from '@/config/particleThemes';
 import { getColorThemeById } from '@/config/colorThemes';
 
 interface GlassBackgroundProps {
@@ -29,9 +28,7 @@ const adjustBrightness = (rgb: { r: number; g: number; b: number }, factor: numb
 };
 
 const GlassBackground: React.FC<GlassBackgroundProps> = ({ isDark = true }) => {
-  const { themeId } = useModel('particleModel');
   const { themeId: colorThemeId } = useModel('colorModel');
-  const currentTheme = getThemeById(themeId);
   const currentColorTheme = getColorThemeById(colorThemeId);
 
   const rgb = hexToRgb(currentColorTheme.primary);

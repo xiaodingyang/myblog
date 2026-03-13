@@ -14,15 +14,9 @@ importers:
       '@ant-design/pro-components':
         specifier: ^2.6.43
         version: 2.8.10(antd@5.29.3(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tsparticles/engine':
-        specifier: ^3.9.1
-        version: 3.9.1
-      '@tsparticles/react':
-        specifier: ^3.0.0
-        version: 3.0.0(@tsparticles/engine@3.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tsparticles/slim':
-        specifier: ^3.9.1
-        version: 3.9.1
+      '@xdy-npm/react-particle-backgrounds':
+        specifier: ^1.0.0
+        version: 1.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.182.0)
       antd:
         specifier: ^5.12.5
         version: 5.29.3(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1981,6 +1975,16 @@ packages:
 
   '@webassemblyjs/wast-printer@1.14.1':
     resolution: {integrity: sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw==}
+
+  '@xdy-npm/react-particle-backgrounds@1.0.0':
+    resolution: {integrity: sha512-RUDkm7PmsMZkxxKlHK5t7oE1wn9ZAr/zf5ZL30TIAuw76lXIO7OGm/oQP2Y0CGmBm5j42+9vUZX4o03k6wP9xg==}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
+      three: '*'
+    peerDependenciesMeta:
+      three:
+        optional: true
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -8269,7 +8273,7 @@ snapshots:
 
   '@types/history@5.0.0':
     dependencies:
-      history: 4.10.1
+      history: 5.3.0
 
   '@types/hoist-non-react-statics@3.3.7(@types/react@18.3.28)':
     dependencies:
@@ -8334,7 +8338,7 @@ snapshots:
       '@types/history': 4.7.11
       '@types/react': 18.3.28
       '@types/react-router': 5.1.20
-      redux: 3.7.2
+      redux: 4.2.1
 
   '@types/react-router@5.1.20':
     dependencies:
@@ -9102,6 +9106,16 @@ snapshots:
     dependencies:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
+
+  '@xdy-npm/react-particle-backgrounds@1.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.182.0)':
+    dependencies:
+      '@tsparticles/engine': 3.9.1
+      '@tsparticles/react': 3.0.0(@tsparticles/engine@3.9.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@tsparticles/slim': 3.9.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      three: 0.182.0
 
   '@xtuc/ieee754@1.2.0': {}
 

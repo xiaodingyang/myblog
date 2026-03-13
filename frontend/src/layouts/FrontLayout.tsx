@@ -20,7 +20,6 @@ import ParticlesBackground from '@/components/ParticlesBackground';
 import ParticleThemeSelector from '@/components/ParticleThemeSelector';
 import GlassBackground from '@/components/GlassBackground';
 import GradientText from '@/components/GradientText';
-import { getThemeById } from '@/config/particleThemes';
 import { getColorThemeById } from '@/config/colorThemes';
 
 const { Header, Content, Footer } = Layout;
@@ -29,9 +28,7 @@ const { Title, Text, Paragraph } = Typography;
 const FrontLayout: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const { themeId } = useModel('particleModel');
   const { themeId: colorThemeId } = useModel('colorModel');
-  const currentTheme = getThemeById(themeId);
   const currentColorTheme = getColorThemeById(colorThemeId);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
