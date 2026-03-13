@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Cursor
+.cursor
+
+# pnpm
+.pnpm-store
+
+# Python venv
+.venv_img
+
+# Logs
+*.log

@@ -11,6 +11,8 @@
 /.umi
 /.umi-production
 /.umi-test
+src/.umi
+src/.umi-production
 
 # misc
 .DS_Store
@@ -33,4 +35,3 @@ pnpm-debug.log*
 
 # turbo
 .turbo
-.umi-production

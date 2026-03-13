@@ -65,7 +65,7 @@ export default defineConfig({
     { path: '/*', component: '@/pages/404' },
   ],
   
-  // 代理配置 - 将 /api 请求转发到服务器后端
+  // 代理配置 - 开发环境将请求转发到本地后端
   proxy: {
     '/api': {
       target: 'http://162.14.83.58',
