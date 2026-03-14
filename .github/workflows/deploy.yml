@@ -1,0 +1,134 @@
+name: Deploy Blog
+
+on:
+  push:
+    branches: [main]
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        working-directory: frontend
+        run: pnpm build
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_deploy" \
+            frontend/dist/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/frontend/dist/
+
+      - name: Install backend dependencies & restart services
+        run: |
+          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            cd /var/www/myblog
+
+            # Sync backend source from latest code (via rsync in next step)
+            cd backend
+            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+            pm2 restart blog-api 2>/dev/null || pm2 start src/index.js --name blog-api
+            pm2 save
+
+            # Reload Nginx
+            nginx -s reload
+
+            echo "✅ Server deployment complete"
+          EOF
+
+      - name: Upload backend source
+        run: |
+          rsync -avz --delete \
+            --exclude node_modules \
+            --exclude .env \
+            -e "ssh -i ~/.ssh/id_deploy" \
+            backend/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/backend/
+
+      - name: Restart backend after sync
+        run: |
+          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            cd /var/www/myblog/backend
+            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+            pm2 restart blog-api
+            pm2 save
+            echo "✅ Backend restarted"
+          EOF
+
+      - name: Notify WeChat on success
+        if: success()
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=format:'%s')
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          COMMIT_SHA=$(git log -1 --pretty=format:'%h')
+          DEPLOY_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+
+          curl -s -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
+            -d "title=✅ 博客部署成功" \
+            -d "desp=## 部署通知
+
+          **状态**: ✅ 部署成功
+
+          **时间**: ${DEPLOY_TIME}
+
+          **提交者**: ${COMMIT_AUTHOR}
+
+          **提交信息**: ${COMMIT_MSG}
+
+          **Commit**: ${COMMIT_SHA}
+
+          **站点**: [https://www.xiaodingyang.art](https://www.xiaodingyang.art)
+
+          ---
+          *GitHub Actions 自动部署*"
+
+      - name: Notify WeChat on failure
+        if: failure()
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=format:'%s')
+          DEPLOY_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+
+          curl -s -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
+            -d "title=❌ 博客部署失败" \
+            -d "desp=## 部署通知
+
+          **状态**: ❌ 部署失败
+
+          **时间**: ${DEPLOY_TIME}
+
+          **提交信息**: ${COMMIT_MSG}
+
+          **详情**: [查看 GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          ---
+          *请检查构建日志排查问题*"
