@@ -7,6 +7,7 @@ export default defineConfig({
     { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
   ],
   metas: [
+    { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
     { name: 'description', content: '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。' },
     { name: 'keywords', content: '若风,前端开发,React,TypeScript,Node.js,技术博客,JavaScript,Vue' },
     { name: 'author', content: '若风' },
@@ -91,10 +92,6 @@ export default defineConfig({
       changeOrigin: true,
     },
     '/uploads': {
-      target: 'http://162.14.83.58',
-      changeOrigin: true,
-    },
-    '/sitemap.xml': {
       target: 'http://162.14.83.58',
       changeOrigin: true,
     },
