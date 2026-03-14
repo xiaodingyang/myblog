@@ -7,10 +7,16 @@ import { TagsOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text } = Typography;
 
 const TagsPage: React.FC = () => {
+  useSEO({
+    title: '标签',
+    description: '按标签浏览若风技术博客的所有文章，精确定位感兴趣的技术话题。',
+    keywords: '文章标签,技术标签,前端开发,React,TypeScript',
+  });
   const [loading, setLoading] = useState(true);
   const [tags, setTags] = useState<API.Tag[]>([]);
 

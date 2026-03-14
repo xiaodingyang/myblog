@@ -16,6 +16,7 @@ import {
   BookOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -26,6 +27,11 @@ const getRequest = () => {
 };
 
 const HomePage: React.FC = () => {
+  useSEO({
+    title: '首页',
+    description: '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。',
+    keywords: '若风,前端博客,React,TypeScript,Node.js,技术分享',
+  });
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<API.Article[]>([]);
   const [categories, setCategories] = useState<API.Category[]>([]);

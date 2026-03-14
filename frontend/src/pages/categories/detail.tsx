@@ -8,6 +8,7 @@ import { request } from 'umi';
 import ArticleCard from '@/components/ArticleCard';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text } = Typography;
 
@@ -21,6 +22,12 @@ const CategoryDetailPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const pageSize = 9;
+
+  useSEO({
+    title: category ? `${category.name} - 分类` : '分类详情',
+    description: category ? `浏览分类「${category.name}」下的所有技术文章。` : '分类详情',
+    keywords: category ? `${category.name},文章分类,技术博客` : '文章分类',
+  });
 
   useEffect(() => {
     const fetchData = async () => {

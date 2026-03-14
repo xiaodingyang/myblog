@@ -7,10 +7,17 @@ import ArticleCard from '@/components/ArticleCard';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 
+import useSEO from '@/hooks/useSEO';
+
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const ArticlesPage: React.FC = () => {
+  useSEO({
+    title: '文章列表',
+    description: '若风的技术博客文章列表，涵盖前端开发、后端技术、开源项目等内容。',
+    keywords: '技术文章,前端开发,React,TypeScript,Node.js',
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<API.Article[]>([]);

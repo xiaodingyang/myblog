@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Form, Input, message } from 'antd';
 import { useModel } from 'umi';
@@ -21,6 +21,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -34,6 +35,41 @@ const ArticleDetailPage: React.FC = () => {
   const [messages, setMessages] = useState<API.Message[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
+
+  const jsonLd = useMemo(() => {
+    if (!article) return undefined;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: article.title,
+      description: article.summary || '',
+      image: article.cover || undefined,
+      datePublished: article.createdAt,
+      dateModified: article.updatedAt,
+      author: {
+        '@type': 'Person',
+        name: article.author?.username || '若风',
+      },
+      publisher: {
+        '@type': 'Person',
+        name: '若风',
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': typeof window !== 'undefined' ? window.location.href : '',
+      },
+    };
+  }, [article]);
+
+  useSEO({
+    title: article?.title,
+    description: article?.summary || `阅读若风的技术博客文章：${article?.title || ''}`,
+    keywords: article?.tags?.map((t: any) => t.name).join(',') || '技术文章',
+    ogImage: article?.cover,
+    ogType: 'article',
+    ogUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+    jsonLd,
+  });
 
   useEffect(() => {
     const fetchArticle = async () => {

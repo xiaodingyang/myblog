@@ -8,6 +8,7 @@ import { request } from 'umi';
 import ArticleCard from '@/components/ArticleCard';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text } = Typography;
 
@@ -21,6 +22,12 @@ const TagDetailPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const pageSize = 9;
+
+  useSEO({
+    title: tag ? `${tag.name} - 标签` : '标签详情',
+    description: tag ? `浏览标签「${tag.name}」下的所有技术文章。` : '标签详情',
+    keywords: tag ? `${tag.name},文章标签,技术博客` : '文章标签',
+  });
 
   useEffect(() => {
     const fetchData = async () => {

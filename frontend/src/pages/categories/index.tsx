@@ -7,10 +7,16 @@ import { FolderOutlined, FileTextOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
 
 const CategoriesPage: React.FC = () => {
+  useSEO({
+    title: '分类',
+    description: '按分类浏览若风技术博客的所有文章，快速找到感兴趣的内容。',
+    keywords: '文章分类,技术博客,前端,后端',
+  });
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<API.Category[]>([]);
   const { themeId: colorThemeId } = useModel('colorModel');

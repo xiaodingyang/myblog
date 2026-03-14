@@ -2,6 +2,7 @@ import React from 'react';
 import { Typography, Card, Row, Col, Tag, Space, Divider, Timeline } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import useSEO from '@/hooks/useSEO';
 import {
   UserOutlined,
   CodeOutlined,
@@ -16,6 +17,11 @@ import {
 const { Title, Text, Paragraph } = Typography;
 
 const AboutPage: React.FC = () => {
+  useSEO({
+    title: '关于我',
+    description: '了解若风——一名热爱前端开发的工程师，专注于 React、TypeScript、Node.js 技术栈。',
+    keywords: '若风,关于我,前端工程师,个人介绍',
+  });
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
 

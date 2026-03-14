@@ -5,11 +5,17 @@ import { request } from 'umi';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const MessagePage: React.FC = () => {
+  useSEO({
+    title: '留言板',
+    description: '欢迎在若风的博客留言板留下你的想法、建议或问题。',
+    keywords: '留言板,评论,交流,技术讨论',
+  });
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<API.Message[]>([]);
   const [total, setTotal] = useState(0);

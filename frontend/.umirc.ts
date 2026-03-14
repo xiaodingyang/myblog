@@ -1,14 +1,33 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  title: '个人博客',
+  title: '若风的博客 - 前端技术分享',
   esbuildMinifyIIFE: true,
-  // 浏览器标签栏图标（favicon）
-  // 使用 SVG 版本的博客 logo 作为标签栏图标
-  // 文件路径：frontend/public/favicon.svg
-  // 放到 frontend/public 目录下
   links: [
     { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+  ],
+  metas: [
+    { name: 'description', content: '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。' },
+    { name: 'keywords', content: '若风,前端开发,React,TypeScript,Node.js,技术博客,JavaScript,Vue' },
+    { name: 'author', content: '若风' },
+    { property: 'og:site_name', content: '若风的博客' },
+    { property: 'og:locale', content: 'zh_CN' },
+    { name: 'renderer', content: 'webkit' },
+    { name: 'applicable-device', content: 'pc,mobile' },
+  ],
+  headScripts: [
+    // 百度自动推送 - 用户访问页面时自动通知百度收录
+    `(function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();`,
   ],
   
   // 启用内置插件
@@ -72,6 +91,10 @@ export default defineConfig({
       changeOrigin: true,
     },
     '/uploads': {
+      target: 'http://162.14.83.58',
+      changeOrigin: true,
+    },
+    '/sitemap.xml': {
       target: 'http://162.14.83.58',
       changeOrigin: true,
     },
