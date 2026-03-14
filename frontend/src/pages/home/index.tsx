@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { Link } from 'umi';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
@@ -42,6 +42,15 @@ const HomePage: React.FC = () => {
   const currentColorTheme = getColorThemeById(colorThemeId);
 
   const sections = ['hero', 'featured', 'latest', 'explore', 'cta'];
+
+  const featuredArticles = useMemo(
+    () => [...articles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3),
+    [articles],
+  );
+  const latestArticles = useMemo(
+    () => [...articles].slice(0, 3),
+    [articles],
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -439,15 +448,15 @@ const HomePage: React.FC = () => {
 
           {loading ? (
             <div className="text-center text-gray-400">加载中...</div>
-          ) : articles.length > 0 ? (
+          ) : featuredArticles.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
               {/* 主推文章 */}
               <div className="lg:col-span-7">
-                <Link to={`/article/${articles[0]?._id}`} className="block group h-full">
+                <Link to={`/article/${featuredArticles[0]?._id}`} className="block group h-full">
                   <div
                     className="relative overflow-hidden rounded-2xl md:rounded-3xl h-full min-h-[280px] md:min-h-[400px]"
                     style={{
-                      background: currentColorTheme.gradient, // 主题色渐变
+                      background: currentColorTheme.gradient,
                     }}
                   >
                     <div className="absolute inset-0 opacity-10">
@@ -457,20 +466,20 @@ const HomePage: React.FC = () => {
                     <div className="relative z-10 p-6 md:p-10 h-full flex flex-col justify-between">
                       <div>
                         <Tag className="!bg-white/20 !border-none !text-white !rounded-full !px-3 md:!px-4 !py-1 !text-xs md:!text-sm">
-                          {articles[0]?.category?.name || '未分类'}
+                          {featuredArticles[0]?.category?.name || '未分类'}
                         </Tag>
                         <Title level={2} className="!text-white !mt-4 md:!mt-6 !mb-2 md:!mb-4 !text-xl md:!text-3xl lg:!text-4xl group-hover:!underline">
-                          {articles[0]?.title}
+                          {featuredArticles[0]?.title}
                         </Title>
                         <Paragraph className="!text-white/80 !text-sm md:!text-lg !mb-0 line-clamp-2 md:line-clamp-3">
-                          {articles[0]?.summary}
+                          {featuredArticles[0]?.summary}
                         </Paragraph>
                       </div>
                       <div className="flex items-center justify-between mt-6">
                         <Space className="text-white/70">
-                          <EyeOutlined /> {articles[0]?.views || 0} 阅读
+                          <EyeOutlined /> {featuredArticles[0]?.views || 0} 阅读
                           <span className="mx-2">·</span>
-                          <ClockCircleOutlined /> {dayjs(articles[0]?.createdAt).format('MM-DD')}
+                          <ClockCircleOutlined /> {dayjs(featuredArticles[0]?.createdAt).format('MM-DD')}
                         </Space>
                         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all">
                           <ArrowRightOutlined className="text-white text-lg" />
@@ -483,7 +492,7 @@ const HomePage: React.FC = () => {
 
               {/* 次推文章 */}
               <div className="lg:col-span-5 flex flex-col gap-6">
-                {articles.slice(1, 3).map((article, index) => (
+                {featuredArticles.slice(1, 3).map((article, index) => (
                   <Link key={article._id} to={`/article/${article._id}`} className="block group flex-1">
                     <div
                       className="relative overflow-hidden rounded-3xl h-full min-h-[185px]"
@@ -589,15 +598,14 @@ const HomePage: React.FC = () => {
             </Text>
           </div>
 
-          {articles.length > 3 ? (
+          {latestArticles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-              {articles.slice(3, 6).map((article, index) => (
+              {latestArticles.map((article, index) => (
                 <Link key={article._id} to={`/article/${article._id}`} className="block group">
                   <div
-                    className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+                    className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
                     style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
                   >
-                    {/* 封面 */}
                     <div className="relative h-52 overflow-hidden">
                       {article.cover ? (
                         <img
@@ -623,11 +631,10 @@ const HomePage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* 内容 */}
                     <div className="p-6">
                       <Title
                         level={5}
-                        className="!mb-3 transition-colors line-clamp-2"
+                        className="!mb-3 transition-colors truncate"
                         style={{
                           '--hover-color': currentColorTheme.primary,
                           textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -664,53 +671,7 @@ const HomePage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {articles.map((article, index) => (
-                <Link key={article._id} to={`/article/${article._id}`} className="block group">
-                  <div
-                    className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
-                    style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      {article.cover ? (
-                        <img src={article.cover} alt={article.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div
-                          className="w-full h-full flex items-center justify-center"
-                          style={{
-                            background: `linear-gradient(135deg, hsl(${(index * 60) % 360}, 70%, 60%) 0%, hsl(${(index * 60 + 40) % 360}, 70%, 50%) 100%)`,
-                          }}
-                        >
-                          <BookOutlined className="text-5xl text-white/30" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <Title
-                        level={5}
-                        className="!mb-2 line-clamp-2"
-                        style={{
-                          '--hover-color': currentColorTheme.primary,
-                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        } as React.CSSProperties & { '--hover-color': string }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = currentColorTheme.primary}
-                        onMouseLeave={(e) => e.currentTarget.style.color = ''}
-                      >
-                        {article.title}
-                      </Title>
-                      <Text
-                        className="text-gray-400 text-sm"
-                        style={{
-                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
-                        }}
-                      >
-                        {dayjs(article.createdAt).format('YYYY-MM-DD')}
-                      </Text>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <div className="text-center text-gray-400">暂无文章</div>
           )}
         </div>
       </section>

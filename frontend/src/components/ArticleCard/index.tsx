@@ -71,7 +71,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
           {/* 标题 */}
           <Title 
             level={5} 
-            ellipsis={{ rows: 2 }}
+            ellipsis={{ rows: 1 }}
             className="!mb-0 hover:text-primary transition-colors !text-sm md:!text-base"
             style={{ 
               color: '#1e293b',
