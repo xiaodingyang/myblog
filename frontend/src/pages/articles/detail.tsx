@@ -32,7 +32,6 @@ const ArticleDetailPage: React.FC = () => {
   const [article, setArticle] = useState<API.Article | null>(null);
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
-  const [messages, setMessages] = useState<API.Message[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -143,7 +142,7 @@ const ArticleDetailPage: React.FC = () => {
             : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
         }}
       >
-        <div className="max-w-4xl mx-auto px-4 md:px-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
           {/* 返回按钮 - 玻璃质感 */}
           <button
             onClick={() => history.back()}
@@ -216,7 +215,7 @@ const ArticleDetailPage: React.FC = () => {
 
       {/* 文章内容 */}
       <section className="py-8 md:py-12">
-        <div className="max-w-4xl mx-auto px-4 md:px-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
           <Card
             style={{
               borderRadius: 16,

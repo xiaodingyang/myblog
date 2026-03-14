@@ -4,7 +4,7 @@ export default defineConfig({
   title: '若风的博客 - 前端技术分享',
   esbuildMinifyIIFE: true,
   links: [
-    { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+    { rel: 'icon', href: '/favicon.png', type: 'image/png' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },

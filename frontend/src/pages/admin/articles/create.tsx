@@ -12,7 +12,6 @@ import {
   Upload,
   Space,
   message,
-  Switch,
 } from 'antd';
 import {
   ArrowLeftOutlined,

@@ -53,7 +53,6 @@ const DashboardPage: React.FC = () => {
           recentMessages: messagesRes.code === 0 ? messagesRes.data.list : [],
         });
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
       } finally {
         setLoading(false);
       }

@@ -35,7 +35,6 @@ const MessagePage: React.FC = () => {
         setTotal(res.data.total);
       }
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
     } finally {
       setLoading(false);
     }

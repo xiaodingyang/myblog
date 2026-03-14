@@ -69,7 +69,6 @@ const HomePage: React.FC = () => {
         if (categoriesRes.code === 0) setCategories(categoriesRes.data);
         if (tagsRes.code === 0) setTags(tagsRes.data);
       } catch (error) {
-        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
@@ -810,16 +809,6 @@ const HomePage: React.FC = () => {
               </div>
               <div className="flex flex-wrap gap-3">
                 {tags.map((tag, index) => {
-                  // 使用主题色生成标签颜色
-                  const getTagStyle = (index: number) => {
-                    const opacity = [0.1, 0.15, 0.2][index % 3];
-                    const hoverOpacity = [0.2, 0.25, 0.3][index % 3];
-                    return {
-                      background: `${currentColorTheme.primary}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`,
-                      color: currentColorTheme.primary,
-                      transition: 'all 0.2s',
-                    };
-                  };
                   const colors = [
                     'hover:opacity-80',
                     'hover:opacity-80',

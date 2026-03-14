@@ -31,7 +31,6 @@ const CategoriesPage: React.FC = () => {
           setCategories(res.data);
         }
       } catch (error) {
-        console.error('Failed to fetch categories:', error);
       } finally {
         setLoading(false);
       }

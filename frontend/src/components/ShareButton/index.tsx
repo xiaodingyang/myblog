@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Popover, message, Space } from 'antd';
-import { ShareAltOutlined, LinkOutlined, WechatOutlined, QqOutlined, WeiboCircleOutlined } from '@ant-design/icons';
+import { Popover, message } from 'antd';
+import { ShareAltOutlined, LinkOutlined, QqOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface ShareButtonProps {

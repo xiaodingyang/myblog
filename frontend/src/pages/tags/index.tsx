@@ -29,7 +29,6 @@ const TagsPage: React.FC = () => {
           setTags(res.data);
         }
       } catch (error) {
-        console.error('Failed to fetch tags:', error);
       } finally {
         setLoading(false);
       }

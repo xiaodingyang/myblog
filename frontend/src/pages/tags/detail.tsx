@@ -46,7 +46,6 @@ const TagDetailPage: React.FC = () => {
           setTotal(articlesRes.data.total);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }

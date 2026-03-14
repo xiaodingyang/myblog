@@ -57,7 +57,6 @@ const ArticlesPage: React.FC = () => {
         if (categoriesRes.code === 0) setCategories(categoriesRes.data);
         if (tagsRes.code === 0) setTags(tagsRes.data);
       } catch (error) {
-        console.error('Failed to fetch articles:', error);
       } finally {
         setLoading(false);
       }
