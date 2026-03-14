@@ -10,7 +10,6 @@ import {
   TagOutlined,
   UserOutlined,
   ArrowLeftOutlined,
-  ShareAltOutlined,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
@@ -21,6 +20,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import ShareButton from '@/components/ShareButton';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -113,17 +113,7 @@ const ArticleDetailPage: React.FC = () => {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: article?.title,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      message.success('链接已复制到剪贴板');
-    }
-  };
+
 
   if (loading) {
     return <Loading />;
@@ -283,13 +273,11 @@ const ArticleDetailPage: React.FC = () => {
                   最后更新于 {dayjs(article.updatedAt).format('YYYY-MM-DD HH:mm')}
                 </Text>
               </Space>
-              <Button
-                type="default"
-                icon={<ShareAltOutlined />}
-                onClick={handleShare}
-              >
-                分享
-              </Button>
+              <ShareButton
+                title={article.title}
+                summary={article.summary || ''}
+                cover={article.cover}
+              />
             </div>
           </Card>
 

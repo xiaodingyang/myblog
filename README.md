@@ -241,7 +241,7 @@ export DEPLOY_DIR=/var/www/myblog
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com;
+    server_name xiaodingyang.art;
 
     # 前端静态文件
     location / {

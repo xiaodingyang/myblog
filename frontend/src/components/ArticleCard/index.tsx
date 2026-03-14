@@ -4,6 +4,7 @@ import { Card, Tag, Space, Typography, Avatar } from 'antd';
 import { EyeOutlined, ClockCircleOutlined, FolderOutlined, UserOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import ShareButton from '@/components/ShareButton';
 import dayjs from 'dayjs';
 
 const { Title, Paragraph, Text } = Typography;
@@ -115,7 +116,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
                 size={20} 
                 icon={<UserOutlined />}
                 src={article.author?.avatar}
-                style={{ background: currentColorTheme.primary }} // 主题色
+                style={{ background: currentColorTheme.primary }}
               />
               <Text className="text-gray-500 text-xs md:text-sm">
                 {article.author?.username || '匿名'}
@@ -135,6 +136,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
               <span>
                 <ClockCircleOutlined className="mr-0.5 md:mr-1" />
                 {dayjs(article.createdAt).format('MM-DD')}
+              </span>
+              <span onClick={(e) => e.preventDefault()}>
+                <ShareButton
+                  title={article.title}
+                  summary={article.summary || ''}
+                  url={`https://www.xiaodingyang.art/article/${article._id}`}
+                  cover={article.cover}
+                  mode="icon"
+                />
               </span>
             </Space>
           </div>

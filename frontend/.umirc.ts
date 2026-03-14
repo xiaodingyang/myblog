@@ -88,12 +88,14 @@ export default defineConfig({
   // 代理配置 - 开发环境将请求转发到本地后端
   proxy: {
     '/api': {
-      target: 'http://162.14.83.58',
+      target: 'https://www.xiaodingyang.art',
       changeOrigin: true,
+      secure: false,
     },
     '/uploads': {
-      target: 'http://162.14.83.58',
+      target: 'https://www.xiaodingyang.art',
       changeOrigin: true,
+      secure: false,
     },
   },
   
