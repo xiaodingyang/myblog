@@ -2,6 +2,7 @@ import { message, ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 dayjs.locale('zh-cn');
 
@@ -97,28 +98,30 @@ export function rootContainer(container: React.ReactNode) {
     };
 
     return (
-        <ConfigProvider
-            locale={zhCN}
-            theme={{
-                token: {
-                    colorPrimary: getDefaultColor(),
-                    borderRadius: 8,
-                    colorBgContainer: '#ffffff',
-                },
-                components: {
-                    Button: {
+        <ErrorBoundary>
+            <ConfigProvider
+                locale={zhCN}
+                theme={{
+                    token: {
+                        colorPrimary: getDefaultColor(),
                         borderRadius: 8,
+                        colorBgContainer: '#ffffff',
                     },
-                    Card: {
-                        borderRadiusLG: 12,
+                    components: {
+                        Button: {
+                            borderRadius: 8,
+                        },
+                        Card: {
+                            borderRadiusLG: 12,
+                        },
+                        Input: {
+                            borderRadius: 8,
+                        },
                     },
-                    Input: {
-                        borderRadius: 8,
-                    },
-                },
-            }}
-        >
-            {container}
-        </ConfigProvider>
+                }}
+            >
+                {container}
+            </ConfigProvider>
+        </ErrorBoundary>
     );
 }
