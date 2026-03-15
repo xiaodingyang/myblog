@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, CameraOutlined } from '@ant-design/icons';
 import { request } from 'umi';
-import type { UploadFile } from 'antd/es/upload/interface';
+import ImgCrop from 'antd-img-crop';
 
 const { Title, Text } = Typography;
 
@@ -24,7 +24,8 @@ const SettingsPage: React.FC = () => {
   const [profileForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [avatarList, setAvatarList] = useState<UploadFile[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (initialState?.currentUser) {
@@ -32,13 +33,8 @@ const SettingsPage: React.FC = () => {
         username: initialState.currentUser.username,
         email: initialState.currentUser.email,
       });
-      if (initialState.currentUser.avatar) {
-        setAvatarList([{
-          uid: '-1',
-          name: 'avatar',
-          status: 'done',
-          url: initialState.currentUser.avatar,
-        }]);
+      if (initialState.currentUser.avatar && !avatarUrl) {
+        setAvatarUrl(initialState.currentUser.avatar);
       }
     }
   }, [initialState?.currentUser, profileForm]);
@@ -48,7 +44,7 @@ const SettingsPage: React.FC = () => {
     try {
       const data = {
         ...values,
-        avatar: avatarList[0]?.response?.data?.url || avatarList[0]?.url || '',
+        avatar: avatarUrl,
       };
 
       const res = await request<API.Response<API.User>>('/api/auth/profile', {
@@ -94,18 +90,42 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    const localUrl = URL.createObjectURL(file);
+    setAvatarUrl(localUrl);
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await request<API.Response<{ url: string }>>('/api/upload', {
+        method: 'POST',
+        data: formData,
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      if (res.code === 0 && res.data?.url) {
+        const serverUrl = res.data.url;
+        const preloadImg = new Image();
+        preloadImg.onload = () => {
+          setAvatarUrl(serverUrl);
+          URL.revokeObjectURL(localUrl);
+        };
+        preloadImg.onerror = () => {
+          // Server image not accessible, keep blob preview
+        };
+        preloadImg.src = serverUrl;
+        message.success('头像上传成功');
+      } else {
+        throw new Error(res.message || '上传失败');
+      }
+    } catch (err: any) {
+      message.error(err?.message || '头像上传失败');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const uploadProps = {
-    name: 'file',
-    action: '/api/upload',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    fileList: avatarList,
-    maxCount: 1,
     showUploadList: false,
-    onChange: ({ fileList }: { fileList: UploadFile[] }) => {
-      setAvatarList(fileList);
-    },
     beforeUpload: (file: File) => {
       const isImage = file.type.startsWith('image/');
       if (!isImage) {
@@ -117,7 +137,8 @@ const SettingsPage: React.FC = () => {
         message.error('图片大小不能超过 2MB');
         return Upload.LIST_IGNORE;
       }
-      return true;
+      handleAvatarUpload(file);
+      return false;
     },
   };
 
@@ -140,27 +161,35 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <div className="flex items-center gap-6 mb-6">
-              <Upload {...uploadProps}>
-                <div className="relative cursor-pointer group">
-                  <Avatar
-                    size={80}
-                    icon={<UserOutlined />}
-                    src={avatarList[0]?.response?.data?.url || avatarList[0]?.url || initialState?.currentUser?.avatar}
-                    style={{
-                      background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
-                    }}
-                  />
-                  <div
-                    className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-white text-xs"
-                    style={{ 
-                      background: '#1677ff',
-                      border: '2px solid #fff',
-                    }}
-                  >
-                    <CameraOutlined />
+              <ImgCrop
+                rotationSlider
+                cropShape="round"
+                modalTitle="裁剪头像"
+                modalOk="确定"
+                modalCancel="取消"
+              >
+                <Upload {...uploadProps}>
+                  <div className="relative cursor-pointer group">
+                    <Avatar
+                      size={80}
+                      icon={<UserOutlined />}
+                      src={avatarUrl || undefined}
+                      style={{
+                        background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
+                      }}
+                    />
+                    <div
+                      className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-white text-xs"
+                      style={{ 
+                        background: '#1677ff',
+                        border: '2px solid #fff',
+                      }}
+                    >
+                      <CameraOutlined />
+                    </div>
                   </div>
-                </div>
-              </Upload>
+                </Upload>
+              </ImgCrop>
               <div>
                 <Text strong className="text-lg block">
                   {initialState?.currentUser?.username}

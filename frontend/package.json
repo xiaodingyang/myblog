@@ -14,6 +14,7 @@
     "@ant-design/pro-components": "^2.6.43",
     "@xdy-npm/react-particle-backgrounds": "^1.0.0",
     "antd": "^5.12.5",
+    "antd-img-crop": "^4.30.0",
     "dayjs": "^1.11.10",
     "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
