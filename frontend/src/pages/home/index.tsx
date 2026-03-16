@@ -914,7 +914,15 @@ const HomePage: React.FC = () => {
               color: 'rgba(255, 255, 255, 0.8)',
             }}
           >
-            © 2026 个人博客. All rights reserved.
+            © {new Date().getFullYear()} 个人博客. All rights reserved.{' '}
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+            >
+              蜀ICP备2026005106号
+            </a>
           </Text>
         </div>
       </section>

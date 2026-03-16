@@ -397,6 +397,15 @@ const FrontLayout: React.FC = () => {
               <Divider className="!border-gray-700 !my-8" />
               <div className="text-center text-gray-500 text-sm">
                 © {new Date().getFullYear()} 肖定阳的博客. All rights reserved.
+                <span className="mx-2">|</span>
+                <a
+                  href="https://beian.miit.gov.cn/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  蜀ICP备2026005106号
+                </a>
               </div>
             </div>
           </Footer>
