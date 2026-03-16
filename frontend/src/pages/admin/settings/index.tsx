@@ -97,25 +97,36 @@ const SettingsPage: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await request<API.Response<{ url: string }>>('/api/upload', {
+      const uploadRes = await request<API.Response<{ url: string }>>('/api/upload', {
         method: 'POST',
         data: formData,
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      if (res.code === 0 && res.data?.url) {
-        const serverUrl = res.data.url;
-        const preloadImg = new Image();
-        preloadImg.onload = () => {
-          setAvatarUrl(serverUrl);
-          URL.revokeObjectURL(localUrl);
-        };
-        preloadImg.onerror = () => {
-          // Server image not accessible, keep blob preview
-        };
-        preloadImg.src = serverUrl;
-        message.success('头像上传成功');
+      if (uploadRes.code === 0 && uploadRes.data?.url) {
+        const serverUrl = uploadRes.data.url;
+        setAvatarUrl(serverUrl);
+        URL.revokeObjectURL(localUrl);
+
+        const profileRes = await request<API.Response<API.User>>('/api/auth/profile', {
+          method: 'PUT',
+          data: {
+            username: profileForm.getFieldValue('username'),
+            email: profileForm.getFieldValue('email'),
+            avatar: serverUrl,
+          },
+        });
+        if (profileRes.code === 0) {
+          localStorage.setItem('user', JSON.stringify(profileRes.data));
+          setInitialState({
+            ...initialState,
+            currentUser: profileRes.data,
+          });
+          message.success('头像更新成功');
+        } else {
+          message.success('头像上传成功，请点击保存修改同步');
+        }
       } else {
-        throw new Error(res.message || '上传失败');
+        throw new Error(uploadRes.message || '上传失败');
       }
     } catch (err: any) {
       message.error(err?.message || '头像上传失败');

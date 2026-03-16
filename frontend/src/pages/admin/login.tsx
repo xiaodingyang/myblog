@@ -257,31 +257,6 @@ const AdminLoginPage: React.FC = () => {
                   登 录
                 </Button>
               </Form.Item>
-
-              {/* 分割线 */}
-              <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400">或</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {/* 社交登录按钮 */}
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  className="flex-1 h-11 rounded-xl border border-gray-200 bg-white flex items-center justify-center gap-2 text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
-                >
-                  <GithubOutlined style={{ fontSize: 18 }} />
-                  <span>GitHub</span>
-                </button>
-                <button
-                  type="button"
-                  className="flex-1 h-11 rounded-xl border border-gray-200 bg-white flex items-center justify-center gap-2 text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
-                >
-                  <WechatOutlined style={{ fontSize: 18, color: '#07c160' }} />
-                  <span>微信</span>
-                </button>
-              </div>
             </Form>
           </div>
         </div>

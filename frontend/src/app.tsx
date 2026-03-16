@@ -12,22 +12,41 @@ export async function getInitialState(): Promise<{
     token?: string;
 }> {
     const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
 
-    if (token && userStr) {
+    if (token) {
         try {
-            const currentUser = JSON.parse(userStr);
-            return { currentUser, token };
+            const res = await fetch('/api/auth/profile', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const json = await res.json();
+            if (json.code === 0 && json.data) {
+                localStorage.setItem('user', JSON.stringify(json.data));
+                return { currentUser: json.data, token };
+            }
         } catch {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            // 网络失败时回退到本地缓存
         }
+
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                return { currentUser: JSON.parse(userStr), token };
+            } catch {
+                // ignore
+            }
+        }
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
     }
 
     return {};
 }
 
 
+
+// 防止 401 重复弹窗
+let _isRedirectingToLogin = false;
 
 // 请求配置
 export const request = {
@@ -36,17 +55,22 @@ export const request = {
         errorHandler: (error: any) => {
             if (error.response) {
                 const { status, data } = error.response;
-                // 先显示后端返回的错误信息
-                const errorMessage = data?.message || `请求错误: ${status}`;
-                message.error(errorMessage);
-                
-                // 如果是 401 且不在登录页，才跳转到登录页
-                if (status === 401 && !window.location.pathname.includes('/admin/login')) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    window.location.href = '/admin/login';
+
+                if (status === 401) {
+                    if (!_isRedirectingToLogin && !window.location.pathname.includes('/admin/login')) {
+                        _isRedirectingToLogin = true;
+                        message.warning('请先登录');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setTimeout(() => {
+                            window.location.href = '/admin/login';
+                        }, 300);
+                    }
                     return;
                 }
+
+                const errorMessage = data?.message || `请求错误: ${status}`;
+                message.error(errorMessage);
             } else if (error.request) {
                 message.error('网络错误，请检查网络连接');
             } else {
