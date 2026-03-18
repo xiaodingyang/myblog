@@ -240,7 +240,7 @@ const FrontLayout: React.FC = () => {
               <button
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all hover:scale-105"
                 style={{
-                  background: '#24292e',
+                  backgroundImage: currentColorTheme.gradient,
                   color: '#fff',
                   border: 'none',
                   cursor: 'pointer',
