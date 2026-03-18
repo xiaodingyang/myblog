@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'umi';
-import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer } from 'antd';
+import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
   HomeOutlined,
@@ -14,12 +14,14 @@ import {
   SearchOutlined,
   MenuOutlined,
   CloseOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import ParticlesBackground from '@/components/ParticlesBackground';
 import ParticleThemeSelector from '@/components/ParticleThemeSelector';
 import GlassBackground from '@/components/GlassBackground';
 import GradientText from '@/components/GradientText';
+import GithubLoginModal from '@/components/GithubLoginModal';
 import { getColorThemeById } from '@/config/colorThemes';
 
 const { Header, Content, Footer } = Layout;
@@ -31,6 +33,31 @@ const FrontLayout: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const shown = sessionStorage.getItem('login_prompt_shown');
+      if (!shown) {
+        const timer = setTimeout(() => {
+          setLoginModalVisible(true);
+          sessionStorage.setItem('login_prompt_shown', '1');
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isLoggedIn, setLoginModalVisible]);
+
+  useEffect(() => {
+    if (isLoggedIn) return;
+    const handleCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      message.info('登录后即可复制内容');
+      setLoginModalVisible(true);
+    };
+    document.addEventListener('copy', handleCopy);
+    return () => document.removeEventListener('copy', handleCopy);
+  }, [isLoggedIn, setLoginModalVisible]);
 
   // 获取主题背景色 - 现在由毛玻璃背景组件处理，Layout 使用透明背景
   const getBackgroundStyle = () => {
@@ -173,6 +200,58 @@ const FrontLayout: React.FC = () => {
 
           {/* 右侧操作区 */}
           <div className="flex items-center gap-3 shrink-0">
+            {/* GitHub 用户状态 */}
+            {isLoggedIn && githubUser ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'profile',
+                      label: (
+                        <a href={githubUser.htmlUrl} target="_blank" rel="noreferrer">
+                          GitHub 主页
+                        </a>
+                      ),
+                      icon: <GithubOutlined />,
+                    },
+                    { type: 'divider' },
+                    {
+                      key: 'logout',
+                      label: '退出登录',
+                      icon: <LogoutOutlined />,
+                      danger: true,
+                      onClick: () => {
+                        logout();
+                        message.success('已退出登录');
+                      },
+                    },
+                  ],
+                }}
+                placement="bottomRight"
+              >
+                <div className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-full transition-colors hover:bg-black/5">
+                  <Avatar size={28} src={githubUser.avatar} icon={<GithubOutlined />} />
+                  <span className="hidden sm:inline text-sm" style={{ color: headerTextColor, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {githubUser.nickname || githubUser.username}
+                  </span>
+                </div>
+              </Dropdown>
+            ) : (
+              <button
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all hover:scale-105"
+                style={{
+                  background: '#24292e',
+                  color: '#fff',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setLoginModalVisible(true)}
+              >
+                <GithubOutlined />
+                登录
+              </button>
+            )}
+
             {/* 搜索框 - PC端显示 */}
             <div className="hidden sm:block" style={{ width: 160 }}>
               <Input
@@ -410,6 +489,7 @@ const FrontLayout: React.FC = () => {
             </div>
           </Footer>
         )}
+        <GithubLoginModal />
       </Layout>
     </ConfigProvider>
   );

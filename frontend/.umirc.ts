@@ -91,6 +91,8 @@ export default defineConfig({
         { path: '/admin/categories', component: '@/pages/admin/categories/index' },
         { path: '/admin/tags', component: '@/pages/admin/tags/index' },
         { path: '/admin/messages', component: '@/pages/admin/messages/index' },
+        { path: '/admin/comments', component: '@/pages/admin/comments/index' },
+        { path: '/admin/users', component: '@/pages/admin/users/index' },
         { path: '/admin/settings', component: '@/pages/admin/settings/index' },
       ],
     },

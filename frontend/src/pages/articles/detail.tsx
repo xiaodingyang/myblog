@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, Link, history } from 'umi';
-import { Typography, Tag, Space, Avatar, Divider, Card, Button, Form, Input, message } from 'antd';
+import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import {
@@ -10,6 +10,7 @@ import {
   TagOutlined,
   UserOutlined,
   ArrowLeftOutlined,
+  GithubOutlined,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
@@ -21,6 +22,7 @@ import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
+import GithubLoginModal from '@/components/GithubLoginModal';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -33,7 +35,13 @@ const ArticleDetailPage: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const [submitting, setSubmitting] = useState(false);
-  const [form] = Form.useForm();
+  const [commentContent, setCommentContent] = useState('');
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentTotal, setCommentTotal] = useState(0);
+  const [commentPage, setCommentPage] = useState(1);
+  const [commentLoading, setCommentLoading] = useState(false);
+  const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
+  const commentPageSize = 10;
 
   const jsonLd = useMemo(() => {
     if (!article) return undefined;
@@ -70,6 +78,24 @@ const ArticleDetailPage: React.FC = () => {
     jsonLd,
   });
 
+  const fetchComments = useCallback(async (page: number) => {
+    if (!id) return;
+    setCommentLoading(true);
+    try {
+      const res = await request(`/api/comments/article/${id}`, {
+        params: { page, pageSize: commentPageSize },
+      });
+      if (res.code === 0) {
+        setComments(res.data.list);
+        setCommentTotal(res.data.total);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setCommentLoading(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     const fetchArticle = async () => {
       setLoading(true);
@@ -89,27 +115,37 @@ const ArticleDetailPage: React.FC = () => {
 
     if (id) {
       fetchArticle();
+      fetchComments(1);
     }
-  }, [id]);
+  }, [id, fetchComments]);
 
-  const handleSubmitMessage = async (values: { nickname: string; email: string; content: string }) => {
-    setSubmitting(true);
-    try {
-      const res = await request<API.Response<API.Message>>('/api/messages', {
-        method: 'POST',
-        data: values,
-      });
-      if (res.code === 0) {
-        message.success('留言提交成功，等待审核');
-        form.resetFields();
-      } else {
-        message.error(res.message || '留言提交失败');
+  const handleSubmitComment = () => {
+    requireAuth(async () => {
+      if (!commentContent.trim() || commentContent.trim().length < 2) {
+        message.warning('评论内容至少2个字符');
+        return;
       }
-    } catch (error) {
-      message.error('留言提交失败');
-    } finally {
-      setSubmitting(false);
-    }
+      setSubmitting(true);
+      try {
+        const res = await request('/api/comments', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${githubToken}` },
+          data: { articleId: id, content: commentContent.trim() },
+        });
+        if (res.code === 0) {
+          message.success('评论发表成功');
+          setCommentContent('');
+          fetchComments(1);
+          setCommentPage(1);
+        } else {
+          message.error(res.message || '评论失败');
+        }
+      } catch {
+        message.error('评论失败');
+      } finally {
+        setSubmitting(false);
+      }
+    });
   };
 
 
@@ -280,7 +316,7 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* 留言区 */}
+          {/* 评论区 */}
           <Card
             className="mt-8"
             style={{
@@ -290,55 +326,124 @@ const ArticleDetailPage: React.FC = () => {
             }}
           >
             <Title level={4} className="!mb-6">
-              💬 发表评论
+              💬 评论 {commentTotal > 0 && `(${commentTotal})`}
             </Title>
 
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmitMessage}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Form.Item
-                  name="nickname"
-                  label="昵称"
-                  rules={[{ required: true, message: '请输入昵称' }]}
+            {/* 评论输入 */}
+            <div className="mb-8">
+              {isLoggedIn ? (
+                <div className="flex gap-3">
+                  <Avatar
+                    size={40}
+                    src={githubUser?.avatar}
+                    icon={<GithubOutlined />}
+                    style={{ flexShrink: 0 }}
+                  />
+                  <div className="flex-1">
+                    <TextArea
+                      value={commentContent}
+                      onChange={(e) => setCommentContent(e.target.value)}
+                      placeholder="写下你的评论..."
+                      rows={3}
+                      showCount
+                      maxLength={500}
+                    />
+                    <div className="flex items-center justify-between mt-3">
+                      <Text type="secondary" className="text-sm">
+                        以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份评论
+                      </Text>
+                      <Button
+                        type="primary"
+                        onClick={handleSubmitComment}
+                        loading={submitting}
+                      >
+                        发表评论
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="text-center py-6 rounded-xl cursor-pointer transition-all hover:shadow-md"
+                  style={{ background: '#f8f9fa', border: '1px dashed #d9d9d9' }}
+                  onClick={() => requireAuth()}
                 >
-                  <Input placeholder="请输入昵称" size="large" />
-                </Form.Item>
-                <Form.Item
-                  name="email"
-                  label="邮箱"
-                  rules={[
-                    { required: true, message: '请输入邮箱' },
-                    { type: 'email', message: '请输入正确的邮箱格式' },
-                  ]}
-                >
-                  <Input placeholder="请输入邮箱（不会公开）" size="large" />
-                </Form.Item>
-              </div>
-              <Form.Item
-                name="content"
-                label="评论内容"
-                rules={[
-                  { required: true, message: '请输入评论内容' },
-                  { min: 5, message: '评论内容至少5个字符' },
-                ]}
-              >
-                <TextArea
-                  placeholder="写下你的评论..."
-                  rows={4}
-                  showCount
-                  maxLength={500}
+                  <GithubOutlined style={{ fontSize: 24, color: '#999', marginBottom: 8 }} />
+                  <div>
+                    <Text type="secondary">登录 GitHub 后即可发表评论</Text>
+                  </div>
+                  <Button type="link" style={{ marginTop: 4 }}>
+                    点击登录
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* 评论列表 */}
+            {commentLoading ? (
+              <Loading />
+            ) : comments.length > 0 ? (
+              <>
+                <List
+                  itemLayout="horizontal"
+                  dataSource={comments}
+                  renderItem={(item, index) => (
+                    <List.Item
+                      className="animate-slide-up !px-0"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <a href={item.user?.htmlUrl} target="_blank" rel="noreferrer">
+                            <Avatar size={40} src={item.user?.avatar} icon={<GithubOutlined />} />
+                          </a>
+                        }
+                        title={
+                          <div className="flex items-center gap-3">
+                            <a
+                              href={item.user?.htmlUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-gray-800 hover:text-blue-500 font-medium"
+                            >
+                              {item.user?.nickname || item.user?.username || '匿名'}
+                            </a>
+                            <Text className="text-gray-400 text-sm">
+                              <ClockCircleOutlined className="mr-1" />
+                              {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
+                            </Text>
+                          </div>
+                        }
+                        description={
+                          <Paragraph className="!mb-0 mt-1 text-gray-600">
+                            {item.content}
+                          </Paragraph>
+                        }
+                      />
+                    </List.Item>
+                  )}
                 />
-              </Form.Item>
-              <Form.Item className="!mb-0">
-                <Button type="primary" htmlType="submit" loading={submitting} size="large">
-                  提交评论
-                </Button>
-              </Form.Item>
-            </Form>
+                {commentTotal > commentPageSize && (
+                  <div className="flex justify-center mt-4 pt-4 border-t border-gray-100">
+                    <Pagination
+                      current={commentPage}
+                      total={commentTotal}
+                      pageSize={commentPageSize}
+                      showSizeChanger={false}
+                      onChange={(p) => {
+                        setCommentPage(p);
+                        fetchComments(p);
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <Empty description="暂无评论，快来抢沙发吧！" />
+            )}
           </Card>
+
+          <GithubLoginModal />
         </div>
       </section>
     </div>

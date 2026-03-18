@@ -13,6 +13,8 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeOutlined,
+  TeamOutlined,
+  CommentOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -59,6 +61,16 @@ const AdminLayout: React.FC = () => {
       key: '/admin/messages',
       icon: <MessageOutlined />,
       label: <Link to="/admin/messages">留言管理</Link>,
+    },
+    {
+      key: '/admin/comments',
+      icon: <CommentOutlined />,
+      label: <Link to="/admin/comments">评论管理</Link>,
+    },
+    {
+      key: '/admin/users',
+      icon: <TeamOutlined />,
+      label: <Link to="/admin/users">用户管理</Link>,
     },
     {
       key: '/admin/settings',

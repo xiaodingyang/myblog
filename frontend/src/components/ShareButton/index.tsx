@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Popover, message } from 'antd';
 import { ShareAltOutlined, LinkOutlined, QqOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { QRCodeSVG } from 'qrcode.react';
+import { useModel } from 'umi';
 
 interface ShareButtonProps {
   title: string;
   summary?: string;
   url?: string;
   cover?: string;
-  /** 'icon' shows only icon; 'button' shows icon + text */
   mode?: 'icon' | 'button';
 }
 
@@ -54,7 +54,16 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   mode = 'button',
 }) => {
   const [open, setOpen] = useState(false);
+  const { isLoggedIn, requireAuth } = useModel('githubUserModel');
   const shareUrl = url || getShareUrl();
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen && !isLoggedIn) {
+      requireAuth();
+      return;
+    }
+    setOpen(newOpen);
+  };
 
   const content = (
     <div style={{ width: 220 }}>
@@ -113,7 +122,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
       content={content}
       trigger="click"
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
       placement="bottomRight"
       arrow={{ pointAtCenter: true }}
     >

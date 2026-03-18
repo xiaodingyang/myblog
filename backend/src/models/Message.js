@@ -1,18 +1,19 @@
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'GithubUser',
+  },
   nickname: {
     type: String,
-    required: [true, '昵称不能为空'],
     trim: true,
     maxlength: [20, '昵称不能超过20个字符'],
   },
   email: {
     type: String,
-    required: [true, '邮箱不能为空'],
     trim: true,
     lowercase: true,
-    match: [/^\S+@\S+\.\S+$/, '请输入有效的邮箱地址'],
   },
   content: {
     type: String,
@@ -30,7 +31,6 @@ const messageSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// 索引
 messageSchema.index({ status: 1 });
 messageSchema.index({ createdAt: -1 });
 

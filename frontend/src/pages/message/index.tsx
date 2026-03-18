@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Card, Form, Input, Button, List, Avatar, Pagination, message } from 'antd';
-import { MessageOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { request } from 'umi';
+import { Typography, Card, Input, Button, List, Avatar, Pagination, message } from 'antd';
+import { MessageOutlined, ClockCircleOutlined, GithubOutlined } from '@ant-design/icons';
+import { request, useModel } from 'umi';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import GithubLoginModal from '@/components/GithubLoginModal';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -17,11 +18,12 @@ const MessagePage: React.FC = () => {
     keywords: '留言板,评论,交流,技术讨论',
   });
   const [loading, setLoading] = useState(true);
-  const [messages, setMessages] = useState<API.Message[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [form] = Form.useForm();
+  const [content, setContent] = useState('');
+  const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const pageSize = 10;
 
   const fetchMessages = async (currentPage: number) => {
@@ -44,24 +46,31 @@ const MessagePage: React.FC = () => {
     fetchMessages(page);
   }, [page]);
 
-  const handleSubmit = async (values: { nickname: string; email: string; content: string }) => {
-    setSubmitting(true);
-    try {
-      const res = await request<API.Response<API.Message>>('/api/messages', {
-        method: 'POST',
-        data: values,
-      });
-      if (res.code === 0) {
-        message.success('留言提交成功，等待审核后显示');
-        form.resetFields();
-      } else {
-        message.error(res.message || '留言提交失败');
+  const handleSubmit = () => {
+    requireAuth(async () => {
+      if (!content.trim() || content.trim().length < 5) {
+        message.warning('留言内容至少5个字符');
+        return;
       }
-    } catch (error) {
-      message.error('留言提交失败');
-    } finally {
-      setSubmitting(false);
-    }
+      setSubmitting(true);
+      try {
+        const res = await request<API.Response<API.Message>>('/api/messages', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${githubToken}` },
+          data: { content: content.trim() },
+        });
+        if (res.code === 0) {
+          message.success('留言提交成功，等待审核后显示');
+          setContent('');
+        } else {
+          message.error(res.message || '留言提交失败');
+        }
+      } catch (error) {
+        message.error('留言提交失败');
+      } finally {
+        setSubmitting(false);
+      }
+    });
   };
 
   return (
@@ -117,56 +126,50 @@ const MessagePage: React.FC = () => {
             ✍️ 发表留言
           </Title>
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Form.Item
-                name="nickname"
-                label="昵称"
-                rules={[
-                  { required: true, message: '请输入昵称' },
-                  { max: 20, message: '昵称不能超过20个字符' },
-                ]}
-              >
-                <Input placeholder="请输入昵称" size="large" prefix={<UserOutlined className="text-gray-400" />} />
-              </Form.Item>
-              <Form.Item
-                name="email"
-                label="邮箱"
-                rules={[
-                  { required: true, message: '请输入邮箱' },
-                  { type: 'email', message: '请输入正确的邮箱格式' },
-                ]}
-              >
-                <Input placeholder="请输入邮箱（不会公开）" size="large" />
-              </Form.Item>
-            </div>
-            <Form.Item
-              name="content"
-              label="留言内容"
-              rules={[
-                { required: true, message: '请输入留言内容' },
-                { min: 5, message: '留言内容至少5个字符' },
-                { max: 500, message: '留言内容不能超过500个字符' },
-              ]}
-            >
-              <TextArea
-                placeholder="写下你想说的话..."
-                rows={4}
-                showCount
-                maxLength={500}
+          {isLoggedIn ? (
+            <div className="flex gap-3">
+              <Avatar
+                size={40}
+                src={githubUser?.avatar}
+                icon={<GithubOutlined />}
+                style={{ flexShrink: 0 }}
               />
-            </Form.Item>
-            <Form.Item className="!mb-0">
-              <Button type="primary" htmlType="submit" loading={submitting} size="large">
-                提交留言
+              <div className="flex-1">
+                <TextArea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="写下你想说的话..."
+                  rows={4}
+                  showCount
+                  maxLength={500}
+                />
+                <div className="flex items-center justify-between mt-3">
+                  <Text type="secondary" className="text-sm">
+                    以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份留言
+                  </Text>
+                  <Button type="primary" onClick={handleSubmit} loading={submitting} size="large">
+                    提交留言
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="text-center py-8 rounded-xl cursor-pointer transition-all hover:shadow-md"
+              style={{ background: '#f8f9fa', border: '1px dashed #d9d9d9' }}
+              onClick={() => requireAuth()}
+            >
+              <GithubOutlined style={{ fontSize: 28, color: '#999', marginBottom: 8 }} />
+              <div>
+                <Text type="secondary">登录 GitHub 后即可发表留言</Text>
+              </div>
+              <Button type="link" style={{ marginTop: 4 }}>
+                点击登录
               </Button>
-            </Form.Item>
-          </Form>
+            </div>
+          )}
         </Card>
+        <GithubLoginModal />
 
         {/* 留言列表 */}
         <Card
@@ -194,14 +197,20 @@ const MessagePage: React.FC = () => {
                   >
                     <List.Item.Meta
                       avatar={
-                        <Avatar
-                          size={48}
-                          style={{
-                            background: `linear-gradient(135deg, hsl(${(item.nickname.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(item.nickname.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
-                          }}
-                        >
-                          {item.nickname.charAt(0).toUpperCase()}
-                        </Avatar>
+                        item.user?.avatar ? (
+                          <a href={item.user?.htmlUrl} target="_blank" rel="noreferrer">
+                            <Avatar size={48} src={item.user.avatar} />
+                          </a>
+                        ) : (
+                          <Avatar
+                            size={48}
+                            style={{
+                              background: `linear-gradient(135deg, hsl(${((item.nickname || '匿').charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${((item.nickname || '匿').charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
+                            }}
+                          >
+                            {(item.nickname || '匿').charAt(0).toUpperCase()}
+                          </Avatar>
+                        )
                       }
                       title={
                         <div className="flex items-center gap-3">
@@ -211,7 +220,7 @@ const MessagePage: React.FC = () => {
                               textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                             }}
                           >
-                            {item.nickname}
+                            {item.user?.nickname || item.user?.username || item.nickname || '匿名'}
                           </Text>
                           <Text 
                             className="text-gray-400 text-sm"

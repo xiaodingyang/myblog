@@ -8,6 +8,8 @@ const articleController = require('../controllers/articleController');
 const categoryController = require('../controllers/categoryController');
 const tagController = require('../controllers/tagController');
 const messageController = require('../controllers/messageController');
+const commentController = require('../controllers/commentController');
+const githubUserController = require('../controllers/githubUserController');
 const statisticsController = require('../controllers/statisticsController');
 
 // 所有后台路由都需要认证和管理员权限
@@ -38,5 +40,15 @@ router.delete('/tags/:id', tagController.deleteTag);
 router.get('/messages', messageController.getAdminMessages);
 router.put('/messages/:id/review', validate(schemas.reviewMessage), messageController.reviewMessage);
 router.delete('/messages/:id', messageController.deleteMessage);
+
+// 评论管理
+router.get('/comments', commentController.getAdminComments);
+router.put('/comments/:id/review', validate(schemas.reviewMessage), commentController.reviewComment);
+router.delete('/comments/:id', commentController.deleteComment);
+
+// GitHub 用户管理
+router.get('/users', githubUserController.getUsers);
+router.put('/users/:id/status', githubUserController.updateUserStatus);
+router.delete('/users/:id', githubUserController.deleteUser);
 
 module.exports = router;
