@@ -348,7 +348,7 @@ const ArticleDetailPage: React.FC = () => {
                       showCount
                       maxLength={500}
                     />
-                    <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center justify-between mt-8">
                       <Text type="secondary" className="text-sm">
                         以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份评论
                       </Text>
