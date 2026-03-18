@@ -2,11 +2,14 @@ import React from 'react';
 import { Modal, Button, Typography, Space, Divider } from 'antd';
 import { GithubOutlined, CommentOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
 
 const { Title, Text, Paragraph } = Typography;
 
 const GithubLoginModal: React.FC = () => {
   const { loginModalVisible, setLoginModalVisible } = useModel('githubUserModel');
+  const { themeId } = useModel('colorModel');
+  const theme = getColorThemeById(themeId);
 
   const handleGithubLogin = () => {
     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
@@ -30,7 +33,7 @@ const GithubLoginModal: React.FC = () => {
             width: 64,
             height: 64,
             borderRadius: 16,
-            background: 'linear-gradient(135deg, #24292e 0%, #586069 100%)',
+            backgroundImage: theme.gradient,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -40,7 +43,7 @@ const GithubLoginModal: React.FC = () => {
           <GithubOutlined style={{ fontSize: 32, color: '#fff' }} />
         </div>
 
-        <Title level={4} style={{ marginBottom: 8 }}>
+        <Title level={4} style={{ marginBottom: 8, color: theme.primary }}>
           登录后解锁更多功能
         </Title>
 
@@ -50,24 +53,25 @@ const GithubLoginModal: React.FC = () => {
 
         <div
           style={{
-            background: '#f8f9fa',
+            background: `${theme.primary}0a`,
             borderRadius: 12,
             padding: '16px 20px',
             marginBottom: 24,
             textAlign: 'left',
+            border: `1px solid ${theme.primary}15`,
           }}
         >
           <Space direction="vertical" size={12} style={{ width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <CommentOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+              <CommentOutlined style={{ fontSize: 18, color: theme.primary }} />
               <Text>发表文章评论和留言</Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <CopyOutlined style={{ fontSize: 18, color: '#52c41a' }} />
+              <CopyOutlined style={{ fontSize: 18, color: theme.primary }} />
               <Text>复制文章内容</Text>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <ShareAltOutlined style={{ fontSize: 18, color: '#722ed1' }} />
+              <ShareAltOutlined style={{ fontSize: 18, color: theme.primary }} />
               <Text>分享文章链接</Text>
             </div>
           </Space>
@@ -82,8 +86,8 @@ const GithubLoginModal: React.FC = () => {
             width: '100%',
             height: 48,
             fontSize: 16,
-            background: '#24292e',
-            borderColor: '#24292e',
+            backgroundImage: theme.gradient,
+            border: 'none',
             borderRadius: 10,
           }}
         >
