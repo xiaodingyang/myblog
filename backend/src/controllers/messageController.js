@@ -1,8 +1,5 @@
 const { Message } = require('../models');
 
-/**
- * 获取留言列表（前台，只返回已审核的）
- */
 exports.getMessages = async (req, res, next) => {
   try {
     const { page = 1, pageSize = 20 } = req.query;
@@ -12,6 +9,7 @@ exports.getMessages = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [messages, total] = await Promise.all([
       Message.find(query)
+        .populate('user', 'username nickname avatar htmlUrl')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(pageSize)),
@@ -33,24 +31,23 @@ exports.getMessages = async (req, res, next) => {
   }
 };
 
-/**
- * 提交留言
- */
 exports.createMessage = async (req, res, next) => {
   try {
-    const { nickname, email, content } = req.body;
+    const { content } = req.body;
 
     const message = await Message.create({
-      nickname,
-      email,
+      user: req.githubUserId,
+      nickname: req.githubUser.nickname || req.githubUser.username,
       content,
       status: 'pending',
     });
 
+    const populated = await message.populate('user', 'username nickname avatar htmlUrl');
+
     res.status(201).json({
       code: 0,
       message: '留言提交成功，等待审核',
-      data: message,
+      data: populated,
     });
   } catch (error) {
     next(error);
@@ -72,6 +69,7 @@ exports.getAdminMessages = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [messages, total] = await Promise.all([
       Message.find(query)
+        .populate('user', 'username nickname avatar htmlUrl')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(pageSize)),

@@ -244,21 +244,28 @@ const DashboardPage: React.FC = () => {
               itemLayout="horizontal"
               dataSource={data?.recentMessages || []}
               locale={{ emptyText: '暂无待审核留言' }}
-              renderItem={(msg) => (
+              renderItem={(msg: any) => {
+                const name = msg.user?.nickname || msg.user?.username || msg.nickname || '匿名';
+                const avatarUrl = msg.user?.avatar;
+                return (
                 <List.Item>
                   <List.Item.Meta
                     avatar={
-                      <Avatar
-                        style={{
-                          background: `linear-gradient(135deg, hsl(${(msg.nickname.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(msg.nickname.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
-                        }}
-                      >
-                        {msg.nickname.charAt(0).toUpperCase()}
-                      </Avatar>
+                      avatarUrl ? (
+                        <Avatar src={avatarUrl} />
+                      ) : (
+                        <Avatar
+                          style={{
+                            background: `linear-gradient(135deg, hsl(${(name.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(name.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
+                          }}
+                        >
+                          {name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      )
                     }
                     title={
                       <div className="flex items-center gap-2">
-                        <Text strong>{msg.nickname}</Text>
+                        <Text strong>{name}</Text>
                         <Tag color="orange">待审核</Tag>
                       </div>
                     }
@@ -269,7 +276,8 @@ const DashboardPage: React.FC = () => {
                     }
                   />
                 </List.Item>
-              )}
+                );
+              }}
             />
           </Card>
         </Col>

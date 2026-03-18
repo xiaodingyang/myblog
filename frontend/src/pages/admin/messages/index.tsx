@@ -107,21 +107,29 @@ const MessagesPage: React.FC = () => {
       title: '用户信息',
       key: 'user',
       width: 200,
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <Avatar
-            style={{
-              background: `linear-gradient(135deg, hsl(${(record.nickname.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(record.nickname.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
-            }}
-          >
-            {record.nickname.charAt(0).toUpperCase()}
-          </Avatar>
-          <div>
-            <Text strong>{record.nickname}</Text>
-            <Text className="block text-gray-400 text-xs">{record.email}</Text>
+      render: (_, record: any) => {
+        const name = record.user?.nickname || record.user?.username || record.nickname || '匿名';
+        const avatarUrl = record.user?.avatar;
+        return (
+          <div className="flex items-center gap-3">
+            {avatarUrl ? (
+              <Avatar src={avatarUrl} />
+            ) : (
+              <Avatar
+                style={{
+                  background: `linear-gradient(135deg, hsl(${(name.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(name.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
+                }}
+              >
+                {name.charAt(0).toUpperCase()}
+              </Avatar>
+            )}
+            <div>
+              <Text strong>{name}</Text>
+              <Text className="block text-gray-400 text-xs">{record.user?.email || record.email || ''}</Text>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: '留言内容',
@@ -285,20 +293,27 @@ const MessagesPage: React.FC = () => {
           ),
         ]}
       >
-        {previewMessage && (
+        {previewMessage && (() => {
+          const pName = (previewMessage as any).user?.nickname || (previewMessage as any).user?.username || previewMessage.nickname || '匿名';
+          const pAvatar = (previewMessage as any).user?.avatar;
+          return (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Avatar
-                size={48}
-                style={{
-                  background: `linear-gradient(135deg, hsl(${(previewMessage.nickname.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(previewMessage.nickname.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
-                }}
-              >
-                {previewMessage.nickname.charAt(0).toUpperCase()}
-              </Avatar>
+              {pAvatar ? (
+                <Avatar size={48} src={pAvatar} />
+              ) : (
+                <Avatar
+                  size={48}
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${(pName.charCodeAt(0) * 10) % 360}, 70%, 50%) 0%, hsl(${(pName.charCodeAt(0) * 10 + 30) % 360}, 70%, 60%) 100%)`,
+                  }}
+                >
+                  {pName.charAt(0).toUpperCase()}
+                </Avatar>
+              )}
               <div>
-                <Text strong className="block">{previewMessage.nickname}</Text>
-                <Text className="text-gray-400">{previewMessage.email}</Text>
+                <Text strong className="block">{pName}</Text>
+                <Text className="text-gray-400">{(previewMessage as any).user?.email || previewMessage.email || ''}</Text>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -316,7 +331,8 @@ const MessagesPage: React.FC = () => {
               </Card>
             </div>
           </div>
-        )}
+          );
+        })()}
       </Modal>
     </div>
   );
