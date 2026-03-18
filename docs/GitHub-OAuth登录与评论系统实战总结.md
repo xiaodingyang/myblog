@@ -13,6 +13,36 @@
 
 ## 二、整体架构
 
+整个 GitHub OAuth 登录采用的是 **OAuth 2.0 授权码模式（Authorization Code Flow）**，涉及三个角色：访客浏览器（Client）、我们的后端服务器（Server）、GitHub 授权服务器（Provider）。完整流程分为以下几个阶段：
+
+### 2.1 发起授权
+
+用户在博客前端点击"GitHub 登录"按钮，浏览器向我们的后端发起请求 `GET /api/github/login`。后端生成一个随机的 `state` 字符串（用于防止 CSRF 攻击），将其暂存在内存中并记录用户当前页面路径（`returnUrl`），然后拼接 GitHub 授权地址，通过 **302 重定向**将用户浏览器导向 GitHub 的授权页面。此时 URL 中携带了 `client_id`（标识我们的应用）、`redirect_uri`（回调地址）、`scope`（申请的权限范围：`read:user user:email`）和 `state` 参数。
+
+### 2.2 用户授权
+
+浏览器跳转到 GitHub 的授权页面后，用户会看到我们应用申请的权限说明。用户点击"Authorize"同意授权后，GitHub 会将浏览器重定向到我们预先配置的回调地址 `https://www.xiaodingyang.art/api/github/callback`，并在 URL 的查询参数中附带一个临时的授权码 `code` 和之前传入的 `state`。
+
+### 2.3 后端处理回调
+
+后端收到回调请求后，首先验证 `state` 参数是否与之前存储的一致（防止 CSRF 攻击），验证通过后将其从内存中删除（一次性使用）。接下来后端用 `code` 向 GitHub 的 `https://github.com/login/oauth/access_token` 接口发起 POST 请求，携带 `client_id`、`client_secret` 和 `code`，换取一个 `access_token`。这个 token 是 GitHub 颁发的临时访问令牌，**仅在后端使用，绝不暴露给前端**。
+
+### 2.4 获取用户信息
+
+后端拿到 `access_token` 后，用它作为 `Authorization: Bearer` 请求头，向 GitHub 的用户信息接口 `https://api.github.com/user` 发起 GET 请求，获取用户的 GitHub ID、用户名（login）、昵称（name）、头像（avatar_url）、邮箱、个人简介等公开信息。
+
+### 2.5 创建/更新用户并签发 JWT
+
+后端根据返回的 `githubId` 在 MongoDB 中查找是否已有该用户记录。如果有，则更新其昵称、头像等可能变化的信息并记录最后登录时间；如果没有，则创建一条新的 `GithubUser` 记录。随后，后端使用项目自己的 JWT 密钥为该用户签发一个 JWT token，payload 中包含 `id`（数据库 ID）、`type: 'github'`（区分管理员和普通用户）和 `githubId`。
+
+### 2.6 重定向回前端
+
+后端将用户重定向回前端页面（使用之前保存的 `returnUrl`），并通过 URL 查询参数附带 JWT token 和用户基本信息（经过 `encodeURIComponent` 编码的 JSON）。例如：`https://www.xiaodingyang.art/articles?github_token=xxx&github_user=xxx`。
+
+### 2.7 前端接收并存储
+
+前端的 `githubUserModel` 在初始化时会检查 URL 中是否包含 `github_token` 和 `github_user` 参数。如果有，则解析并存储到 `localStorage` 和 React state 中，然后立即通过 `window.history.replaceState` 将这两个参数从 URL 中移除，避免 token 暴露在地址栏中。至此登录流程完成，用户后续的评论、留言等请求都会在 HTTP 请求头中携带 `Authorization: Bearer <jwt_token>` 进行身份验证。
+
 ```
 访客浏览器                    后端服务器                    GitHub
     │                           │                           │
