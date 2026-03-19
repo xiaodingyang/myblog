@@ -43,43 +43,9 @@
 
 前端的 `githubUserModel` 在初始化时会检查 URL 中是否包含 `github_token` 和 `github_user` 参数。如果有，则解析并存储到 `localStorage` 和 React state 中，然后立即通过 `window.history.replaceState` 将这两个参数从 URL 中移除，避免 token 暴露在地址栏中。至此登录流程完成，用户后续的评论、留言等请求都会在 HTTP 请求头中携带 `Authorization: Bearer <jwt_token>` 进行身份验证。
 
-```mermaid
-sequenceDiagram
-    participant B as 访客浏览器
-    participant S as 后端服务器
-    participant G as GitHub
+**OAuth 完整交互流程（共六个阶段、17 步）：**
 
-    Note over B,G: 第一阶段：发起授权
-    B->>S: 1. 点击"GitHub 登录"（GET /api/github/login）
-    S->>S: 2. 生成随机 state（防 CSRF）
-    S-->>B: 3. 302 重定向到 GitHub 授权页
-
-    Note over B,G: 第二阶段：用户授权
-    B->>G: 4. 用户在 GitHub 页面点击 Authorize
-    G-->>S: 5. 回调 /api/github/callback?code=xxx&state=xxx
-
-    Note over B,G: 第三阶段：后端换取令牌
-    S->>S: 6. 验证 state 合法性
-    S->>G: 7. POST code + client_secret 换 access_token
-    G-->>S: 8. 返回 access_token
-
-    Note over B,G: 第四阶段：获取用户信息
-    S->>G: 9. GET /user（携带 access_token）
-    G-->>S: 10. 返回 login、avatar_url、name 等
-
-    Note over B,G: 第五阶段：入库 + 签发
-    S->>S: 11. 创建/更新 GithubUser
-    S->>S: 12. 签发 JWT（type: github）
-    S-->>B: 13. 302 重定向回前端页面，URL 附带 JWT + 用户信息
-
-    Note over B,G: 第六阶段：前端接收
-    B->>B: 14. 解析 URL 参数，存入 localStorage
-    B->>B: 15. 清除 URL 中的 token 参数
-
-    Note over B,G: 后续请求
-    B->>S: 16. 携带 JWT 发表评论/留言
-    S-->>B: 17. 验证 JWT，返回成功
-```
+![GitHub OAuth 授权流程时序图](https://www.xiaodingyang.art/uploads/oauth-flow-diagram.png)
 
 ### 技术栈
 

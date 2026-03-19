@@ -6,10 +6,6 @@ import { getColorThemeById } from '@/config/colorThemes';
 
 const { Title, Text, Paragraph } = Typography;
 
-// #region agent log
-console.log('[DEBUG-63a015] GithubLoginModal module loaded OK');
-// #endregion
-
 const GithubLoginModal: React.FC = () => {
   const { loginModalVisible, setLoginModalVisible } = useModel('githubUserModel');
   const { themeId } = useModel('colorModel');

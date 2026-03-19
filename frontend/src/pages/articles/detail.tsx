@@ -22,20 +22,12 @@ import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
-import GithubLoginModal from '@/components/GithubLoginModal';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-// #region agent log
-console.log('[DEBUG-63a015] detail.tsx module loaded OK');
-// #endregion
-
 const ArticleDetailPage: React.FC = () => {
-  // #region agent log
-  console.log('[DEBUG-63a015] ArticleDetailPage component entered');
-  // #endregion
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [article, setArticle] = useState<API.Article | null>(null);
@@ -450,7 +442,6 @@ const ArticleDetailPage: React.FC = () => {
             )}
           </Card>
 
-          <GithubLoginModal />
         </div>
       </section>
     </div>

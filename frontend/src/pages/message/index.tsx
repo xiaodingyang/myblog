@@ -5,7 +5,6 @@ import { request, useModel } from 'umi';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
-import GithubLoginModal from '@/components/GithubLoginModal';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -169,8 +168,6 @@ const MessagePage: React.FC = () => {
             </div>
           )}
         </Card>
-        <GithubLoginModal />
-
         {/* 留言列表 */}
         <Card
           style={{

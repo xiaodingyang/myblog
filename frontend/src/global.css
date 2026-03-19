@@ -317,3 +317,51 @@ body {
   border-color: var(--theme-primary, #ffb3d9) !important;
   box-shadow: 0 0 0 2px rgba(255, 179, 217, 0.2) !important;
 }
+
+/* ========== 首页移动端全屏滚动 ========== */
+/* 布局容器高度：使用 dvh 适配移动端浏览器地址栏 */
+.home-layout-content {
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+}
+
+@supports (height: 100dvh) {
+  .home-layout-content {
+    height: calc(100dvh - 64px);
+    min-height: calc(100dvh - 64px);
+  }
+}
+
+.home-fullscreen-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-fullscreen-section {
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+@supports (height: 100dvh) {
+  .home-fullscreen-section {
+    height: calc(100dvh - 64px);
+    min-height: calc(100dvh - 64px);
+  }
+}
+
+/* 有内层滚动的 section：内容区可滚动，section 保持一屏高度 */
+.home-fullscreen-section-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* CTA 底部留出安全区，避免与浏览器底部栏重叠 */
+.home-cta-footer {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+}

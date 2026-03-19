@@ -43,6 +43,15 @@ const HomePage: React.FC = () => {
 
   const sections = ['hero', 'featured', 'latest', 'explore', 'cta'];
 
+  const heroParticles = useMemo(() =>
+    Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      size: Math.random() * 6 + 2,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 2}s`,
+    })), []);
+
   const featuredArticles = useMemo(
     () => [...articles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3),
     [articles],
@@ -74,26 +83,39 @@ const HomePage: React.FC = () => {
       }
     };
 
-    fetchData();
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(() => fetchData());
+      return () => cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(fetchData, 200);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // 计算实际 section 高度
   const getActualSectionHeight = () => window.innerHeight - 64;
 
-  // 监听滚动位置
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    let rafId = 0;
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const height = getActualSectionHeight();
-      const index = Math.round(scrollTop / height);
-      setCurrentSection(Math.min(index, sections.length - 1));
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        const scrollTop = container.scrollTop;
+        const height = getActualSectionHeight();
+        const index = Math.round(scrollTop / height);
+        setCurrentSection(Math.min(index, sections.length - 1));
+        rafId = 0;
+      });
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // 滚动到指定区域
@@ -107,13 +129,10 @@ const HomePage: React.FC = () => {
     });
   };
 
-  // 每屏高度（考虑导航栏）
-  const sectionHeight = 'calc(100vh - 64px)';
-
   return (
     <div
       ref={containerRef}
-      className="h-full overflow-y-auto relative"
+      className="home-fullscreen-scroll h-full overflow-y-auto relative"
       style={{
         scrollSnapType: 'y mandatory',
         scrollBehavior: 'smooth',
@@ -156,15 +175,8 @@ const HomePage: React.FC = () => {
 
       {/* ========== 第一屏：Hero ========== */}
       <section
-        className="w-full relative flex items-center justify-center overflow-hidden"
-        style={{
-          height: sectionHeight,
-          minHeight: sectionHeight,
-          scrollSnapAlign: 'start',
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 10,
-        }}
+        className="home-fullscreen-section w-full relative flex items-center justify-center overflow-hidden"
+        style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
         {/* 动态背景 */}
         <div className="absolute inset-0">
@@ -187,36 +199,36 @@ const HomePage: React.FC = () => {
             style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
           />
           {/* 浮动粒子 */}
-          {[...Array(20)].map((_, i) => (
+          {heroParticles.map((p) => (
             <div
-              key={i}
+              key={p.id}
               className="absolute rounded-full animate-pulse"
               style={{
-                width: Math.random() * 6 + 2,
-                height: Math.random() * 6 + 2,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                background: currentColorTheme.primary, // 主题色
-                animationDelay: `${Math.random() * 2}s`,
+                width: p.size,
+                height: p.size,
+                left: p.left,
+                top: p.top,
+                background: currentColorTheme.primary,
+                animationDelay: p.delay,
                 opacity: 0.6,
               }}
             />
           ))}
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-4 md:gap-8 lg:gap-16">
           {/* 左侧文字 */}
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-8 border border-white/10">
-              <RocketOutlined className="text-yellow-400 text-lg" />
-              <span className="text-white/90 text-sm font-medium">探索技术的无限可能</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-4 md:mb-8 border border-white/10">
+              <RocketOutlined className="text-yellow-400 text-base md:text-lg" />
+              <span className="text-white/90 text-xs md:text-sm font-medium">探索技术的无限可能</span>
             </div>
 
             <Title
               level={1}
-              className="!mb-8"
+              className="!mb-4 md:!mb-8"
               style={{
-                fontSize: 'clamp(3rem, 8vw, 5rem)',
+                fontSize: 'clamp(2rem, 6vw, 5rem)',
                 fontWeight: 800,
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
@@ -252,16 +264,16 @@ const HomePage: React.FC = () => {
               </span>
             </Title>
 
-            <Paragraph className="!text-gray-400 !text-xl !mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <Paragraph className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               在这里分享编程技术、学习心得与项目经验。
-              <br />每一行代码都是通往未来的阶梯。
+              <br className="hidden md:block" />每一行代码都是通往未来的阶梯。
             </Paragraph>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-5">
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5">
               <Link to="/articles">
                 <Button
                   size="large"
-                  className="!h-14 !px-10 !rounded-full !font-bold !text-base !border-none"
+                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-none"
                   style={{
                     background: currentColorTheme.gradient,
                     boxShadow: `0 10px 40px ${currentColorTheme.primary}66`, // 主题色阴影
@@ -283,7 +295,7 @@ const HomePage: React.FC = () => {
               <Link to="/about">
                 <Button
                   size="large"
-                  className="!h-14 !px-10 !rounded-full !font-bold !text-base !border-0"
+                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-0"
                   style={{
                     background: 'rgba(0, 0, 0, 0.25)',
                     backdropFilter: 'blur(12px)',
@@ -297,7 +309,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* 统计数据 */}
-            <div className="flex justify-center lg:justify-start gap-6 md:gap-12 mt-10 md:mt-16">
+            <div className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16">
               {[
                 { label: '文章', value: articles.length || '0', icon: '📝' },
                 { label: '分类', value: categories.length || '0', icon: '📂' },
@@ -311,7 +323,7 @@ const HomePage: React.FC = () => {
                   }}
                 >
                   <div
-                    className="text-4xl font-bold text-white mb-1"
+                    className="text-2xl md:text-4xl font-bold text-white mb-0.5 md:mb-1"
                     style={{
                       textShadow: '0 2px 12px rgba(0, 0, 0, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3)',
                     }}
@@ -319,7 +331,7 @@ const HomePage: React.FC = () => {
                     {item.value}
                   </div>
                   <div
-                    className="text-gray-500 text-sm"
+                    className="text-gray-500 text-xs md:text-sm"
                     style={{
                       textShadow: '0 1px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2)',
                       color: 'rgba(255, 255, 255, 0.9)',
@@ -381,12 +393,12 @@ const HomePage: React.FC = () => {
         {/* 向下滚动提示 */}
         <div
           onClick={() => scrollToSection(1)}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+          className="absolute bottom-3 md:bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
           style={{ animation: 'bounce 2s infinite' }}
         >
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-1 md:gap-2">
             <span
-              className="text-sm font-medium px-4 py-1.5 rounded-full"
+              className="text-xs md:text-sm font-medium px-3 py-1 md:px-4 md:py-1.5 rounded-full"
               style={{
                 background: 'rgba(0, 0, 0, 0.2)',
                 backdropFilter: 'blur(8px)',
@@ -410,18 +422,12 @@ const HomePage: React.FC = () => {
 
       {/* ========== 第二屏：精选文章 ========== */}
       <section
-        className="w-full relative flex items-center justify-center"
-        style={{
-          height: sectionHeight,
-          minHeight: sectionHeight,
-          scrollSnapAlign: 'start',
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 10,
-        }}
+        className="home-fullscreen-section w-full relative flex flex-col"
+        style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
-          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
+          <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-orange-100 text-orange-600 mb-3 md:mb-4 text-sm md:text-base">
               <FireOutlined />
               <span className="font-medium">热门推荐</span>
@@ -552,22 +558,17 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ========== 第三屏：最新发布 ========== */}
       <section
-        className="w-full relative flex items-center justify-center"
-        style={{
-          height: sectionHeight,
-          minHeight: sectionHeight,
-          scrollSnapAlign: 'start',
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 10,
-        }}
+        className="home-fullscreen-section w-full relative flex flex-col"
+        style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
-          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
+          <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
               className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4 text-sm md:text-base"
               style={{
@@ -610,6 +611,7 @@ const HomePage: React.FC = () => {
                         <img
                           src={article.cover}
                           alt={article.title}
+                          loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (
@@ -673,22 +675,17 @@ const HomePage: React.FC = () => {
             <div className="text-center text-gray-400">暂无文章</div>
           )}
         </div>
+        </div>
       </section>
 
       {/* ========== 第四屏：分类与标签 ========== */}
       <section
-        className="w-full relative flex items-center justify-center"
-        style={{
-          height: sectionHeight,
-          minHeight: sectionHeight,
-          scrollSnapAlign: 'start',
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 10,
-        }}
+        className="home-fullscreen-section w-full relative flex flex-col"
+        style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
-          <div className="text-center mb-8 md:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
+          <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
               className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4 text-sm md:text-base"
               style={{
@@ -835,19 +832,13 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ========== 第五屏：CTA ========== */}
       <section
-        className="w-full relative flex items-center justify-center"
-        style={{
-          height: sectionHeight,
-          minHeight: sectionHeight,
-          scrollSnapAlign: 'start',
-          background: 'transparent',
-          position: 'relative',
-          zIndex: 10,
-        }}
+        className="home-fullscreen-section w-full relative flex flex-col items-center justify-center"
+        style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
         {/* 背景装饰 */}
         <div className="absolute inset-0 overflow-hidden">
@@ -905,10 +896,10 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* 底部信息 - 相对于 section 定位 */}
-        <div className="absolute bottom-8 left-0 right-0 text-center z-10">
+        {/* 底部信息 - 相对于 section 定位，留出安全区 */}
+        <div className="home-cta-footer absolute bottom-4 md:bottom-8 left-0 right-0 text-center z-10">
           <Text
-            className="text-gray-500 text-sm"
+            className="text-gray-500 text-xs md:text-sm"
             style={{
               textShadow: '0 1px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2)',
               color: 'rgba(255, 255, 255, 0.8)',

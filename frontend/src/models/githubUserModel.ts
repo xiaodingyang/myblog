@@ -8,10 +8,6 @@ export interface GithubUserInfo {
   htmlUrl: string;
 }
 
-// #region agent log
-console.log('[DEBUG-63a015] githubUserModel module loaded OK');
-// #endregion
-
 const STORAGE_KEY_TOKEN = 'github_token';
 const STORAGE_KEY_USER = 'github_user';
 

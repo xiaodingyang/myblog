@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Outlet, Link, useLocation } from 'umi';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
@@ -17,26 +17,32 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
-import ParticlesBackground from '@/components/ParticlesBackground';
-import ParticleThemeSelector from '@/components/ParticleThemeSelector';
 import GlassBackground from '@/components/GlassBackground';
 import GradientText from '@/components/GradientText';
 import GithubLoginModal from '@/components/GithubLoginModal';
 import { getColorThemeById } from '@/config/colorThemes';
 
+const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
+const LazyParticleThemeSelector = lazy(() => import('@/components/ParticleThemeSelector'));
+
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 const FrontLayout: React.FC = () => {
-  // #region agent log
-  console.log('[DEBUG-63a015] FrontLayout component entered');
-  // #endregion
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showParticles, setShowParticles] = useState(false);
   const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setTimeout(() => setShowParticles(true), 100);
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -155,11 +161,13 @@ const FrontLayout: React.FC = () => {
         {/* 毛玻璃背景层 - 先渲染，作为底层背景 */}
         <GlassBackground isDark={isDarkTheme} />
 
-        {/* 粒子背景 - 在毛玻璃之上，确保粒子可见 */}
-        <ParticlesBackground isDark={isDarkTheme} />
-
-        {/* 粒子主题选择器 */}
-        <ParticleThemeSelector isDark={isDarkTheme} />
+        {/* 粒子背景 - 延迟加载，首屏渲染完成后再加载 Three.js (~973KB) */}
+        {showParticles && (
+          <Suspense fallback={null}>
+            <LazyParticlesBackground isDark={isDarkTheme} />
+            <LazyParticleThemeSelector isDark={isDarkTheme} />
+          </Suspense>
+        )}
 
         {/* 头部导航 */}
         <Header
@@ -405,13 +413,13 @@ const FrontLayout: React.FC = () => {
 
         {/* 主内容区 */}
         <Content
-          className={isHomePage ? 'pt-16 h-[calc(100vh-64px)] overflow-hidden' : 'pt-16'}
+          className={isHomePage ? 'pt-16 overflow-hidden home-layout-content' : 'pt-16'}
           style={{
             position: 'relative',
             zIndex: isHomePage ? 10 : 2, // 确保内容在毛玻璃背景之上
           }}
         >
-          <div className={isHomePage ? 'h-full' : 'min-h-[calc(100vh-64px-200px)]'}>
+          <div className={isHomePage ? 'h-full min-h-0' : 'min-h-[calc(100vh-64px-200px)]'}>
             <Outlet />
           </div>
         </Content>
