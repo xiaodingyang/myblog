@@ -425,7 +425,7 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-8">
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
           <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-orange-100 text-orange-600 mb-3 md:mb-4 text-sm md:text-base">
@@ -566,7 +566,7 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-8">
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
           <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
@@ -683,7 +683,7 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-0 md:justify-center">
+        <div className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-8">
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full flex-1">
           <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
             <div
