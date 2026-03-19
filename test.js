@@ -1,46 +1,57 @@
-(function (){
-    const arr = [2,2,3,3,5]
-    const getNumber = (arr)=>{
-        const map = new Map()
-        arr.forEach(item=>{
-            map.set(item,map.get(item)+1||1)
-        })
-        let maxCount = 0
-        arr.forEach(item=>{
-            if(map.get(item)>maxCount){
-                maxCount = map.get(item)
-            }
-            
-        })
-        return  [...map.keys()].filter(item=>map.get(item)===maxCount)
-        console.log(map)
-    }
-
-    const callbackStr = (str)=>{
-        const arr = str.split('')
-        let left = 0;
-        let right = arr.length-1;
-        while(left<right){
-            if(arr[left]!==arr[right]){
-                return false
-            }
-            left++
-            right--
+const menuTree = [
+    {
+      path: '/blog',
+      name: '博客',
+      children: [
+        {
+          path: '/articles',
+          name: '文章',
+          children: [
+            { path: '/list', name: '列表' },
+            { path: '/create', name: '发布文章' },
+          ],
+        },
+        {
+          path: '/about',
+          name: '关于',
+        },
+      ],
+    },
+    {
+      path: '/admin',
+      name: '后台',
+      children: [
+        {
+          path: '/dashboard',
+          name: '仪表盘',
+        },
+        {
+          path: '/settings',
+          name: '设置',
+          children: [{ path: '/profile', name: '个人资料' }],
+        },
+      ],
+    },
+  ]
+  
+  const collectBreadcrumbs = (
+    nodes,
+    result = [],
+  ) => {
+    const dfs = (nodes, currentPath, currentTrail, result) => {
+        nodes.forEach((item) => {
+        const fullPath = `${currentPath}${item.path}`
+        const newTrail = currentTrail.concat({ path:fullPath, name: item.name })
+        if (item?.children?.length) {
+          dfs(item.children, fullPath, newTrail, result)
+        } else {
+          result.push(newTrail)
         }
-        return true
+      })
     }
-
-    function longestCommonPrefix(strs) {
-        if (strs.length === 0) return '';
-        let prefix = strs[0]; // 基准前缀
-        for (let i = 1; i < strs.length; i++) {
-          // 逐字符对比，直到找到不匹配的位置
-          while (strs[i].indexOf(prefix) !== 0) {
-            prefix = prefix.slice(0, prefix.length - 1);
-            if (prefix === '') return ''; // 无公共前缀
-          }
-        }
-        return prefix;
-      }
-    console.log(longestCommonPrefix(['flower','flow','flight']))
-})()
+    dfs(nodes,'',[],result)
+    return result
+  }
+  
+  console.log(collectBreadcrumbs(menuTree))
+  

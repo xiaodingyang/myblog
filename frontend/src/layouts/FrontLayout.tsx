@@ -28,6 +28,9 @@ const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 const FrontLayout: React.FC = () => {
+  // #region agent log
+  console.log('[DEBUG-63a015] FrontLayout component entered');
+  // #endregion
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const { themeId: colorThemeId } = useModel('colorModel');

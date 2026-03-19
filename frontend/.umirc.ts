@@ -2,6 +2,7 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   title: '若风的博客 - 前端技术分享',
+  hash: true,
   esbuildMinifyIIFE: true,
   links: [
     { rel: 'icon', href: '/favicon.png', type: 'image/png' },

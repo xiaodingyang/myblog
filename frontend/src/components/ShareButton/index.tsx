@@ -12,6 +12,10 @@ interface ShareButtonProps {
   mode?: 'icon' | 'button';
 }
 
+// #region agent log
+console.log('[DEBUG-63a015] ShareButton module loaded OK');
+// #endregion
+
 const PROD_ORIGIN = 'https://www.xiaodingyang.art';
 
 function getShareUrl() {

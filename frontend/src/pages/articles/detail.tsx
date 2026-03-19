@@ -28,7 +28,14 @@ import useSEO from '@/hooks/useSEO';
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
+// #region agent log
+console.log('[DEBUG-63a015] detail.tsx module loaded OK');
+// #endregion
+
 const ArticleDetailPage: React.FC = () => {
+  // #region agent log
+  console.log('[DEBUG-63a015] ArticleDetailPage component entered');
+  // #endregion
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [article, setArticle] = useState<API.Article | null>(null);
