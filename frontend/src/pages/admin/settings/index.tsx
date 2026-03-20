@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, CameraOutlined } from '@ant-design/icons';
 import { request } from 'umi';
-import ImgCrop from 'antd-img-crop';
+import ImgCrop from 'antd-img-crop'
 
 const { Title, Text } = Typography;
 
