@@ -71,6 +71,7 @@ jobs:
           rsync -avz --delete \
             --exclude node_modules \
             --exclude .env \
+            --exclude uploads \
             -e "ssh -i ~/.ssh/id_deploy" \
             backend/ \
             ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/backend/
