@@ -117,4 +117,25 @@ export default defineConfig({
   
   // Mock 配置 - 设置为 false 使用真实后端 API
   mock: false,
+
+  // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
+  chainWebpack(config, { env }) {
+    if (env === 'production') {
+      config.optimization.splitChunks({
+        chunks: 'all',
+        cacheGroups: {
+          antd: {
+            name: 'antd',
+            test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
+            priority: 20,
+          },
+          vendors: {
+            name: 'vendors',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+          },
+        },
+      });
+    }
+  },
 });

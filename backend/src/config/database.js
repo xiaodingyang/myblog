@@ -8,7 +8,12 @@ const connectDB = async () => {
     console.log('🔄 Connecting to MongoDB...');
     console.log(`   URI: ${MONGODB_URI.replace(/\/\/.*@/, '//***@')}`); // 隐藏密码
 
-    const conn = await mongoose.connect(MONGODB_URI);
+    const conn = await mongoose.connect(MONGODB_URI, {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
 

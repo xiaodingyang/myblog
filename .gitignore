@@ -11,6 +11,9 @@ Thumbs.db
 # Cursor
 .cursor
 
+# Claude / local AI notes
+CLAUDE.md
+
 # pnpm
 .pnpm-store
 
@@ -19,3 +22,5 @@ Thumbs.db
 
 # Logs
 *.log
+
+test.js

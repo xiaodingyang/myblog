@@ -9,6 +9,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const connectDB = require('./config/database');
 const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
@@ -18,10 +20,15 @@ const app = express();
 // 连接数据库
 connectDB();
 
+// 安全中间件
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
 // 中间件
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL
     : ['http://localhost:8001', 'http://127.0.0.1:8001', 'http://localhost:8000', 'http://127.0.0.1:8000'],
   credentials: true,
 }));
@@ -30,11 +37,20 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// API 限流
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分钟
+  max: 100, // 限制100次请求
+  message: { code: 429, message: '请求过于频繁，请稍后再试', data: null },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // 静态文件服务
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 路由
-app.use('/api', routes);
+app.use('/api', apiLimiter, routes);
 
 // Sitemap (accessible at /sitemap.xml for search engines)
 const sitemapRoutes = require('./routes/sitemap');
