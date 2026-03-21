@@ -6,6 +6,7 @@ export interface GithubUserInfo {
   nickname: string;
   avatar: string;
   htmlUrl: string;
+  themeId?: string;
 }
 
 const STORAGE_KEY_TOKEN = 'github_token';
@@ -34,6 +35,10 @@ export default function useGithubUserModel() {
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
     setGithubToken(token);
     setGithubUser(user);
+
+    if (user.themeId) {
+      localStorage.setItem('color-theme-id', user.themeId);
+    }
   }, []);
 
   const logout = useCallback(() => {

@@ -135,6 +135,7 @@ router.get('/callback', async (req, res) => {
       nickname: user.nickname,
       avatar: user.avatar,
       htmlUrl: user.htmlUrl,
+      themeId: user.themeId,
     }));
 
     const redirectUrl = `${FRONTEND_URL}${returnUrl}`;
@@ -169,6 +170,44 @@ router.get('/userinfo', async (req, res) => {
     }
 
     res.json({ code: 0, message: 'success', data: user });
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return res.status(401).json({ code: 401, message: '登录已过期', data: null });
+    }
+    res.status(500).json({ code: 500, message: '服务器错误', data: null });
+  }
+});
+
+router.put('/theme', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ code: 401, message: '未登录', data: null });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, jwtConfig.secret);
+
+    if (decoded.type !== 'github') {
+      return res.status(401).json({ code: 401, message: '无效的用户类型', data: null });
+    }
+
+    const { themeId } = req.body;
+    if (!themeId) {
+      return res.status(400).json({ code: 400, message: '主题ID不能为空', data: null });
+    }
+
+    const user = await GithubUser.findByIdAndUpdate(
+      decoded.id,
+      { themeId },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ code: 404, message: '用户不存在', data: null });
+    }
+
+    res.json({ code: 0, message: 'success', data: { themeId: user.themeId } });
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
       return res.status(401).json({ code: 401, message: '登录已过期', data: null });

@@ -39,6 +39,10 @@ const githubUserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  themeId: {
+    type: String,
+    default: '',
+  },
 }, {
   timestamps: true,
   toJSON: {
