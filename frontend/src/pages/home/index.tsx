@@ -34,6 +34,7 @@ const HomePage: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<API.Article[]>([]);
+  const [articleCount, setArticleCount] = useState(0);
   const [categories, setCategories] = useState<API.Category[]>([]);
   const [tags, setTags] = useState<API.Tag[]>([]);
   const [currentSection, setCurrentSection] = useState(0);
@@ -74,7 +75,10 @@ const HomePage: React.FC = () => {
           request<API.Response<API.Tag[]>>('/api/tags'),
         ]);
 
-        if (articlesRes.code === 0) setArticles(articlesRes.data.list);
+        if (articlesRes.code === 0) {
+          setArticles(articlesRes.data.list);
+          setArticleCount(articlesRes.data.total);
+        }
         if (categoriesRes.code === 0) setCategories(categoriesRes.data);
         if (tagsRes.code === 0) setTags(tagsRes.data);
       } catch (error) {
@@ -311,7 +315,7 @@ const HomePage: React.FC = () => {
             {/* 统计数据 */}
             <div className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16">
               {[
-                { label: '文章', value: articles.length || '0', icon: '📝' },
+                { label: '文章', value: articleCount || '0', icon: '📝' },
                 { label: '分类', value: categories.length || '0', icon: '📂' },
                 { label: '标签', value: tags.length || '0', icon: '🏷️' },
               ].map((item, i) => (

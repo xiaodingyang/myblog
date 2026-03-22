@@ -33,8 +33,9 @@ const Loading: React.FC<LoadingProps> = ({
   }
 
   return (
-    <div className="flex items-center justify-center py-20">
-      <Spin indicator={antIcon} tip={tip} size={size} />
+    <div className="flex flex-col items-center justify-center py-20">
+      <Spin indicator={antIcon} size={size} />
+      {tip && <p className="mt-4 text-gray-500">{tip}</p>}
     </div>
   );
 };

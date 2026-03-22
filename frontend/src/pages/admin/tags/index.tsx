@@ -175,7 +175,7 @@ const TagsPage: React.FC = () => {
           border: 'none',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
         }}
-        bodyStyle={{ padding: 16 }}
+        styles={{ body: { padding: 16 } }}
       >
         <div className="flex items-center justify-between">
           <Title level={4} className="!mb-0">
@@ -195,7 +195,7 @@ const TagsPage: React.FC = () => {
           border: 'none',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
         }}
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
       >
         <Table
           columns={columns}

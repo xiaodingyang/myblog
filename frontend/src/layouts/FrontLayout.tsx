@@ -400,10 +400,10 @@ const FrontLayout: React.FC = () => {
             {/* 底部信息 */}
             <div className="p-4 border-t border-gray-100">
               <div className="flex items-center gap-4 justify-center">
-                <a href="mailto:example@email.com" className="text-gray-400 hover:text-gray-600 transition-colors">
+                <a href="mailto:346629678@qq.com" className="text-gray-400 hover:text-gray-600 transition-colors">
                   <MailOutlined style={{ fontSize: 20 }} />
                 </a>
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
+                <a href="https://github.com/xiaodingyang" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
                   <GithubOutlined style={{ fontSize: 20 }} />
                 </a>
               </div>

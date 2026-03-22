@@ -76,7 +76,7 @@ const AboutPage: React.FC = () => {
               border: 'none',
               boxShadow: '0 10px 40px -10px rgb(0 0 0 / 0.15)',
             }}
-            bodyStyle={{ padding: 0 }}
+            styles={{ body: { padding: 0 } }}
           >
             {/* 封面背景 */}
             <div
