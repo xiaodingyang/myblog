@@ -36,7 +36,11 @@ const ArticlesPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [keyword, setKeyword] = useState('');
   const [status, setStatus] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [searchVersion, setSearchVersion] = useState(0);
   const [categories, setCategories] = useState<API.Category[]>([]);
+  const [tags, setTags] = useState<API.Tag[]>([]);
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -47,6 +51,8 @@ const ArticlesPage: React.FC = () => {
           pageSize,
           keyword: keyword || undefined,
           status: status || undefined,
+          category: categoryId || undefined,
+          tags: tagIds.length ? tagIds.join(',') : undefined,
         },
       });
       if (res.code === 0) {
@@ -71,14 +77,29 @@ const ArticlesPage: React.FC = () => {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const res = await request<API.Response<API.Tag[]>>('/api/tags');
+      if (res.code === 0) {
+        setTags(res.data);
+      }
+    } catch (error) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchTags();
+  }, []);
+
   useEffect(() => {
     fetchArticles();
-    fetchCategories();
-  }, [page, pageSize, status]);
+  }, [page, pageSize, status, categoryId, tagIds, searchVersion]);
 
   const handleSearch = () => {
     setPage(1);
-    fetchArticles();
+    setSearchVersion((v) => v + 1);
   };
 
   const handleDelete = async (id: string) => {
@@ -231,12 +252,53 @@ const ArticlesPage: React.FC = () => {
             <Select
               placeholder="文章状态"
               value={status || undefined}
-              onChange={setStatus}
+              onChange={(v) => {
+                setStatus(v ?? '');
+                setPage(1);
+              }}
               style={{ width: 120 }}
               allowClear
             >
               <Option value="published">已发布</Option>
               <Option value="draft">草稿</Option>
+            </Select>
+            <Select
+              placeholder="分类"
+              value={categoryId || undefined}
+              onChange={(v) => {
+                setCategoryId(v ?? '');
+                setPage(1);
+              }}
+              style={{ width: 160 }}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+            >
+              {categories.map((c) => (
+                <Option key={c._id} value={c._id}>
+                  {c.name}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              mode="multiple"
+              placeholder="标签"
+              value={tagIds}
+              onChange={(v) => {
+                setTagIds(v);
+                setPage(1);
+              }}
+              style={{ minWidth: 200, maxWidth: 280 }}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+              maxTagCount="responsive"
+            >
+              {tags.map((t) => (
+                <Option key={t._id} value={t._id}>
+                  {t.name}
+                </Option>
+              ))}
             </Select>
             <Button type="primary" onClick={handleSearch}>
               搜索

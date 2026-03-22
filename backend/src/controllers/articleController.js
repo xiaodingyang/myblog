@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Article, Category, Tag } = require('../models');
 
 /**
@@ -91,7 +92,7 @@ exports.getArticle = async (req, res, next) => {
  */
 exports.getAdminArticles = async (req, res, next) => {
   try {
-    const { page = 1, pageSize = 10, keyword, status, category } = req.query;
+    const { page = 1, pageSize = 10, keyword, status, category, tags } = req.query;
 
     // 构建查询条件
     const query = {};
@@ -104,8 +105,18 @@ exports.getAdminArticles = async (req, res, next) => {
       query.status = status;
     }
 
-    if (category) {
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
       query.category = category;
+    }
+
+    if (tags) {
+      const raw = Array.isArray(tags) ? tags : String(tags).split(',');
+      const tagIds = raw.map((t) => String(t).trim()).filter((id) => mongoose.Types.ObjectId.isValid(id));
+      if (tagIds.length === 1) {
+        query.tags = tagIds[0];
+      } else if (tagIds.length > 1) {
+        query.tags = { $all: tagIds };
+      }
     }
 
     // 分页查询
