@@ -12,6 +12,7 @@ import {
   Popconfirm,
   message,
   Card,
+  Tooltip,
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,6 +27,51 @@ import type { ColumnsType } from 'antd/es/table';
 
 const { Text } = Typography;
 const { Option } = Select;
+
+/** 表格内只读展示：用 Select 的 responsive 标签宽度自适应，省略项悬停查看 */
+const ArticleTagsCell: React.FC<{ tags?: API.Tag[] }> = ({ tags }) => {
+  if (!tags?.length) {
+    return <Text type="secondary">—</Text>;
+  }
+  const value = tags.map((t) => t._id);
+  const options = tags.map((t) => ({ label: t.name, value: t._id }));
+  return (
+    <Select
+      mode="multiple"
+      variant="borderless"
+      open={false}
+      suffixIcon={null}
+      allowClear={false}
+      value={value}
+      options={options}
+      maxTagCount="responsive"
+      maxTagPlaceholder={(omittedValues) => (
+        <Tooltip
+          getPopupContainer={() => document.body}
+          title={
+            <span
+              style={{
+                display: 'inline-flex',
+                flexWrap: 'nowrap',
+                alignItems: 'center',
+                gap: 4,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {omittedValues.map((ov) => (
+                <Tag key={String(ov.value)}>{ov.label}</Tag>
+              ))}
+            </span>
+          }
+          styles={{ body: { maxWidth: 'none', whiteSpace: 'nowrap' } }}
+        >
+          <span style={{ cursor: 'default', marginInlineStart: 4 }}>+{omittedValues.length}</span>
+        </Tooltip>
+      )}
+      style={{ width: '100%', minWidth: 0 }}
+    />
+  );
+};
 
 const ArticlesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -157,14 +203,7 @@ const ArticlesPage: React.FC = () => {
       dataIndex: 'tags',
       key: 'tags',
       width: 200,
-      render: (tags: API.Tag[]) => (
-        <Space wrap size={[4, 4]}>
-          {tags?.slice(0, 2).map(tag => (
-            <Tag key={tag._id}>{tag.name}</Tag>
-          ))}
-          {tags?.length > 2 && <Tag>+{tags.length - 2}</Tag>}
-        </Space>
-      ),
+      render: (tags: API.Tag[]) => <ArticleTagsCell tags={tags} />,
     },
     {
       title: '状态',
