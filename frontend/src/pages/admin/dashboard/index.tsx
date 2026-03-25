@@ -125,7 +125,9 @@ const DashboardPage: React.FC = () => {
       {/* 统计卡片 */}
       <Row gutter={[16, 16]} className="mb-6">
         {statCards.map((item, index) => (
-          <Col xs={12} sm={8} lg={index < 4 ? 6 : 24} xl={index < 4 ? 6 : 6} key={item.title}>
+          // Bug Fix #12: 统一所有卡片的列宽分布
+          // xs=12: 移动端每行1个, sm=8: 小屏每行1.5个(3列), lg=6: 大屏每行2个(2列), xl=6: 超大屏每行2个
+          <Col xs={12} sm={8} lg={6} xl={6} key={item.title}>
             <Card
               hoverable={!!item.link}
               onClick={() => item.link && (window.location.href = item.link)}

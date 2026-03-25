@@ -69,7 +69,7 @@ export const request = {
                     return;
                 }
 
-                const errorMessage = data?.message || `请求错误: ${status}`;
+                const errorMessage = (data?.message && data.message.trim()) || `请求错误: ${status}`;
                 message.error(errorMessage);
             } else if (error.request) {
                 message.error('网络错误，请检查网络连接');

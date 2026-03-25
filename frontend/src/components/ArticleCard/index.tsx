@@ -137,15 +137,14 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
                 <ClockCircleOutlined className="mr-0.5 md:mr-1" />
                 {dayjs(article.createdAt).format('MM-DD')}
               </span>
-              <span onClick={(e) => e.preventDefault()}>
-                <ShareButton
-                  title={article.title}
-                  summary={article.summary || ''}
-                  url={`https://www.xiaodingyang.art/article/${article._id}`}
-                  cover={article.cover}
-                  mode="icon"
-                />
-              </span>
+              {/* Bug Fix #8: 移除外层 span 的 onClick={e.preventDefault()}，否则可能阻止 ShareButton 的正常交互 */}
+              <ShareButton
+                title={article.title}
+                summary={article.summary || ''}
+                url={`https://www.xiaodingyang.art/article/${article._id}`}
+                cover={article.cover}
+                mode="icon"
+              />
             </Space>
           </div>
         </div>

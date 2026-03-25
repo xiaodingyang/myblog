@@ -49,7 +49,14 @@ const AdminLoginPage: React.FC = () => {
         message.error(res.message || '登录失败');
       }
     } catch (error: any) {
-      // handled by global errorHandler
+      // Bug Fix #10: 添加更友好的错误提示，而不是依赖全局 errorHandler（用户体验更好）
+      if (error?.response?.data?.message) {
+        message.error(error.response.data.message);
+      } else if (error.message) {
+        message.error('登录失败：' + error.message);
+      } else {
+        message.error('网络错误，请检查网络连接后重试');
+      }
     } finally {
       setLoading(false);
     }

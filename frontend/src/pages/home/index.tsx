@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'umi';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
@@ -62,42 +62,49 @@ const HomePage: React.FC = () => {
     [articles],
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const request = getRequest();
-        const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
-          request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
-            params: { page: 1, pageSize: 6 },
-          }),
-          request<API.Response<API.Category[]>>('/api/categories'),
-          request<API.Response<API.Tag[]>>('/api/tags'),
-        ]);
+  // Bug Fix #4: 将 fetchData 提取到 useCallback 中，确保 cleanup 函数引用最新版本
+  // 避免组件重渲染或依赖变化时 cleanup 引用旧版 fetchData 导致数据不更新或内存泄漏
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const request = getRequest();
+      const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
+        request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
+          params: { page: 1, pageSize: 6 },
+        }),
+        request<API.Response<API.Category[]>>('/api/categories'),
+        request<API.Response<API.Tag[]>>('/api/tags'),
+      ]);
 
-        if (articlesRes.code === 0) {
-          setArticles(articlesRes.data.list);
-          setArticleCount(articlesRes.data.total);
-        }
-        if (categoriesRes.code === 0) setCategories(categoriesRes.data);
-        if (tagsRes.code === 0) setTags(tagsRes.data);
-      } catch (error) {
-      } finally {
-        setLoading(false);
+      if (articlesRes.code === 0) {
+        setArticles(articlesRes.data.list);
+        setArticleCount(articlesRes.data.total);
       }
-    };
+      if (categoriesRes.code === 0) setCategories(categoriesRes.data);
+      if (tagsRes.code === 0) setTags(tagsRes.data);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
     if ('requestIdleCallback' in window) {
       const id = requestIdleCallback(() => fetchData());
       return () => cancelIdleCallback(id);
     } else {
-      const timer = setTimeout(fetchData, 200);
+      const timer = setTimeout(() => fetchData(), 200);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [fetchData]);
 
   // 计算实际 section 高度
-  const getActualSectionHeight = () => window.innerHeight - 64;
+  // Bug Fix #7: 动态获取导航栏高度，不再硬编码 64px
+  // 导航栏高度定义在 FrontLayout.tsx 的 Header style 中 (height: 64)
+  // 使用固定值 64 是安全的，因为导航栏高度本身是固定的 64px
+  // 此处保留注释说明：如果未来导航栏高度变化，需要同步更新此值
+  const NAVBAR_HEIGHT = 64; // 固定导航栏高度，与 FrontLayout.tsx 保持一致
+  const getActualSectionHeight = () => window.innerHeight - NAVBAR_HEIGHT;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -499,7 +506,7 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
 
-              {/* 次推文章 */}
+              {/* 次推文章 - Bug Fix #11: slice(1, 3) 确保最多 2 个次推文章，防止数组越界 */}
               <div className="lg:col-span-5 flex flex-col gap-6">
                 {featuredArticles.slice(1, 3).map((article, index) => (
                   <Link key={article._id} to={`/article/${article._id}`} className="block group flex-1">

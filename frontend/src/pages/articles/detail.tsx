@@ -118,8 +118,14 @@ const ArticleDetailPage: React.FC = () => {
     }
   }, [id, fetchComments]);
 
+  // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {
     requireAuth(async () => {
+      // 二次检查：确保 githubToken 有效（防止 requireAuth 调用后 token 被清空的边缘情况）
+      if (!isLoggedIn || !githubToken) {
+        message.warning('请先登录后再发表评论');
+        return;
+      }
       if (!commentContent.trim() || commentContent.trim().length < 2) {
         message.warning('评论内容至少2个字符');
         return;

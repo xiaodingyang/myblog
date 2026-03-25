@@ -45,8 +45,14 @@ const MessagePage: React.FC = () => {
     fetchMessages(page);
   }, [page]);
 
+  // Bug Fix #2: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmit = () => {
     requireAuth(async () => {
+      // 二次检查：确保 githubToken 有效（防止 requireAuth 调用后 token 被清空的边缘情况）
+      if (!isLoggedIn || !githubToken) {
+        message.warning('请先登录后再发表留言');
+        return;
+      }
       if (!content.trim() || content.trim().length < 5) {
         message.warning('留言内容至少5个字符');
         return;

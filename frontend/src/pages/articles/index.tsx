@@ -238,8 +238,9 @@ const ArticlesPage: React.FC = () => {
                   total={total}
                   pageSize={pageSize}
                   showSizeChanger={false}
+                  // Bug Fix #9: 移除 hidden md:inline，移动端用户也应能看到文章总数信息
                   showTotal={(total, range) => (
-                    <span className="hidden md:inline">共 {total} 篇文章</span>
+                    <span>共 {total} 篇文章</span>
                   )}
                   size="default"
                   responsive

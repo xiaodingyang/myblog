@@ -117,8 +117,10 @@ const EditArticlePage: React.FC = () => {
     }
   };
 
+  // Bug Fix #6: 草稿保存时也验证 category 字段（Form.Item rules 中 category 是必填的）
+  // 避免草稿保存后发布时才发现缺少分类，导致用户体验问题
   const handleSaveDraft = () => {
-    form.validateFields(['title', 'content']).then(() => {
+    form.validateFields(['title', 'content', 'category']).then(() => {
       handleSubmit(form.getFieldsValue(), 'draft');
     });
   };
