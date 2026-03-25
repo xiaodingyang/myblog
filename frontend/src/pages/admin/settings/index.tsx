@@ -123,7 +123,7 @@ const SettingsPage: React.FC = () => {
           });
           message.success('头像更新成功');
         } else {
-          message.success('头像上传成功，请点击保存修改同步');
+          message.error('头像已上传，但保存头像信息失败，请点击"保存修改"');
         }
       } else {
         throw new Error(uploadRes.message || '上传失败');

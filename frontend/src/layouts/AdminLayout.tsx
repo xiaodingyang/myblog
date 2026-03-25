@@ -31,8 +31,11 @@ const AdminLayout: React.FC = () => {
     // 检查登录状态
     const token = localStorage.getItem('token');
     if (!token) {
-      message.warning('请先登录');
-      navigate('/admin/login');
+      // 延迟执行，避免在 render 阶段调用 message
+      setTimeout(() => {
+        message.warning('请先登录');
+        navigate('/admin/login');
+      }, 0);
     }
   }, [navigate]);
 

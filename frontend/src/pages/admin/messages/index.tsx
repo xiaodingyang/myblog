@@ -279,7 +279,7 @@ const MessagesPage: React.FC = () => {
           <Button key="close" onClick={() => setPreviewMessage(null)}>
             关闭
           </Button>,
-          previewMessage?.status === 'pending' && (
+          previewMessage?.status === 'pending' ? (
             <Button
               key="approve"
               type="primary"
@@ -290,7 +290,7 @@ const MessagesPage: React.FC = () => {
             >
               审核通过
             </Button>
-          ),
+          ) : null,
         ]}
       >
         {previewMessage && (() => {
