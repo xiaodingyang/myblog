@@ -219,6 +219,13 @@ const CategoriesPage: React.FC = () => {
         confirmLoading={saving}
         okText="保存"
         cancelText="取消"
+        afterOpenChange={(open) => {
+          if (open) {
+            form.setFields([]);
+          } else {
+            form.resetFields();
+          }
+        }}
       >
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item
