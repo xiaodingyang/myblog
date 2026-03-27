@@ -15,8 +15,13 @@ import {
   CodeOutlined,
   BookOutlined,
 } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import useSEO from '@/hooks/useSEO';
+
+// 轻量日期格式化
+const formatDate = (date: string) => {
+  const d = new Date(date);
+  return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -45,7 +50,7 @@ const HomePage: React.FC = () => {
   const sections = ['hero', 'featured', 'latest', 'explore', 'cta'];
 
   const heroParticles = useMemo(() =>
-    Array.from({ length: 20 }, (_, i) => ({
+    Array.from({ length: 10 }, (_, i) => ({
       id: i,
       size: Math.random() * 6 + 2,
       left: `${Math.random() * 100}%`,
@@ -505,7 +510,7 @@ const HomePage: React.FC = () => {
                         <Space className="text-white/70">
                           <EyeOutlined /> {featuredArticles[0]?.views || 0} 阅读
                           <span className="mx-2">·</span>
-                          <ClockCircleOutlined /> {dayjs(featuredArticles[0]?.createdAt).format('MM-DD')}
+                          <ClockCircleOutlined /> {formatDate(featuredArticles[0]?.createdAt)}
                         </Space>
                         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all">
                           <ArrowRightOutlined className="text-white text-lg" />
@@ -692,7 +697,7 @@ const HomePage: React.FC = () => {
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                         <Space className="text-gray-400 text-xs">
                           <span><EyeOutlined /> {article.views || 0}</span>
-                          <span><ClockCircleOutlined /> {dayjs(article.createdAt).format('MM-DD')}</span>
+                          <span><ClockCircleOutlined /> {formatDate(article.createdAt)}</span>
                         </Space>
                         <span
                           className="text-sm font-medium group-hover:underline"
