@@ -43,42 +43,50 @@ const AdminLayout: React.FC = () => {
     {
       key: '/admin/dashboard',
       icon: <DashboardOutlined />,
-      label: <Link to="/admin/dashboard">仪表盘</Link>,
+      label: '仪表盘',
+      onClick: () => navigate('/admin/dashboard'),
     },
     {
       key: '/admin/articles',
       icon: <FileTextOutlined />,
-      label: <Link to="/admin/articles">文章管理</Link>,
+      label: '文章管理',
+      onClick: () => navigate('/admin/articles'),
     },
     {
       key: '/admin/categories',
       icon: <FolderOutlined />,
-      label: <Link to="/admin/categories">分类管理</Link>,
+      label: '分类管理',
+      onClick: () => navigate('/admin/categories'),
     },
     {
       key: '/admin/tags',
       icon: <TagsOutlined />,
-      label: <Link to="/admin/tags">标签管理</Link>,
+      label: '标签管理',
+      onClick: () => navigate('/admin/tags'),
     },
     {
       key: '/admin/messages',
       icon: <MessageOutlined />,
-      label: <Link to="/admin/messages">留言管理</Link>,
+      label: '留言管理',
+      onClick: () => navigate('/admin/messages'),
     },
     {
       key: '/admin/comments',
       icon: <CommentOutlined />,
-      label: <Link to="/admin/comments">评论管理</Link>,
+      label: '评论管理',
+      onClick: () => navigate('/admin/comments'),
     },
     {
       key: '/admin/users',
       icon: <TeamOutlined />,
-      label: <Link to="/admin/users">用户管理</Link>,
+      label: '用户管理',
+      onClick: () => navigate('/admin/users'),
     },
     {
       key: '/admin/settings',
       icon: <SettingOutlined />,
-      label: <Link to="/admin/settings">个人设置</Link>,
+      label: '个人设置',
+      onClick: () => navigate('/admin/settings'),
     },
   ];
 
