@@ -243,6 +243,8 @@ const HomePage: React.FC = () => {
                 fontWeight: 800,
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
+                willChange: 'transform',
+                contain: 'layout style paint',
               }}
             >
               <span className="gradient-text-white">
