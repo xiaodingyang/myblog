@@ -463,7 +463,17 @@ const HomePage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="text-center text-gray-400">加载中...</div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+              {/* 主推文章骨架屏 */}
+              <div className="lg:col-span-7">
+                <div className="relative overflow-hidden rounded-2xl md:rounded-3xl h-full min-h-[280px] md:min-h-[400px] bg-gray-800/50 animate-pulse" />
+              </div>
+              {/* 次要文章骨架屏 */}
+              <div className="lg:col-span-5 flex flex-col gap-4 md:gap-6">
+                <div className="relative overflow-hidden rounded-2xl h-[180px] md:h-[190px] bg-gray-800/50 animate-pulse" />
+                <div className="relative overflow-hidden rounded-2xl h-[180px] md:h-[190px] bg-gray-800/50 animate-pulse" />
+              </div>
+            </div>
           ) : featuredArticles.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
               {/* 主推文章 */}
@@ -609,7 +619,20 @@ const HomePage: React.FC = () => {
             </Text>
           </div>
 
-          {latestArticles.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-3xl overflow-hidden h-full">
+                  <div className="h-52 bg-gray-200 animate-pulse" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-6 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : latestArticles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
               {latestArticles.map((article, index) => (
                 <Link key={article._id} to={`/article/${article._id}`} className="block group">
@@ -624,6 +647,7 @@ const HomePage: React.FC = () => {
                           alt={article.title}
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          style={{ backgroundColor: '#f3f4f6' }}
                         />
                       ) : (
                         <div
