@@ -235,16 +235,14 @@ const HomePage: React.FC = () => {
               <span className="text-white/90 text-xs md:text-sm font-medium">探索技术的无限可能</span>
             </div>
 
-            <Title
-              level={1}
+            <h1
               className="!mb-4 md:!mb-8"
               style={{
                 fontSize: 'clamp(2rem, 6vw, 5rem)',
                 fontWeight: 800,
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
-                willChange: 'transform',
-                contain: 'layout style paint',
+                margin: 0,
               }}
             >
               <span className="gradient-text-white">
@@ -275,7 +273,7 @@ const HomePage: React.FC = () => {
               >
                 记录成长轨迹
               </span>
-            </Title>
+            </h1>
 
             <Paragraph className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               在这里分享编程技术、学习心得与项目经验。

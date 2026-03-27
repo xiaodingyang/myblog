@@ -127,8 +127,11 @@ export default defineConfig({
   mock: false,
 
   // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
-  chainWebpack(config, { env }) {
+  chainWebpack(config: any, { env }: any) {
     if (env === 'production') {
+      // 压缩优化
+      config.optimization.minimize(true);
+
       config.optimization.splitChunks({
         chunks: 'all',
         cacheGroups: {
@@ -136,6 +139,11 @@ export default defineConfig({
             name: 'antd',
             test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
             priority: 20,
+          },
+          react: {
+            name: 'react',
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
+            priority: 30,
           },
           vendors: {
             name: 'vendors',
