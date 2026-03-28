@@ -8,6 +8,7 @@ export default defineConfig({
     { rel: 'icon', href: '/favicon.png', type: 'image/png' },
     { rel: 'preconnect', href: 'https://www.xiaodingyang.art' },
     { rel: 'dns-prefetch', href: 'https://www.xiaodingyang.art' },
+    { rel: 'preload', href: '/umi.css', as: 'style' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
@@ -134,6 +135,8 @@ export default defineConfig({
 
       config.optimization.splitChunks({
         chunks: 'all',
+        maxInitialRequests: 25,
+        minSize: 20000,
         cacheGroups: {
           antd: {
             name: 'antd',
@@ -144,6 +147,21 @@ export default defineConfig({
             name: 'react',
             test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
             priority: 30,
+          },
+          markdown: {
+            name: 'markdown',
+            test: /[\\/]node_modules[\\/](react-markdown|remark-gfm|rehype-raw|rehype-highlight)[\\/]/,
+            priority: 25,
+          },
+          syntax: {
+            name: 'syntax',
+            test: /[\\/]node_modules[\\/]react-syntax-highlighter[\\/]/,
+            priority: 25,
+          },
+          particles: {
+            name: 'particles',
+            test: /[\\/]node_modules[\\/](@xdy-npm|@tsparticles|three)[\\/]/,
+            priority: 25,
           },
           vendors: {
             name: 'vendors',

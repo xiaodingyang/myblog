@@ -30,12 +30,14 @@ exports.getArticles = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [articles, total] = await Promise.all([
       Article.find(query)
+        .select('-content')
         .populate('category', 'name')
         .populate('tags', 'name')
         .populate('author', 'username avatar')
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(parseInt(pageSize)),
+        .limit(parseInt(pageSize))
+        .lean(),
       Article.countDocuments(query),
     ]);
 
@@ -64,7 +66,8 @@ exports.getArticle = async (req, res, next) => {
     const article = await Article.findOne({ _id: id, status: 'published' })
       .populate('category', 'name description')
       .populate('tags', 'name')
-      .populate('author', 'username avatar');
+      .populate('author', 'username avatar')
+      .lean();
 
     if (!article) {
       return res.status(404).json({
@@ -74,8 +77,8 @@ exports.getArticle = async (req, res, next) => {
       });
     }
 
-    // 增加阅读量
-    await Article.findByIdAndUpdate(id, { $inc: { views: 1 } });
+    // 异步增加阅读量，不阻塞响应
+    Article.findByIdAndUpdate(id, { $inc: { views: 1 } }).exec();
 
     res.json({
       code: 0,
