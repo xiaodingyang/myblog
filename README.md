@@ -76,6 +76,11 @@ myblog/
 │   ├── .env.example         # 环境变量模板
 │   └── package.json
 │
+├── myblog-comment-mf/       # 评论微前端子应用（Umi + qiankun）
+│   ├── src/
+│   ├── .umirc.ts
+│   └── package.json
+│
 ├── deploy.sh                # 部署脚本
 ├── LICENSE
 └── README.md
