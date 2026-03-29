@@ -12,6 +12,12 @@ export default defineConfig({
     slave: {},
   },
 
+  // 微应用基础路径（与 nginx 转发路径一致）
+  base: '/myblog-comment-mf',
+
+  // 使用 browser history，指定 basename
+  history: { type: 'browser', basename: '/myblog-comment-mf' },
+
   // 代理配置
   proxy: {
     '/api': {

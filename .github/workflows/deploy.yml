@@ -35,6 +35,17 @@ jobs:
         working-directory: frontend
         run: pnpm build
 
+      - name: Setup pnpm for micro frontend
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Build micro frontend (comment app)
+        working-directory: myblog-comment-mf
+        run: |
+          pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+          pnpm build
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -48,6 +59,13 @@ jobs:
             -e "ssh -i ~/.ssh/id_deploy" \
             frontend/dist/ \
             ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/frontend/dist/
+
+      - name: Deploy micro frontend to server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_deploy" \
+            myblog-comment-mf/dist/ \
+            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/myblog-comment-mf/
 
       - name: Install backend dependencies & restart services
         run: |
@@ -84,6 +102,13 @@ jobs:
             pm2 restart blog-api
             pm2 save
             echo "✅ Backend restarted"
+          EOF
+
+      - name: Reload nginx for micro frontend
+        run: |
+          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            nginx -s reload
+            echo "✅ Nginx reloaded for micro frontend"
           EOF
 
       - name: Notify WeChat on success
