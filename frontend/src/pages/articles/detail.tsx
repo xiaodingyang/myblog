@@ -98,6 +98,9 @@ const ArticleDetailPage: React.FC = () => {
     }
   }, [id]);
 
+  const fetchCommentsRef = useRef(fetchComments);
+  fetchCommentsRef.current = fetchComments;
+
   useEffect(() => {
     if (!id) return;
     // 同一篇文章且已成功加载过：不再整页 loading / 清空 article，防止 MicroComment 被卸载后反复挂载
@@ -130,12 +133,12 @@ const ArticleDetailPage: React.FC = () => {
     };
 
     fetchArticle();
-    fetchComments(1);
+    fetchCommentsRef.current(1);
 
     return () => {
       cancelled = true;
     };
-  }, [id, fetchComments]);
+  }, [id]);
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {

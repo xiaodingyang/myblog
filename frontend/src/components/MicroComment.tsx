@@ -18,6 +18,7 @@ const getMicroAppEntry = (): string => {
 export default function MicroComment({ articleId, token, username }: MicroCommentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const microAppRef = useRef<MicroApp | null>(null);
+  const microMountedRef = useRef(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const propsRef = useRef({ articleId, token, username });
@@ -35,24 +36,33 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
     }
 
     let cancelled = false;
+    microMountedRef.current = false;
     setLoading(true);
     setError(false);
     lastPushedPropsRef.current = null;
 
     try {
+      const bootProps = propsRef.current;
       microAppRef.current = loadMicroApp({
         name: 'commentApp',
         entry: getMicroAppEntry(),
         container: containerRef.current,
-        props: { articleId, token, username },
+        props: bootProps,
       });
 
       microAppRef.current
         .mountPromise
         .then(() => {
           if (cancelled) return;
+          microMountedRef.current = true;
           setLoading(false);
-          lastPushedPropsRef.current = { articleId, token, username };
+          const latest = propsRef.current;
+          lastPushedPropsRef.current = { ...latest };
+          try {
+            microAppRef.current?.update?.(latest);
+          } catch {
+            /* update 在部分版本上挂载完成前不可用 */
+          }
         })
         .catch((err) => {
           if (cancelled) return;
@@ -70,6 +80,7 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
 
     return () => {
       cancelled = true;
+      microMountedRef.current = false;
       if (microAppRef.current) {
         try { microAppRef.current.unmount(); } catch {}
         microAppRef.current = null;
@@ -78,7 +89,7 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
   }, [articleId]);
 
   useEffect(() => {
-    if (!microAppRef.current?.update) return;
+    if (!microMountedRef.current || !microAppRef.current?.update) return;
     const prev = lastPushedPropsRef.current;
     if (
       prev &&
