@@ -10,7 +10,7 @@ interface MicroCommentProps {
 
 const getMicroAppEntry = (): string => {
   if (process.env.NODE_ENV === 'production') {
-    return '/myblog-comment-mf';
+    return '/myblog-comment-mf/';
   }
   const configuredEntry = process.env.UMI_APP_COMMENT_MF_ENTRY;
   if (configuredEntry) {
