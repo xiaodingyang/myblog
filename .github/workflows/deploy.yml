@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: 18.20.8
           cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: |
+            frontend/pnpm-lock.yaml
+            myblog-comment-mf/pnpm-lock.yaml
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -35,15 +37,10 @@ jobs:
         working-directory: frontend
         run: pnpm build
 
-      - name: Setup pnpm for micro frontend
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Build micro frontend (comment app)
+      - name: Install & build micro frontend (comment app)
         working-directory: myblog-comment-mf
         run: |
-          pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+          pnpm install --frozen-lockfile
           pnpm build
 
       - name: Setup SSH key
