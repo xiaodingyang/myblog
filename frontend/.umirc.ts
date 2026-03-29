@@ -8,7 +8,6 @@ export default defineConfig({
     { rel: 'icon', href: '/favicon.png', type: 'image/png' },
     { rel: 'preconnect', href: 'https://www.xiaodingyang.art' },
     { rel: 'dns-prefetch', href: 'https://www.xiaodingyang.art' },
-    { rel: 'preload', href: '/umi.css', as: 'style' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
