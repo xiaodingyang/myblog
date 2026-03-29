@@ -62,6 +62,9 @@ jobs:
 
       - name: Deploy micro frontend to server
         run: |
+          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            mkdir -p /var/www/myblog/myblog-comment-mf
+          EOF
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_deploy" \
             myblog-comment-mf/dist/ \
