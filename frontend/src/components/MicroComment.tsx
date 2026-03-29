@@ -12,6 +12,14 @@ const getMicroAppEntry = (): string => {
   if (process.env.NODE_ENV === 'production') {
     return '/myblog-comment-mf';
   }
+  const configuredEntry = process.env.UMI_APP_COMMENT_MF_ENTRY;
+  if (configuredEntry) {
+    return configuredEntry;
+  }
+  // 避免主应用占用 8002 时把自己当作子应用加载，默认切到 8003（子应用固定开发端口）
+  if (typeof window !== 'undefined' && window.location.port === '8002') {
+    return '//localhost:8003/myblog-comment-mf';
+  }
   return '//localhost:8002/myblog-comment-mf';
 };
 
@@ -43,11 +51,16 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
 
     try {
       const bootProps = propsRef.current;
+      // 勿用 sandbox.loose：UMD 子应用把库挂在 self(沙箱 proxy) 上，loose 时 import-html-entry 用 window 解析 scriptExports 会失败
       microAppRef.current = loadMicroApp({
-        name: 'commentApp',
+        name: 'myblog-comment-mf',
         entry: getMicroAppEntry(),
         container: containerRef.current,
-        props: bootProps,
+        props: {
+          ...bootProps,
+          base: '/myblog-comment-mf',
+          history: { type: 'memory' },
+        },
       });
 
       microAppRef.current

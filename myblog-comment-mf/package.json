@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "PORT=8002 umi dev",
+    "dev": "umi dev --port 8003",
     "build": "umi build",
     "preview": "umi preview"
   },
