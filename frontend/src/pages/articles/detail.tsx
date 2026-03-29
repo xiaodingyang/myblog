@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message } from 'antd';
 import { useModel } from 'umi';
@@ -42,6 +42,8 @@ const ArticleDetailPage: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const commentPageSize = 10;
+  /** 已成功拉取过正文的 article id，用于避免 effect 重复触发时整页 loading 导致评论区微前端卸载重挂 */
+  const loadedArticleIdRef = useRef<string | null>(null);
 
   const jsonLd = useMemo(() => {
     if (!article) return undefined;
@@ -97,6 +99,14 @@ const ArticleDetailPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
+    if (!id) return;
+    // 同一篇文章且已成功加载过：不再整页 loading / 清空 article，防止 MicroComment 被卸载后反复挂载
+    if (loadedArticleIdRef.current === id) {
+      return;
+    }
+
+    let cancelled = false;
+
     const fetchArticle = async () => {
       setLoading(true);
       setArticle(null);
@@ -105,22 +115,26 @@ const ArticleDetailPage: React.FC = () => {
       setCommentPage(1);
       try {
         const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
+        if (cancelled) return;
         if (res.code === 0) {
           setArticle(res.data);
+          loadedArticleIdRef.current = id;
         } else {
           message.error(res.message || '文章不存在');
         }
       } catch (error) {
-        message.error('获取文章失败');
+        if (!cancelled) message.error('获取文章失败');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    if (id) {
-      fetchArticle();
-      fetchComments(1);
-    }
+    fetchArticle();
+    fetchComments(1);
+
+    return () => {
+      cancelled = true;
+    };
   }, [id, fetchComments]);
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件

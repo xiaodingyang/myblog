@@ -22,6 +22,9 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
   const [loading, setLoading] = useState(true);
   const propsRef = useRef({ articleId, token, username });
   propsRef.current = { articleId, token, username };
+  const lastPushedPropsRef = useRef<{ articleId: string; token?: string; username?: string } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!articleId || !containerRef.current) return;
@@ -31,8 +34,10 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
       microAppRef.current = null;
     }
 
+    let cancelled = false;
     setLoading(true);
     setError(false);
+    lastPushedPropsRef.current = null;
 
     try {
       microAppRef.current = loadMicroApp({
@@ -45,20 +50,26 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
       microAppRef.current
         .mountPromise
         .then(() => {
+          if (cancelled) return;
           setLoading(false);
+          lastPushedPropsRef.current = { articleId, token, username };
         })
         .catch((err) => {
+          if (cancelled) return;
           console.error('[MicroComment] Mount failed:', err);
           setError(true);
           setLoading(false);
         });
     } catch (err) {
-      console.error('[MicroComment] Failed to load micro app:', err);
-      setError(true);
-      setLoading(false);
+      if (!cancelled) {
+        console.error('[MicroComment] Failed to load micro app:', err);
+        setError(true);
+        setLoading(false);
+      }
     }
 
     return () => {
+      cancelled = true;
       if (microAppRef.current) {
         try { microAppRef.current.unmount(); } catch {}
         microAppRef.current = null;
@@ -67,9 +78,18 @@ export default function MicroComment({ articleId, token, username }: MicroCommen
   }, [articleId]);
 
   useEffect(() => {
-    if (microAppRef.current && microAppRef.current.update) {
-      microAppRef.current.update({ articleId, token, username });
+    if (!microAppRef.current?.update) return;
+    const prev = lastPushedPropsRef.current;
+    if (
+      prev &&
+      prev.articleId === articleId &&
+      prev.token === token &&
+      prev.username === username
+    ) {
+      return;
     }
+    microAppRef.current.update({ articleId, token, username });
+    lastPushedPropsRef.current = { articleId, token, username };
   }, [articleId, token, username]);
 
   if (!articleId) {
