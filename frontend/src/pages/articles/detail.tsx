@@ -16,7 +16,6 @@ import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { lazy, Suspense } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
@@ -100,6 +99,10 @@ const ArticleDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       setLoading(true);
+      setArticle(null);
+      setComments([]);
+      setCommentTotal(0);
+      setCommentPage(1);
       try {
         const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
         if (res.code === 0) {
@@ -228,10 +231,23 @@ const ArticleDetailPage: React.FC = () => {
 
           {/* 分类 & 标签 */}
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            {/* 分类 */}
-            <Link to={`/category/${article.category?._id}`}>
+            {/* 分类：无有效 id 时不使用 Link，避免跳转到 /category/undefined */}
+            {article.category?._id ? (
+              <Link to={`/category/${article.category._id}`}>
+                <span
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90 transition-all duration-300 hover:text-white hover:bg-white/20"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                  }}
+                >
+                  <FolderOutlined />
+                  {article.category.name || '未分类'}
+                </span>
+              </Link>
+            ) : (
               <span
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90 transition-all duration-300 hover:text-white hover:bg-white/20"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90"
                 style={{
                   background: 'rgba(255, 255, 255, 0.15)',
                   border: '1px solid rgba(255, 255, 255, 0.25)',
@@ -240,7 +256,7 @@ const ArticleDetailPage: React.FC = () => {
                 <FolderOutlined />
                 {article.category?.name || '未分类'}
               </span>
-            </Link>
+            )}
             {/* 标签 */}
             {article.tags?.map(tag => (
               <Link key={tag._id} to={`/tag/${tag._id}`}>
@@ -271,27 +287,51 @@ const ArticleDetailPage: React.FC = () => {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
-                  code({ node, className, children, ...props }) {
+                  code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
-                    const isInline = !match && !className;
-                    return !isInline ? (
-                      <SyntaxHighlighter
-                        style={vscDarkPlus}
-                        language={match ? match[1] : 'text'}
-                        PreTag="div"
-                        customStyle={{
-                          margin: '1em 0',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          overflowX: 'auto',
-                        }}
-                        showLineNumbers
-                        wrapLines
-                        wrapLongLines
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
-                    ) : (
+                    const text = String(children).replace(/\n$/, '');
+                    // 与 react-markdown 官方示例一致：有 language- 才走高亮；无标记但含换行的围栏块仍应按代码块展示
+                    if (match) {
+                      return (
+                        <SyntaxHighlighter
+                          style={vscDarkPlus}
+                          language={match[1]}
+                          PreTag="div"
+                          customStyle={{
+                            margin: '1em 0',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            overflowX: 'auto',
+                          }}
+                          showLineNumbers
+                          wrapLines
+                          wrapLongLines
+                        >
+                          {text}
+                        </SyntaxHighlighter>
+                      );
+                    }
+                    if (text.includes('\n')) {
+                      return (
+                        <SyntaxHighlighter
+                          style={vscDarkPlus}
+                          language="text"
+                          PreTag="div"
+                          customStyle={{
+                            margin: '1em 0',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            overflowX: 'auto',
+                          }}
+                          showLineNumbers
+                          wrapLines
+                          wrapLongLines
+                        >
+                          {text}
+                        </SyntaxHighlighter>
+                      );
+                    }
+                    return (
                       <code
                         className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
                         {...props}
@@ -302,7 +342,7 @@ const ArticleDetailPage: React.FC = () => {
                   },
                 }}
               >
-                {article.content}
+                {article.content ?? ''}
               </ReactMarkdown>
             </div>
 
@@ -333,7 +373,7 @@ const ArticleDetailPage: React.FC = () => {
             }}
           >
             <MicroComment
-              articleId={id}
+              articleId={id!}
               token={githubToken}
               username={githubUser?.username}
             />
