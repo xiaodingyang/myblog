@@ -287,14 +287,7 @@ body {
 
 
 
-/* 搜索框聚焦时使用主题色 */
-.ant-input-affix-wrapper:focus,
-.ant-input-affix-wrapper-focused {
-  border-color: var(--theme-primary, #ffb3d9) !important;
-  box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb, 255, 179, 217), 0.1) !important;
-}
-
-/* 头部搜索框样式修复 */
+/* 头部搜索框样式修复（勿对全站 .ant-input-affix-wrapper 写 focus，会与 Ant Design 叠层并在毛玻璃登录卡上闪屏） */
 .header-search.ant-input-affix-wrapper {
   width: 100% !important;
   border: 1px solid #d9d9d9 !important;

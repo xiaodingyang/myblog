@@ -4,29 +4,21 @@ import { Form, Input, Button, Checkbox, ConfigProvider, message } from 'antd';
 import { UserOutlined, LockOutlined, GithubOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import { ParticlesBackground } from '@xdy-npm/react-particle-backgrounds';
-import { getColorThemeById } from '@/config/colorThemes';
+import { getColorThemeById, type ColorTheme } from '@/config/colorThemes';
 import AnimatedCharacters from '@/components/AnimatedCharacters';
 
 /** 与 global.css 一致，避免登录卡内回退成生硬的系统默认字体 */
 const UI_FONT =
   "'Source Han Sans SC', 'Noto Sans SC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
-const AdminLoginPage: React.FC = () => {
+/** 表单与动效状态放此子树，避免 input 焦点切换时连带重绘全屏粒子背景导致闪白 */
+const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ currentColorTheme }) => {
   const navigate = useNavigate();
   const { setInitialState } = useModel('@@initialState');
-  const { themeId: colorThemeId } = useModel('colorModel');
   const [loading, setLoading] = useState(false);
-  const currentColorTheme = getColorThemeById(colorThemeId);
   const [time, setTime] = useState(new Date());
   const [isTyping, setIsTyping] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/admin/dashboard');
-    }
-  }, [navigate]);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);
@@ -109,9 +101,7 @@ const AdminLoginPage: React.FC = () => {
   const unifiedOverlay = `linear-gradient(160deg, rgba(15, 23, 42, 0.55) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2) 50%, rgba(30, 41, 59, 0.65) 100%)`;
 
   return (
-    <>
-      <ParticlesBackground theme="tyndall" isDark themeColor={currentColorTheme.primary} />
-      <div className="relative z-[1] min-h-screen flex">
+    <div className="relative z-[1] min-h-screen flex">
       <div className="pointer-events-none absolute inset-0 z-0" style={{ background: unifiedOverlay }} />
       {/* 全页光晕（相对整屏定位，避免只在左栏内 + overflow 裁剪造成垂直接缝） */}
       <div
@@ -297,7 +287,7 @@ const AdminLoginPage: React.FC = () => {
                   rules={[{ required: true, message: '请输入用户名' }]}
                 >
                   <Input
-                    prefix={<UserOutlined style={{ color: loginText.iconMuted }} />}
+                    prefix={<UserOutlined style={{ color: loginText.iconInInput }} />}
                     placeholder="请输入用户名"
                     onFocus={() => {
                       setIsTyping(true);
@@ -319,7 +309,7 @@ const AdminLoginPage: React.FC = () => {
                   rules={[{ required: true, message: '请输入密码' }]}
                 >
                   <Input.Password
-                    prefix={<LockOutlined style={{ color: loginText.iconMuted }} />}
+                    prefix={<LockOutlined style={{ color: loginText.iconInInput }} />}
                     placeholder="请输入密码"
                     onFocus={() => {
                       setIsPassword(true);
@@ -396,6 +386,25 @@ const AdminLoginPage: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const AdminLoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { themeId: colorThemeId } = useModel('colorModel');
+  const currentColorTheme = getColorThemeById(colorThemeId);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/admin/dashboard');
+    }
+  }, [navigate]);
+
+  return (
+    <>
+      <ParticlesBackground theme="tyndall" isDark themeColor={currentColorTheme.primary} />
+      <AdminLoginLayout currentColorTheme={currentColorTheme} />
     </>
   );
 };
