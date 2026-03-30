@@ -29,6 +29,9 @@ export default defineConfig({
   // 微应用基础路径（与 nginx 转发路径一致）
   base: '/myblog-comment-mf',
 
+  // 生产环境静态资源路径必须与 nginx alias 一致，否则 /umi.js 会 404
+  publicPath: '/myblog-comment-mf/',
+
   // 使用 browser history，指定 basename
   history: { type: 'browser', basename: '/myblog-comment-mf' },
 

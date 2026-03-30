@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Typography, Space, Divider } from 'antd';
-import { GithubOutlined, CommentOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
+import { GithubOutlined, CommentOutlined, ShareAltOutlined, CopyOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 
@@ -10,8 +10,10 @@ const GithubLoginModal: React.FC = () => {
   const { loginModalVisible, setLoginModalVisible } = useModel('githubUserModel');
   const { themeId } = useModel('colorModel');
   const theme = getColorThemeById(themeId);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const handleGithubLogin = () => {
+    setLoginLoading(true);
     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
   };
@@ -19,7 +21,8 @@ const GithubLoginModal: React.FC = () => {
   return (
     <Modal
       open={loginModalVisible}
-      onCancel={() => setLoginModalVisible(false)}
+      onCancel={() => { setLoginModalVisible(false); setLoginLoading(false); }}
+      afterOpenChange={(open) => { if (!open) setLoginLoading(false); }}
       footer={null}
       centered
       width={420}
@@ -80,8 +83,10 @@ const GithubLoginModal: React.FC = () => {
         <Button
           type="primary"
           size="large"
-          icon={<GithubOutlined />}
+          icon={loginLoading ? <LoadingOutlined /> : <GithubOutlined />}
           onClick={handleGithubLogin}
+          loading={loginLoading}
+          disabled={loginLoading}
           style={{
             width: '100%',
             height: 48,
@@ -91,7 +96,7 @@ const GithubLoginModal: React.FC = () => {
             borderRadius: 10,
           }}
         >
-          使用 GitHub 登录
+          {loginLoading ? '正在跳转 GitHub ...' : '使用 GitHub 登录'}
         </Button>
 
         <Divider plain>
