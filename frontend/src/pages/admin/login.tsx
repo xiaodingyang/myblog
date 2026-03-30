@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useModel } from 'umi';
-import { Form, Input, Button, Checkbox, message } from 'antd';
-import { UserOutlined, LockOutlined, GithubOutlined, WechatOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Checkbox, ConfigProvider, message } from 'antd';
+import { UserOutlined, LockOutlined, GithubOutlined } from '@ant-design/icons';
 import { request } from 'umi';
+import { ParticlesBackground } from '@xdy-npm/react-particle-backgrounds';
 import { getColorThemeById } from '@/config/colorThemes';
 import AnimatedCharacters from '@/components/AnimatedCharacters';
+
+/** 与 global.css 一致，避免登录卡内回退成生硬的系统默认字体 */
+const UI_FONT =
+  "'Source Han Sans SC', 'Noto Sans SC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -67,28 +72,58 @@ const AdminLoginPage: React.FC = () => {
     return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : { r: 255, g: 179, b: 217 };
   };
 
+  const blendRgb = (
+    from: { r: number; g: number; b: number },
+    to: { r: number; g: number; b: number },
+    weightFrom: number,
+  ) => {
+    const w = Math.min(1, Math.max(0, weightFrom));
+    return {
+      r: Math.round(from.r * w + to.r * (1 - w)),
+      g: Math.round(from.g * w + to.g * (1 - w)),
+      b: Math.round(from.b * w + to.b * (1 - w)),
+    };
+  };
+  const rgbCss = (c: { r: number; g: number; b: number }) => `rgb(${c.r}, ${c.g}, ${c.b})`;
+
   const rgb = hexToRgb(currentColorTheme.primary);
+  /** 深色毛玻璃卡片：以白字为主，主题色做渐变强调与点缀 */
+  const loginText = {
+    greeting: 'rgba(255, 255, 255, 0.78)',
+    sub: 'rgba(255, 255, 255, 0.58)',
+    /** 表单项标签（深色底上） */
+    label: 'rgba(255, 255, 255, 0.92)',
+    /** 输入框内文字（浅底） */
+    body: rgbCss(blendRgb(rgb, { r: 30, g: 41, b: 59 }, 0.22)),
+    hint: rgbCss(blendRgb(rgb, { r: 148, g: 163, b: 184 }, 0.18)),
+    muted: 'rgba(255, 255, 255, 0.72)',
+    border: 'rgba(255, 255, 255, 0.14)',
+    borderHover: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
+    inputBorder: 'rgba(255, 255, 255, 0.28)',
+    inputBorderHover: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`,
+    iconInInput: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
+    titleGradient: `linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 35%, ${currentColorTheme.primary} 100%)`,
+  };
   const greeting = time.getHours() < 12 ? '早上好' : time.getHours() < 18 ? '下午好' : '晚上好';
+  // 整页统一罩层（左右同一套渐变，避免中间色差接缝）
+  const unifiedOverlay = `linear-gradient(160deg, rgba(15, 23, 42, 0.55) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2) 50%, rgba(30, 41, 59, 0.65) 100%)`;
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#f8fafc' }}>
-      {/* 左侧动画面板 */}
+    <>
+      <ParticlesBackground theme="tyndall" isDark themeColor={currentColorTheme.primary} />
+      <div className="relative z-[1] min-h-screen flex">
+      <div className="pointer-events-none absolute inset-0 z-0" style={{ background: unifiedOverlay }} />
+      {/* 全页光晕（相对整屏定位，避免只在左栏内 + overflow 裁剪造成垂直接缝） */}
       <div
-        className="hidden lg:flex lg:w-[45%] xl:w-[42%] relative flex-col items-center justify-center overflow-hidden"
-        style={{
-          background: `linear-gradient(160deg, #0f172a 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25) 50%, #1e293b 100%)`,
-        }}
-      >
-        {/* 装饰光晕 */}
-        <div
-          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
-          style={{ background: currentColorTheme.primary }}
-        />
-        <div
-          className="absolute bottom-[-15%] left-[-10%] w-[400px] h-[400px] rounded-full opacity-15 blur-3xl"
-          style={{ background: currentColorTheme.primary }}
-        />
-
+        className="pointer-events-none absolute -top-[14%] left-[-12%] z-[1] h-[min(88vh,900px)] w-[min(145vw,1680px)] rounded-full opacity-[0.22] blur-[120px]"
+        style={{ background: currentColorTheme.primary }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-[22%] right-[-14%] z-[1] h-[min(62vh,640px)] w-[min(95vw,960px)] rounded-full opacity-[0.14] blur-[100px]"
+        style={{ background: currentColorTheme.primary }}
+      />
+      {/* 左侧动画面板 */}
+      <div className="relative z-[2] hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col items-center justify-center min-w-0 bg-transparent">
         {/* 顶部 Logo */}
         <div className="absolute top-0 left-0 w-full z-10 p-8 lg:p-10">
           <div className="flex items-center gap-3">
@@ -155,8 +190,8 @@ const AdminLoginPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 右侧登录表单 */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      {/* 右侧 */}
+      <div className="relative z-[2] flex-1 flex flex-col min-h-screen min-w-0 bg-transparent">
         {/* 移动端顶部 Logo + 角色 */}
         <div className="lg:hidden flex flex-col items-center pt-8 pb-4">
           <div className="flex items-center gap-3 mb-6">
@@ -166,7 +201,7 @@ const AdminLoginPage: React.FC = () => {
             >
               风
             </div>
-            <span className="font-bold text-lg text-gray-800">若风的博客</span>
+            <span className="font-bold text-lg text-white drop-shadow-md">若风的博客</span>
           </div>
           <div style={{ transform: 'scale(0.7)', transformOrigin: 'center' }}>
             <AnimatedCharacters
@@ -179,102 +214,179 @@ const AdminLoginPage: React.FC = () => {
 
         {/* 表单居中区域 */}
         <div className="flex-1 flex items-center justify-center px-6 sm:px-12 lg:px-16 xl:px-24">
-          <div className="w-full max-w-[400px]">
-            {/* 欢迎语 */}
-            <div className="mb-8">
-              <div className="text-sm font-medium text-gray-400 mb-2">{greeting}，管理员</div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          <div
+            className="admin-login-card w-full max-w-[400px] rounded-2xl px-6 py-8 sm:px-9 antialiased border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
+            style={{
+              fontFamily: UI_FONT,
+              background: `linear-gradient(165deg, rgba(15, 23, 42, 0.72) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12) 48%, rgba(15, 23, 42, 0.78) 100%)`,
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+            }}
+          >
+            <div className="mb-9 space-y-2">
+              <div
+                className="text-[15px] font-medium tracking-wide"
+                style={{ color: loginText.greeting, textShadow: `0 0 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)` }}
+              >
+                {greeting}，管理员
+              </div>
+              <h2
+                className="text-[1.65rem] sm:text-[1.85rem] font-semibold tracking-tight leading-snug"
+                style={{
+                  background: loginText.titleGradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 欢迎回来
               </h2>
-              <p className="text-gray-400 text-sm">请输入你的账号信息以继续</p>
+              <p className="text-[15px] leading-relaxed" style={{ color: loginText.sub }}>
+                请输入你的账号信息以继续
+              </p>
             </div>
 
-            <Form
-              name="login"
-              size="large"
-              onFinish={handleSubmit}
-              autoComplete="off"
-              initialValues={{ username: '', password: '', remember: true }}
-              layout="vertical"
+            <ConfigProvider
+              theme={{
+                token: {
+                  fontFamily: UI_FONT,
+                  fontSize: 15,
+                  colorText: loginText.body,
+                  colorTextSecondary: loginText.muted,
+                  colorTextPlaceholder: loginText.hint,
+                  colorBgContainer: '#ffffff',
+                  colorBorder: loginText.inputBorder,
+                  colorPrimary: currentColorTheme.primary,
+                  borderRadiusLG: 12,
+                },
+                components: {
+                  Form: {
+                    labelFontSize: 15,
+                    labelColor: loginText.label,
+                    verticalLabelPadding: '0 0 10px',
+                    itemMarginBottom: 20,
+                  },
+                  Input: {
+                    inputFontSizeLG: 15,
+                    paddingLG: 11,
+                    colorBgContainer: '#ffffff',
+                    activeBorderColor: currentColorTheme.primary,
+                    hoverBorderColor: loginText.inputBorderHover,
+                    activeShadow: `0 0 0 2px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
+                  },
+                  Checkbox: {
+                    fontSize: 14,
+                    colorText: loginText.muted,
+                  },
+                },
+              }}
             >
-              <Form.Item
-                name="username"
-                label={<span className="text-gray-600 font-medium text-sm">用户名</span>}
-                rules={[{ required: true, message: '请输入用户名' }]}
+              <Form
+                name="login"
+                size="large"
+                onFinish={handleSubmit}
+                autoComplete="off"
+                initialValues={{ username: '', password: '', remember: true }}
+                layout="vertical"
+                requiredMark
+                colon={false}
               >
-                <Input
-                  prefix={<UserOutlined className="text-gray-300" />}
-                  placeholder="请输入用户名"
-                  onFocus={() => {
-                    setIsTyping(true);
-                    setIsPassword(false);
-                  }}
-                  onBlur={() => setIsTyping(false)}
-                  style={{
-                    borderRadius: 12,
-                    height: 48,
-                    borderColor: '#e2e8f0',
-                  }}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                label={<span className="text-gray-600 font-medium text-sm">密码</span>}
-                rules={[{ required: true, message: '请输入密码' }]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined className="text-gray-300" />}
-                  placeholder="请输入密码"
-                  onFocus={() => {
-                    setIsPassword(true);
-                    setIsTyping(false);
-                  }}
-                  onBlur={() => setIsPassword(false)}
-                  style={{
-                    borderRadius: 12,
-                    height: 48,
-                    borderColor: '#e2e8f0',
-                  }}
-                />
-              </Form.Item>
-
-              <div className="flex items-center justify-between mb-6">
-                <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox className="text-gray-500 text-sm">记住登录状态</Checkbox>
-                </Form.Item>
-              </div>
-
-              <Form.Item className="!mb-4">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  block
-                  style={{
-                    height: 48,
-                    borderRadius: 12,
-                    fontWeight: 600,
-                    fontSize: 15,
-                    border: 'none',
-                    backgroundImage: currentColorTheme.gradient,
-                    boxShadow: `0 4px 14px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`,
-                  }}
+                <Form.Item
+                  name="username"
+                  label="用户名"
+                  rules={[{ required: true, message: '请输入用户名' }]}
                 >
-                  登 录
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Input
+                    prefix={<UserOutlined style={{ color: loginText.iconMuted }} />}
+                    placeholder="请输入用户名"
+                    onFocus={() => {
+                      setIsTyping(true);
+                      setIsPassword(false);
+                    }}
+                    onBlur={() => setIsTyping(false)}
+                    style={{
+                      borderRadius: 12,
+                      height: 48,
+                      borderColor: loginText.border,
+                      color: loginText.body,
+                    }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="password"
+                  label="密码"
+                  rules={[{ required: true, message: '请输入密码' }]}
+                >
+                  <Input.Password
+                    prefix={<LockOutlined style={{ color: loginText.iconMuted }} />}
+                    placeholder="请输入密码"
+                    onFocus={() => {
+                      setIsPassword(true);
+                      setIsTyping(false);
+                    }}
+                    onBlur={() => setIsPassword(false)}
+                    style={{
+                      borderRadius: 12,
+                      height: 48,
+                      borderColor: loginText.border,
+                      color: loginText.body,
+                    }}
+                  />
+                </Form.Item>
+
+                <div className="flex items-center justify-between mb-6">
+                  <Form.Item name="remember" valuePropName="checked" noStyle>
+                    <Checkbox className="text-[14px]" style={{ color: loginText.muted }}>
+                      记住登录状态
+                    </Checkbox>
+                  </Form.Item>
+                </div>
+
+                <Form.Item className="!mb-4">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    block
+                    style={{
+                      height: 48,
+                      borderRadius: 12,
+                      fontWeight: 600,
+                      fontSize: 16,
+                      letterSpacing: '0.02em',
+                      border: 'none',
+                      backgroundImage: currentColorTheme.gradient,
+                      fontFamily: UI_FONT,
+                      boxShadow: `0 4px 14px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`,
+                    }}
+                  >
+                    登录
+                  </Button>
+                </Form.Item>
+              </Form>
+            </ConfigProvider>
+            <style>{`
+              .admin-login-card .ant-form-item-label > label {
+                font-weight: 500 !important;
+              }
+              .admin-login-card .ant-form-item .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+                margin-inline-end: 6px;
+                font-size: 13px;
+                line-height: 1;
+                color: ${currentColorTheme.primary} !important;
+              }
+            `}</style>
           </div>
         </div>
 
         {/* 底部 */}
         <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 text-center lg:text-left">
-          <p className="text-xs text-gray-300">
+          <p className="text-xs text-white/55 drop-shadow-sm">
             访问
             <a
               href="/"
-              className="mx-1 hover:underline"
+              className="mx-1 hover:underline font-medium"
               style={{ color: currentColorTheme.primary }}
             >
               博客首页
@@ -284,6 +396,7 @@ const AdminLoginPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
