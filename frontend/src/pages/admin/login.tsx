@@ -101,7 +101,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
   const unifiedOverlay = `linear-gradient(160deg, rgba(15, 23, 42, 0.55) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2) 50%, rgba(30, 41, 59, 0.65) 100%)`;
 
   return (
-    <div className="relative z-[1] min-h-screen flex">
+    <div className="relative z-[1] h-full min-h-0 w-full flex overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0" style={{ background: unifiedOverlay }} />
       {/* 全页光晕（相对整屏定位，避免只在左栏内 + overflow 裁剪造成垂直接缝） */}
       <div
@@ -113,7 +113,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         style={{ background: currentColorTheme.primary }}
       />
       {/* 左侧动画面板 */}
-      <div className="relative z-[2] hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col items-center justify-center min-w-0 bg-transparent">
+      <div className="relative z-[2] hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col items-center justify-center min-w-0 min-h-0 h-full overflow-hidden bg-transparent">
         {/* 顶部 Logo */}
         <div className="absolute top-0 left-0 w-full z-10 p-8 lg:p-10">
           <div className="flex items-center gap-3">
@@ -181,9 +181,9 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
       </div>
 
       {/* 右侧 */}
-      <div className="relative z-[2] flex-1 flex flex-col min-h-screen min-w-0 bg-transparent">
+      <div className="relative z-[2] flex-1 flex flex-col min-h-0 h-full min-w-0 overflow-hidden bg-transparent">
         {/* 移动端顶部 Logo + 角色 */}
-        <div className="lg:hidden flex flex-col items-center pt-8 pb-4">
+        <div className="lg:hidden flex flex-col items-center shrink-0 pt-5 pb-2 sm:pt-6 sm:pb-3">
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
@@ -202,8 +202,8 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
           </div>
         </div>
 
-        {/* 表单居中区域 */}
-        <div className="flex-1 flex items-center justify-center px-6 sm:px-12 lg:px-16 xl:px-24">
+        {/* 表单居中区域（min-h-0 避免 flex 子项撑出整页滚动） */}
+        <div className="flex-1 min-h-0 flex items-center justify-center px-6 sm:px-12 lg:px-16 xl:px-24 overflow-hidden">
           <div
             className="admin-login-card w-full max-w-[400px] rounded-2xl px-6 py-8 sm:px-9 antialiased border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
             style={{
@@ -371,7 +371,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         </div>
 
         {/* 底部 */}
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 text-center lg:text-left">
+        <div className="shrink-0 px-6 sm:px-12 lg:px-16 xl:px-24 py-3 sm:py-4 text-center lg:text-left">
           <p className="text-xs text-white/55 drop-shadow-sm">
             访问
             <a
@@ -401,11 +401,25 @@ const AdminLoginPage: React.FC = () => {
     }
   }, [navigate]);
 
+  // 登录页全屏铺满视口，禁止 html/body 因光晕负定位等出现外层滚动条
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
   return (
-    <>
+    <div className="admin-login-page fixed inset-0 z-[1] h-[100dvh] overflow-hidden">
       <ParticlesBackground theme="tyndall" isDark themeColor={currentColorTheme.primary} />
       <AdminLoginLayout currentColorTheme={currentColorTheme} />
-    </>
+    </div>
   );
 };
 
