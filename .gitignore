@@ -25,7 +25,6 @@ node_modules/
 .cache/
 **/node_modules/.cache/
 **/.umi/
-**/.umi-production/
 **/.turbo/
 
 # Build outputs

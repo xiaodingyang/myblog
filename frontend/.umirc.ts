@@ -8,6 +8,7 @@ export default defineConfig({
     { rel: 'icon', href: '/favicon.png', type: 'image/png' },
     { rel: 'preconnect', href: 'https://www.xiaodingyang.art' },
     { rel: 'dns-prefetch', href: 'https://www.xiaodingyang.art' },
+    { rel: 'preload', href: '/umi.css', as: 'style' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
@@ -25,6 +26,19 @@ export default defineConfig({
       var style = document.createElement('style');
       style.textContent = '.gradient-text-white{background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.gradient-text-dynamic{background:linear-gradient(135deg,var(--gradient-color) 0%,var(--gradient-color-end) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}h1.ant-typography{font-display:swap}';
       document.head.appendChild(style);
+    })();`,
+    // 异步 chunk 加载失败时自动刷新页面（仅重试一次，防止死循环）
+    `(function(){
+      window.addEventListener('error', function(e) {
+        var target = e.target || e.srcElement;
+        if (target && target.tagName === 'SCRIPT' && /\\.async\\.js/.test(target.src || '')) {
+          var key = 'chunk_retry_' + target.src;
+          if (!sessionStorage.getItem(key)) {
+            sessionStorage.setItem(key, '1');
+            window.location.reload();
+          }
+        }
+      }, true);
     })();`,
     // 百度自动推送 - 用户访问页面时自动通知百度收录
     `(function(){
@@ -141,7 +155,7 @@ export default defineConfig({
           },
           syntax: {
             name: 'syntax',
-            test: /[\\/]node_modules[\\/](react-syntax-highlighter)[\\/]/,
+            test: /[\\/]node_modules[\\/]react-syntax-highlighter[\\/]/,
             priority: 25,
           },
           particles: {

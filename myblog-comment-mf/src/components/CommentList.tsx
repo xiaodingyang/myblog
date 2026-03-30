@@ -28,37 +28,16 @@ function CommentListContent({ commentsPromise, optimisticComments }: CommentList
       itemLayout="horizontal"
       dataSource={comments}
       renderItem={(item) => {
-        const u = item.user || item.author;
-        const displayName = u?.nickname || u?.username || '匿名';
-        const avatar = u?.avatar;
-        const profileUrl = u?.htmlUrl;
+        const username = item.author?.username || '匿名';
+        const avatar = item.author?.avatar;
 
         return (
           <List.Item style={{ paddingLeft: 0, paddingRight: 0, opacity: item.pending ? 0.6 : 1 }}>
             <List.Item.Meta
-              avatar={
-                profileUrl ? (
-                  <a href={profileUrl} target="_blank" rel="noreferrer">
-                    <Avatar size={40} src={avatar} icon={<GithubOutlined />} />
-                  </a>
-                ) : (
-                  <Avatar size={40} src={avatar} icon={<GithubOutlined />} />
-                )
-              }
+              avatar={<Avatar size={40} src={avatar} icon={<GithubOutlined />} />}
               title={
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {profileUrl ? (
-                    <a
-                      href={profileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ color: '#1f2937', fontWeight: 500 }}
-                    >
-                      {displayName}
-                    </a>
-                  ) : (
-                    <span style={{ color: '#1f2937', fontWeight: 500 }}>{displayName}</span>
-                  )}
+                  <span style={{ color: '#1f2937', fontWeight: 500 }}>{username}</span>
                   <Text style={{ color: '#9ca3af', fontSize: 13 }}>
                     <ClockCircleOutlined style={{ marginRight: 4 }} />
                     {item.pending ? '发送中...' : dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message } from 'antd';
 import { useModel } from 'umi';
@@ -16,6 +16,7 @@ import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { lazy, Suspense } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
@@ -42,8 +43,6 @@ const ArticleDetailPage: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const commentPageSize = 10;
-  /** 已成功拉取过正文的 article id，用于避免 effect 重复触发时整页 loading 导致评论区微前端卸载重挂 */
-  const loadedArticleIdRef = useRef<string | null>(null);
 
   const jsonLd = useMemo(() => {
     if (!article) return undefined;
@@ -98,47 +97,28 @@ const ArticleDetailPage: React.FC = () => {
     }
   }, [id]);
 
-  const fetchCommentsRef = useRef(fetchComments);
-  fetchCommentsRef.current = fetchComments;
-
   useEffect(() => {
-    if (!id) return;
-    // 同一篇文章且已成功加载过：不再整页 loading / 清空 article，防止 MicroComment 被卸载后反复挂载
-    if (loadedArticleIdRef.current === id) {
-      return;
-    }
-
-    let cancelled = false;
-
     const fetchArticle = async () => {
       setLoading(true);
-      setArticle(null);
-      setComments([]);
-      setCommentTotal(0);
-      setCommentPage(1);
       try {
         const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
-        if (cancelled) return;
         if (res.code === 0) {
           setArticle(res.data);
-          loadedArticleIdRef.current = id;
         } else {
           message.error(res.message || '文章不存在');
         }
       } catch (error) {
-        if (!cancelled) message.error('获取文章失败');
+        message.error('获取文章失败');
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchArticle();
-    fetchCommentsRef.current(1);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+    if (id) {
+      fetchArticle();
+      fetchComments(1);
+    }
+  }, [id, fetchComments]);
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {
@@ -248,23 +228,10 @@ const ArticleDetailPage: React.FC = () => {
 
           {/* 分类 & 标签 */}
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            {/* 分类：无有效 id 时不使用 Link，避免跳转到 /category/undefined */}
-            {article.category?._id ? (
-              <Link to={`/category/${article.category._id}`}>
-                <span
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90 transition-all duration-300 hover:text-white hover:bg-white/20"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                  }}
-                >
-                  <FolderOutlined />
-                  {article.category.name || '未分类'}
-                </span>
-              </Link>
-            ) : (
+            {/* 分类 */}
+            <Link to={`/category/${article.category?._id}`}>
               <span
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm text-white/90 transition-all duration-300 hover:text-white hover:bg-white/20"
                 style={{
                   background: 'rgba(255, 255, 255, 0.15)',
                   border: '1px solid rgba(255, 255, 255, 0.25)',
@@ -273,7 +240,7 @@ const ArticleDetailPage: React.FC = () => {
                 <FolderOutlined />
                 {article.category?.name || '未分类'}
               </span>
-            )}
+            </Link>
             {/* 标签 */}
             {article.tags?.map(tag => (
               <Link key={tag._id} to={`/tag/${tag._id}`}>
@@ -304,51 +271,27 @@ const ArticleDetailPage: React.FC = () => {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
-                  code({ className, children, ...props }) {
+                  code({ node, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
-                    const text = String(children).replace(/\n$/, '');
-                    // 与 react-markdown 官方示例一致：有 language- 才走高亮；无标记但含换行的围栏块仍应按代码块展示
-                    if (match) {
-                      return (
-                        <SyntaxHighlighter
-                          style={vscDarkPlus}
-                          language={match[1]}
-                          PreTag="div"
-                          customStyle={{
-                            margin: '1em 0',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            overflowX: 'auto',
-                          }}
-                          showLineNumbers
-                          wrapLines
-                          wrapLongLines
-                        >
-                          {text}
-                        </SyntaxHighlighter>
-                      );
-                    }
-                    if (text.includes('\n')) {
-                      return (
-                        <SyntaxHighlighter
-                          style={vscDarkPlus}
-                          language="text"
-                          PreTag="div"
-                          customStyle={{
-                            margin: '1em 0',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            overflowX: 'auto',
-                          }}
-                          showLineNumbers
-                          wrapLines
-                          wrapLongLines
-                        >
-                          {text}
-                        </SyntaxHighlighter>
-                      );
-                    }
-                    return (
+                    const isInline = !match && !className;
+                    return !isInline ? (
+                      <SyntaxHighlighter
+                        style={vscDarkPlus}
+                        language={match ? match[1] : 'text'}
+                        PreTag="div"
+                        customStyle={{
+                          margin: '1em 0',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          overflowX: 'auto',
+                        }}
+                        showLineNumbers
+                        wrapLines
+                        wrapLongLines
+                      >
+                        {String(children).replace(/\n$/, '')}
+                      </SyntaxHighlighter>
+                    ) : (
                       <code
                         className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
                         {...props}
@@ -359,7 +302,7 @@ const ArticleDetailPage: React.FC = () => {
                   },
                 }}
               >
-                {article.content ?? ''}
+                {article.content}
               </ReactMarkdown>
             </div>
 
@@ -390,7 +333,7 @@ const ArticleDetailPage: React.FC = () => {
             }}
           >
             <MicroComment
-              articleId={id!}
+              articleId={id}
               token={githubToken}
               username={githubUser?.username}
             />

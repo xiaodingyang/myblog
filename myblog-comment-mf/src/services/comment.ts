@@ -2,22 +2,13 @@ import type { Comment } from '@/types/comment';
 
 const isDev = process.env.NODE_ENV === 'development';
 
-export async function fetchComments(
-  articleId: string,
-  page = 1,
-  pageSize = 10,
-): Promise<{ list: Comment[]; total: number }> {
+export async function fetchComments(articleId: string): Promise<Comment[]> {
   try {
-    const response = await fetch(
-      `/api/comments/article/${encodeURIComponent(articleId)}?page=${page}&pageSize=${pageSize}`,
-    );
+    const response = await fetch(`/api/comments?articleId=${articleId}&page=1&pageSize=50`);
     const data = await response.json();
-    return {
-      list: data?.data?.list || [],
-      total: data?.data?.total || 0,
-    };
+    return data.data?.list || [];
   } catch {
-    return { list: [], total: 0 };
+    return [];
   }
 }
 
@@ -28,7 +19,7 @@ export async function postComment(articleId: string, content: string, token: str
     return {
       _id: String(Date.now()),
       content,
-      user: { username: '开发测试用户' },
+      author: { username: '开发测试用户' },
       createdAt: new Date().toISOString(),
     };
   }

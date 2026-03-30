@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "umi dev --port 8003",
+    "dev": "PORT=8002 umi dev",
     "build": "umi build",
     "preview": "umi preview"
   },
@@ -25,13 +25,5 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "core-js",
-      "core-js-pure",
-      "esbuild",
-      "es5-ext"
-    ]
   }
 }

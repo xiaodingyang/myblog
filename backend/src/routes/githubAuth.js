@@ -12,7 +12,6 @@ const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8001';
 
 function httpsRequest(url, options = {}) {
-  const timeout = options.timeout || 20000;
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
       method: options.method || 'GET',
@@ -21,7 +20,6 @@ function httpsRequest(url, options = {}) {
         'User-Agent': 'XiaoDingYang-Blog',
         ...options.headers,
       },
-      timeout,
     }, (res) => {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
@@ -33,27 +31,12 @@ function httpsRequest(url, options = {}) {
         }
       });
     });
-    req.setTimeout(timeout, () => {
-      req.destroy(new Error(`Request timeout after ${timeout}ms`));
-    });
     req.on('error', reject);
     if (options.body) {
       req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body));
     }
     req.end();
   });
-}
-
-async function httpsRequestWithRetry(url, options = {}, retries = 2) {
-  for (let i = 0; i <= retries; i++) {
-    try {
-      return await httpsRequest(url, options);
-    } catch (err) {
-      if (i === retries) throw err;
-      console.log(`[GitHub] Request to ${url} failed (attempt ${i + 1}/${retries + 1}), retrying...`);
-      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-    }
-  }
 }
 
 const stateStore = new Map();
@@ -91,7 +74,7 @@ router.get('/callback', async (req, res) => {
     stateStore.delete(state);
     const { returnUrl } = stateData;
 
-    const tokenData = await httpsRequestWithRetry('https://github.com/login/oauth/access_token', {
+    const tokenData = await httpsRequest('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -99,15 +82,14 @@ router.get('/callback', async (req, res) => {
         client_secret: GITHUB_CLIENT_SECRET,
         code,
       }),
-      timeout: 30000,
     });
 
     if (tokenData.error || !tokenData.access_token) {
       console.error('GitHub token exchange failed:', tokenData);
-      return res.redirect(`${FRONTEND_URL}${returnUrl}?login_error=token_failed`);
+      return res.redirect(`${FRONTEND_URL}?login_error=token_failed`);
     }
 
-    const githubUserInfo = await httpsRequestWithRetry('https://api.github.com/user', {
+    const githubUserInfo = await httpsRequest('https://api.github.com/user', {
       headers: { 'Authorization': `Bearer ${tokenData.access_token}` },
     });
 
