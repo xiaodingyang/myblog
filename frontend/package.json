@@ -21,8 +21,8 @@
     "antd-img-crop": "^4.30.0",
     "dayjs": "^1.11.20",
     "qrcode.react": "^4.2.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-markdown": "^9.1.0",
     "react-syntax-highlighter": "^16.1.1",
     "rehype-highlight": "^7.0.2",
@@ -32,8 +32,8 @@
     "umi": "^4.6.34"
   },
   "devDependencies": {
-    "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@umijs/plugins": "^4.6.34",
     "autoprefixer": "^10.4.27",
