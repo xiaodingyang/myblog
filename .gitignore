@@ -14,27 +14,8 @@ Thumbs.db
 # Claude / local AI notes
 CLAUDE.md
 
-# Package manager
+# pnpm
 .pnpm-store
-
-# Dependencies
-node_modules/
-**/node_modules/
-
-# Build caches & framework caches
-.cache/
-**/node_modules/.cache/
-**/.umi/
-**/.turbo/
-
-# Build outputs
-**/dist/
-**/build/
-**/.next/
-
-# Test outputs
-coverage/
-**/coverage/
 
 # Python venv
 .venv_img
@@ -42,5 +23,4 @@ coverage/
 # Logs
 *.log
 
-# Local temporary file
-# test.js
+test.js

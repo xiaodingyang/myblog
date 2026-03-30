@@ -17,14 +17,18 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { lazy, Suspense } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const SyntaxHighlighter = lazy(() =>
+  import('react-syntax-highlighter').then((mod) => ({ default: mod.Prism }))
+);
+const vscDarkPlus = lazy(() =>
+  import('react-syntax-highlighter/dist/esm/styles/prism').then((mod) => ({ default: mod.vscDarkPlus }))
+);
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
 import useSEO from '@/hooks/useSEO';
-import MicroComment from '@/components/MicroComment';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -275,22 +279,24 @@ const ArticleDetailPage: React.FC = () => {
                     const match = /language-(\w+)/.exec(className || '');
                     const isInline = !match && !className;
                     return !isInline ? (
-                      <SyntaxHighlighter
-                        style={vscDarkPlus}
-                        language={match ? match[1] : 'text'}
-                        PreTag="div"
-                        customStyle={{
-                          margin: '1em 0',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          overflowX: 'auto',
-                        }}
-                        showLineNumbers
-                        wrapLines
-                        wrapLongLines
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
+                      <Suspense fallback={<div style={{ padding: '1em', background: '#1e1e1e', borderRadius: '8px' }}>加载中...</div>}>
+                        <SyntaxHighlighter
+                          style={vscDarkPlus}
+                          language={match ? match[1] : 'text'}
+                          PreTag="div"
+                          customStyle={{
+                            margin: '1em 0',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            overflowX: 'auto',
+                          }}
+                          showLineNumbers
+                          wrapLines
+                          wrapLongLines
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      </Suspense>
                     ) : (
                       <code
                         className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
@@ -323,30 +329,13 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* 微前端评论区 - React 19 */}
+          {/* 评论区 */}
           <Card
             className="mt-8"
             style={{
               borderRadius: 16,
               border: 'none',
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-            }}
-          >
-            <MicroComment
-              articleId={id}
-              token={githubToken}
-              username={githubUser?.username}
-            />
-          </Card>
-
-          {/* 原评论区（备用） */}
-          <Card
-            className="mt-8"
-            style={{
-              borderRadius: 16,
-              border: 'none',
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-              display: 'none', // 隐藏原评论区
             }}
           >
             <Title level={4} className="!mb-6">

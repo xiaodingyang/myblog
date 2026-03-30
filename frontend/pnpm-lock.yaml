@@ -35,9 +35,6 @@ importers:
       dayjs:
         specifier: ^1.11.20
         version: 1.11.20
-      qiankun:
-        specifier: ^2.10.16
-        version: 2.10.16
       qrcode.react:
         specifier: ^4.2.0
         version: 4.2.0(react@18.3.1)
