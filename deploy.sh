@@ -53,6 +53,11 @@ cd frontend
 pnpm install --frozen-lockfile || pnpm install
 pnpm build
 
+echo "📦 安装评论子应用依赖并打包 ..."
+cd ../myblog-comment-mf
+pnpm install --frozen-lockfile || pnpm install
+pnpm build
+
 echo "📦 安装后端依赖 ..."
 cd ../backend
 pnpm install --frozen-lockfile || pnpm install
