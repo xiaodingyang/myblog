@@ -2,7 +2,7 @@ name: Deploy Blog
 
 on:
   push:
-    branches: [feat/react-19]
+    branches: [main]
 
 env:
   SERVER_HOST: ${{ secrets.SERVER_HOST }}

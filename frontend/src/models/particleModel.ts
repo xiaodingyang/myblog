@@ -3,10 +3,22 @@ import { DEFAULT_THEME_ID } from '@xdy-npm/react-particle-backgrounds';
 
 const STORAGE_KEY = 'particle-theme-id';
 
+function normalizeParticleThemeId(id: string | null | undefined): string {
+  if (!id) return DEFAULT_THEME_ID;
+  // 旧版博客自建 id，已合并到 npm 包内置 tyndall
+  if (id === 'tyndall-rain') return 'tyndall';
+  return id;
+}
+
 export default function useParticleModel() {
   const [themeId, setThemeId] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(STORAGE_KEY) || DEFAULT_THEME_ID;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const normalized = normalizeParticleThemeId(raw);
+      if (raw && raw !== normalized) {
+        localStorage.setItem(STORAGE_KEY, normalized);
+      }
+      return normalized;
     }
     return DEFAULT_THEME_ID;
   });
@@ -20,6 +32,12 @@ export default function useParticleModel() {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    const normalized = normalizeParticleThemeId(saved);
+    if (saved && saved !== normalized) {
+      localStorage.setItem(STORAGE_KEY, normalized);
+      setThemeId(normalized);
+      return;
+    }
     if (saved && saved !== themeId) {
       setThemeId(saved);
     }
