@@ -31,6 +31,10 @@ jobs:
         working-directory: frontend
         run: pnpm install --frozen-lockfile
 
+      - name: Verify react-particle-backgrounds version
+        working-directory: frontend
+        run: node -p "require('@xdy-npm/react-particle-backgrounds/package.json').version"
+
       - name: Build frontend
         working-directory: frontend
         run: pnpm build

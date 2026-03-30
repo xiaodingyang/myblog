@@ -3,8 +3,15 @@ import {
   getThemeById as libGetThemeById,
   DEFAULT_THEME_ID,
   baseConfig,
+  tyndallTheme,
 } from '@xdy-npm/react-particle-backgrounds';
 import type { ParticleTheme } from '@xdy-npm/react-particle-backgrounds';
+
+// 显式合并丁达尔主题：避免旧构建/缓存导致列表缺项；并保持紧挨在「关闭特效」上方
+const mergedLibThemes = (() => {
+  const rest = libThemes.filter((t) => t.id !== 'tyndall');
+  return [...rest, tyndallTheme];
+})();
 
 // 博客特有的「关闭特效」主题
 const noneTheme: ParticleTheme = {
@@ -19,7 +26,7 @@ const noneTheme: ParticleTheme = {
   }),
 };
 
-export const particleThemes: ParticleTheme[] = [...libThemes, noneTheme];
+export const particleThemes: ParticleTheme[] = [...mergedLibThemes, noneTheme];
 
 export const getThemeById = (id: string): ParticleTheme => {
   if (id === 'none') return noneTheme;
