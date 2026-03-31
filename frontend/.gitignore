@@ -42,3 +42,5 @@ pnpm-debug.log*
 /playwright
 /.lhci-tmp
 
+# old e2e dir (replaced by tests/e2e)
+/e2e
