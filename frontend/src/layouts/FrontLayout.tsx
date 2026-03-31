@@ -82,35 +82,47 @@ const FrontLayout: React.FC = () => {
       : { r: 255, g: 179, b: 217 };
   };
 
+  // 非首页顶栏：深色毛玻璃 + 白色系导航，与粒子星空背景统一
+  const useDarkHeader = !isHomePage;
+
   // 获取头部样式
   const getHeaderStyle = () => {
     const rgb = hexToRgb(currentColorTheme.primary);
 
-    // 使用主题色衍生的半透明背景
-    const headerBg = isHomePage
-      ? `linear-gradient(90deg, 
+    if (isHomePage) {
+      const headerBg = `linear-gradient(90deg, 
           rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 0%, 
           rgba(255, 255, 255, 0.85) 50%, 
           rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 100%
-        )`
-      : `linear-gradient(90deg, 
-          rgba(255, 255, 255, 0.95) 0%, 
-          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08) 50%,
-          rgba(255, 255, 255, 0.95) 100%
         )`;
+      return {
+        background: headerBg,
+        backdropFilter: 'blur(20px) saturate(180%)',
+        boxShadow: `0 4px 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`,
+        height: 64,
+        color: '#1e293b',
+        borderBottom: `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`,
+      };
+    }
+
+    const headerBg = `linear-gradient(90deg, 
+        rgba(15, 23, 42, 0.78) 0%, 
+        rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.22) 50%,
+        rgba(15, 23, 42, 0.78) 100%
+      )`;
 
     return {
       background: headerBg,
       backdropFilter: 'blur(20px) saturate(180%)',
-      boxShadow: `0 4px 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`,
+      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.28)',
       height: 64,
-      color: '#1e293b',
-      borderBottom: `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`,
+      color: '#f8fafc',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
     };
   };
 
-  const headerTextColor = '#1e293b'; // 统一使用深色文字
-  const isDarkTheme = false; // 导航栏现在是浅色的
+  const headerTextColor = useDarkHeader ? 'rgba(248, 250, 252, 0.95)' : '#1e293b';
+  const isDarkTheme = false; // 粒子/毛玻璃底：浅色参数；顶栏单独用 useDarkHeader
 
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
@@ -171,7 +183,7 @@ const FrontLayout: React.FC = () => {
 
         {/* 头部导航 */}
         <Header
-          className="fixed w-full z-50 px-4 md:px-8 flex items-center justify-between"
+          className={`fixed w-full z-50 px-4 md:px-8 flex items-center justify-between${useDarkHeader ? ' front-header-dark' : ''}`}
           style={{
             ...getHeaderStyle(),
             overflow: 'visible',
@@ -240,7 +252,9 @@ const FrontLayout: React.FC = () => {
                 }}
                 placement="bottomRight"
               >
-                <div className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-full transition-colors hover:bg-black/5">
+                <div
+                  className={`flex items-center gap-2 cursor-pointer px-2 py-1 rounded-full transition-colors ${useDarkHeader ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
+                >
                   <Avatar size={28} src={githubUser.avatar} icon={<GithubOutlined />} />
                   <span className="hidden sm:inline text-sm" style={{ color: headerTextColor, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {githubUser.nickname || githubUser.username}
@@ -282,7 +296,7 @@ const FrontLayout: React.FC = () => {
             <button
               className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors"
               style={{
-                background: 'rgba(0, 0, 0, 0.05)',
+                background: useDarkHeader ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.05)',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -300,7 +314,7 @@ const FrontLayout: React.FC = () => {
             <button
               className="md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors"
               style={{
-                background: 'rgba(0, 0, 0, 0.05)',
+                background: useDarkHeader ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.05)',
                 border: 'none',
                 cursor: 'pointer',
               }}

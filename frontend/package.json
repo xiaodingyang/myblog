@@ -4,7 +4,7 @@
   "private": true,
   "description": "个人博客前端 - Umi 4 + Ant Design 5 + Tailwind CSS",
   "scripts": {
-    "dev": "PORT=8001 umi dev",
+    "dev": "cross-env PORT=8001 umi dev",
     "build": "umi build",
     "build:ssg": "umi build && umi generate",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
@@ -32,6 +32,7 @@
     "umi": "^4.6.34"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "@types/react-syntax-highlighter": "^15.5.13",

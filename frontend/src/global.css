@@ -12,7 +12,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Source Han Sans SC', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  /* zinc 中性灰，避免 slate 系列的冷蓝底色在换主题时一直透出来 */
+  background: linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%);
   min-height: 100vh;
 }
 
@@ -274,6 +275,29 @@ body {
   border-bottom-color: var(--theme-primary, #ffb3d9) !important;
 }
 
+/* 深色顶栏（非首页）：菜单以白为主，悬停/选中用主题色点缀 */
+.front-header-dark .ant-menu-horizontal .ant-menu-item,
+.front-header-dark .ant-menu-horizontal .ant-menu-item a,
+.front-header-dark .ant-menu-horizontal .ant-menu-item .anticon {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.front-header-dark .ant-menu-horizontal .ant-menu-item:hover,
+.front-header-dark .ant-menu-horizontal .ant-menu-item:hover a,
+.front-header-dark .ant-menu-horizontal .ant-menu-item:hover .anticon {
+  color: #ffffff !important;
+}
+
+.front-header-dark .ant-menu-horizontal .ant-menu-item-selected,
+.front-header-dark .ant-menu-horizontal .ant-menu-item-selected a,
+.front-header-dark .ant-menu-horizontal .ant-menu-item-selected .anticon {
+  color: var(--theme-primary, #ffb3d9) !important;
+}
+
+.front-header-dark .ant-menu-horizontal .ant-menu-item-selected::after {
+  border-bottom-color: var(--theme-primary, #ffb3d9) !important;
+}
+
 /* 首页特殊样式 */
 .home-menu.ant-menu-horizontal {
   background: transparent !important;
@@ -344,7 +368,7 @@ body {
   }
 }
 
-/* 有内层滚动的 section：内容区可滚动，section 保持一屏高度 */
+/* 有内层滚动的 section：内容区可滚动，section 保持一屏高度；safe center 短内容垂直居中，溢出时回退为顶部对齐以便滚动 */
 .home-fullscreen-section-inner {
   display: flex;
   flex-direction: column;
@@ -352,6 +376,7 @@ body {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  justify-content: safe center;
 }
 
 /* CTA 底部留出安全区，避免与浏览器底部栏重叠 */

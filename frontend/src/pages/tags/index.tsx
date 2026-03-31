@@ -79,17 +79,17 @@ const TagsPage: React.FC = () => {
           </div>
           <Title 
             level={1} 
-            className="!mb-3 !text-gray-800"
+            className="!mb-3 !text-white"
             style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)',
             }}
           >
             标签云
           </Title>
           <Text 
-            className="text-gray-600 text-lg"
+            className="!text-white/85 text-lg"
             style={{
-              textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+              textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)',
             }}
           >
             共 {tags.length} 个标签

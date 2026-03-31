@@ -87,17 +87,17 @@ const ArticlesPage: React.FC = () => {
         <div className="text-center mb-8 md:mb-12">
           <Title 
             level={1} 
-            className="!mb-2 md:!mb-3 !text-gray-800 !text-2xl md:!text-4xl"
+            className="!mb-2 md:!mb-3 !text-white !text-2xl md:!text-4xl"
             style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)',
             }}
           >
             文章列表
           </Title>
           <Text 
-            className="text-gray-600 text-sm md:text-lg"
+            className="!text-white/85 text-sm md:text-lg"
             style={{
-              textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+              textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)',
             }}
           >
             共 {total} 篇文章，记录技术成长的点滴

@@ -10,7 +10,7 @@ const NotFoundPage: React.FC = () => {
     <div 
       className="min-h-screen flex items-center justify-center px-6"
       style={{
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: 'linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%)',
       }}
     >
       <div className="text-center max-w-md">
