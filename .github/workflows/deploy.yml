@@ -31,9 +31,11 @@ jobs:
         working-directory: frontend
         run: pnpm install --frozen-lockfile
 
+      # 包未导出 package.json 子路径，需从 resolve 入口向上找包根目录（pnpm 下入口可能在 dist/）
       - name: Verify react-particle-backgrounds version
         working-directory: frontend
-        run: node -p "require('@xdy-npm/react-particle-backgrounds/package.json').version"
+        run: |
+          node -e "const fs=require('fs');const p=require('path');let d=p.dirname(require.resolve('@xdy-npm/react-particle-backgrounds'));for(let i=0;i<8;i++){const j=p.join(d,'package.json');if(fs.existsSync(j)){console.log(JSON.parse(fs.readFileSync(j,'utf8')).version);process.exit(0);}d=p.dirname(d);}throw new Error('package root not found');"
 
       - name: Build frontend
         working-directory: frontend
