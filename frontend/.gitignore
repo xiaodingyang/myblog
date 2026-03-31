@@ -35,3 +35,10 @@ pnpm-debug.log*
 
 # turbo
 .turbo
+# testing
+/coverage
+/test-results
+/playwright-report
+/playwright
+/.lhci-tmp
+

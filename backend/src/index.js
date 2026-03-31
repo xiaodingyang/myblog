@@ -41,10 +41,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const compression = require('compression');
 app.use(compression());
 
-// API 限流
+// API 限流（生产环境严格；本地/测试放宽，避免 E2E 高频请求误伤登录）
+const isProd = process.env.NODE_ENV === 'production';
+const envWindowMs = Number(process.env.API_RATE_LIMIT_WINDOW_MS);
+const envMax = Number(process.env.API_RATE_LIMIT_MAX);
+const windowMs = Number.isFinite(envWindowMs) && envWindowMs > 0
+  ? envWindowMs
+  : (isProd ? 15 * 60 * 1000 : 60 * 1000);
+const max = Number.isFinite(envMax) && envMax > 0
+  ? envMax
+  : (isProd ? 100 : 2000);
+
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15分钟
-  max: 100, // 限制100次请求
+  windowMs,
+  max,
   message: { code: 429, message: '请求过于频繁，请稍后再试', data: null },
   standardHeaders: true,
   legacyHeaders: false,

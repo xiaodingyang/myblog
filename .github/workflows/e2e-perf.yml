@@ -1,0 +1,80 @@
+name: E2E & Performance
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/e2e-perf.yml"
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/e2e-perf.yml"
+
+jobs:
+  e2e_perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start dev server
+        run: |
+          pnpm dev:strict > dev-server.log 2>&1 &
+          echo $! > /tmp/frontend-dev.pid
+
+      - name: Wait for dev server
+        run: pnpm exec wait-on http://127.0.0.1:8001
+
+      - name: Run E2E tests
+        run: pnpm e2e
+        env:
+          CI: true
+
+      - name: Run Lighthouse CI
+        run: pnpm lhci
+        env:
+          CI: true
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f /tmp/frontend-dev.pid ]; then
+            kill "$(cat /tmp/frontend-dev.pid)" || true
+          fi
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+            frontend/dev-server.log
+          if-no-files-found: ignore
+
