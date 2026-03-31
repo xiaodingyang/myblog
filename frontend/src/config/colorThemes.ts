@@ -86,4 +86,4 @@ export const getColorThemeById = (id: string): ColorTheme => {
 };
 
 // 默认主题 ID
-export const DEFAULT_COLOR_THEME_ID = 'pink';
+export const DEFAULT_COLOR_THEME_ID = 'mint';

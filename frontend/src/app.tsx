@@ -103,7 +103,7 @@ export function rootContainer(container: React.ReactNode) {
     // 从 localStorage 读取默认主题色（不使用 useModel，因为此时 model 系统还未初始化）
     const getDefaultColor = () => {
         if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('color-theme-id') || 'pink';
+            const saved = localStorage.getItem('color-theme-id') || 'mint';
             const colorThemes = {
                 pink: '#ffb3d9',
                 rose: '#f43f5e',

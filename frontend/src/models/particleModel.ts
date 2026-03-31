@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
-import { DEFAULT_THEME_ID } from '@xdy-npm/react-particle-backgrounds';
 
 const STORAGE_KEY = 'particle-theme-id';
+const DEFAULT_PARTICLE_THEME_ID = 'tyndall';
 
 function normalizeParticleThemeId(id: string | null | undefined): string {
-  if (!id) return DEFAULT_THEME_ID;
+  if (!id) return DEFAULT_PARTICLE_THEME_ID;
   // 旧版博客自建 id，已合并到 npm 包内置 tyndall
   if (id === 'tyndall-rain') return 'tyndall';
   return id;
@@ -20,7 +20,7 @@ export default function useParticleModel() {
       }
       return normalized;
     }
-    return DEFAULT_THEME_ID;
+    return DEFAULT_PARTICLE_THEME_ID;
   });
 
   const changeTheme = useCallback((id: string) => {
