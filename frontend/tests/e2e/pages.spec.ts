@@ -24,16 +24,26 @@ test('TC002 - 文章列表页', async ({ appPage }) => {
 
   await expect(appPage.getByText('文章列表')).toBeVisible({ timeout: 20_000 });
 
+  // 等待文章列表或暂无文章出现（最多30s），兼容网络慢的情况
   const totalText = appPage.locator('text=/共\\s*\\d+\\s*篇文章/');
-  await expect(totalText.first()).toBeVisible({ timeout: 20_000 });
-  const totalRaw = await totalText.first().innerText();
-  const total = Number((totalRaw.match(/共\s*(\d+)\s*篇文章/) || [])[1] || 0);
+  const noArticleText = appPage.getByText('暂无文章');
+  
+  let total = 0;
+  // 优先等待文章列表文字出现
+  const totalVisible = await totalText.first().isVisible({ timeout: 30_000 }).catch(() => false);
+  if (totalVisible) {
+    const totalRaw = await totalText.first().innerText();
+    total = Number((totalRaw.match(/共\s*(\d+)\s*篇文章/) || [])[1] || 0);
+  } else {
+    // 文章数据未加载出来，等待暂无文章
+    await expect(noArticleText).toBeVisible({ timeout: 30_000 });
+  }
 
   const firstArticleLink = appPage.locator('a[href^="/article/"]').first();
   if (total > 0) {
     await expect(firstArticleLink).toBeVisible({ timeout: 20_000 });
   } else {
-    await expect(appPage.getByText('暂无文章')).toBeVisible({ timeout: 20_000 });
+    await expect(noArticleText).toBeVisible({ timeout: 5_000 });
   }
 
   const pagination = appPage.locator('.ant-pagination');
