@@ -82,14 +82,14 @@ const FrontLayout: React.FC = () => {
       : { r: 255, g: 179, b: 217 };
   };
 
-  // 非首页顶栏：深色毛玻璃 + 白色系导航，与粒子星空背景统一
-  const useDarkHeader = !isHomePage;
+  // 顶栏：深色毛玻璃 + 白色系导航（首页也统一为白色系，更贴合粒子星空背景）
+  const useDarkHeader = true;
 
   // 获取头部样式
   const getHeaderStyle = () => {
     const rgb = hexToRgb(currentColorTheme.primary);
 
-    if (isHomePage) {
+    if (!useDarkHeader && isHomePage) {
       const headerBg = `linear-gradient(90deg, 
           rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) 0%, 
           rgba(255, 255, 255, 0.85) 50%, 
