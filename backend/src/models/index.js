@@ -6,6 +6,7 @@ const Message = require('./Message');
 const GithubUser = require('./GithubUser');
 const Comment = require('./Comment');
 const Favorite = require('./Favorite');
+const Follow = require('./Follow');
 
 module.exports = {
   User,
@@ -16,4 +17,5 @@ module.exports = {
   GithubUser,
   Comment,
   Favorite,
+  Follow,
 };

@@ -157,15 +157,40 @@ exports.getArticle = async (req, res, next) => {
     data.likeCount = likeCount;
     data.liked = liked;
     data.favorited = favorited;
+    data.viewCount = typeof article.viewCount === 'number' ? article.viewCount : 0;
 
     // 异步增加阅读量，不阻塞响应
-    Article.findByIdAndUpdate(id, { $inc: { views: 1 } }).exec();
+    Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } }).exec();
 
     res.json({
       code: 0,
       message: 'success',
       data,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 增加文章阅读量
+ */
+exports.incArticleView = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const article = await Article.findOne({ _id: id, status: 'published' });
+    if (!article) {
+      return res.status(404).json({
+        code: 404,
+        message: '文章不存在',
+        data: null,
+      });
+    }
+
+    await Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } });
+
+    res.json({ success: true });
   } catch (error) {
     next(error);
   }

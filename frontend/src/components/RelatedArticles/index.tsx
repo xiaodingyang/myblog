@@ -1,0 +1,135 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'umi';
+import { Card, Typography, Space, Skeleton } from 'antd';
+import { EyeOutlined, FolderOutlined } from '@ant-design/icons';
+import { request } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
+import { useModel } from 'umi';
+
+const { Title, Text } = Typography;
+
+const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = ({
+  categoryId,
+  excludeId,
+}) => {
+  const [articles, setArticles] = useState<API.Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { themeId: colorThemeId } = useModel('colorModel');
+  const currentColorTheme = getColorThemeById(colorThemeId);
+
+  useEffect(() => {
+    if (!categoryId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchRelated = async () => {
+      setLoading(true);
+      try {
+        const res = await request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
+          params: { page: 1, pageSize: 4, category: categoryId },
+        });
+        if (res.code === 0) {
+          const filtered = (res.data.list || []).filter(
+            (a) => a._id !== excludeId
+          );
+          setArticles(filtered.slice(0, 3));
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRelated();
+  }, [categoryId, excludeId]);
+
+  if (loading) {
+    return (
+      <Card
+        className="mt-8"
+        style={{
+          borderRadius: 16,
+          border: 'none',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        }}
+      >
+        <Title level={4} className="!mb-6">📋 相关推荐</Title>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i}>
+              <Skeleton.Image active style={{ width: '100%', height: 120 }} />
+              <Skeleton active paragraph={{ rows: 2 }} />
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  if (articles.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card
+      className="mt-8"
+      style={{
+        borderRadius: 16,
+        border: 'none',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+      }}
+    >
+      <Title level={4} className="!mb-6">
+        📋 相关推荐
+      </Title>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {articles.map((article) => (
+          <Link key={article._id} to={`/article/${article._id}`} className="block group">
+            <Card
+              hoverable
+              className="h-full !rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-lg"
+              cover={
+                article.cover ? (
+                  <img
+                    src={article.cover}
+                    alt={article.title}
+                    style={{ height: 120, objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      height: 120,
+                      background: currentColorTheme.gradient,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: 32 }}>📝</span>
+                  </div>
+                )
+              }
+              bodyStyle={{ padding: 12 }}
+            >
+              <Text
+                strong
+                className="block mb-2 line-clamp-2 transition-colors group-hover:text-blue-500"
+                style={{ fontSize: 14 }}
+              >
+                {article.title}
+              </Text>
+              <Space size="small" className="text-gray-400 text-xs">
+                <EyeOutlined />
+                <span>{article.views || 0}</span>
+              </Space>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+};
+
+export default RelatedArticles;

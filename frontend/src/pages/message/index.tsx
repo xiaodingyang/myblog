@@ -3,8 +3,8 @@ import { Typography, Card, Input, Button, List, Avatar, Pagination, message } fr
 import { MessageOutlined, ClockCircleOutlined, GithubOutlined } from '@ant-design/icons';
 import { request, useModel } from 'umi';
 import dayjs from 'dayjs';
-import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import MessageSkeleton from '@/components/Skeleton/MessageSkeleton';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -187,7 +187,7 @@ const MessagePage: React.FC = () => {
           </Title>
 
           {loading ? (
-            <Loading />
+            <MessageSkeleton />
           ) : messages.length > 0 ? (
             <>
               <List

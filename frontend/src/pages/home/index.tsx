@@ -3,6 +3,7 @@ import { Link } from 'umi';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import HomeSkeleton from '@/components/Skeleton/HomeSkeleton';
 import {
   ArrowRightOutlined,
   ArrowDownOutlined,

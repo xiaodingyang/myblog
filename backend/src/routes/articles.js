@@ -9,6 +9,9 @@ router.get('/', articleController.getArticles);
 // 获取文章归档
 router.get('/archives', articleController.getArchives);
 
+// 增加文章阅读量
+router.get('/:id/view', articleController.incArticleView);
+
 // 文章点赞（需登录，须放在 /:id 之前避免误匹配时可区分的路径）
 router.post('/:id/like', githubAuth, articleController.toggleArticleLike);
 

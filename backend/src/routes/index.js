@@ -12,6 +12,7 @@ const rankingsRoutes = require('./rankings');
 const favoritesRoutes = require('./favorites');
 const adminRoutes = require('./admin');
 const githubAuthRoutes = require('./githubAuth');
+const followRoutes = require('./follow');
 
 // 公开路由
 router.use('/auth', authRoutes);
@@ -27,5 +28,8 @@ router.use('/github', githubAuthRoutes);
 
 // 后台管理路由
 router.use('/admin', adminRoutes);
+
+// 关注功能
+router.use('/follow', followRoutes);
 
 module.exports = router;

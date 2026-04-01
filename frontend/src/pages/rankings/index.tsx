@@ -62,7 +62,7 @@ const Rankings: React.FC = () => {
         title={
           <Space>
             <TrophyOutlined style={{ color: '#faad14' }} />
-            <span>🏆 评论活跃榜</span>
+            <span>评论活跃榜</span>
           </Space>
         }
         style={{ borderRadius: 12 }}

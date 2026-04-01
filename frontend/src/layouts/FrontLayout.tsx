@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
-import { Outlet, Link, useLocation } from 'umi';
+import { Outlet, Link, useLocation, history } from 'umi';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
@@ -24,6 +24,8 @@ import GradientText from '@/components/GradientText';
 import GithubLoginModal from '@/components/GithubLoginModal';
 import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import ReadingProgressBar from '@/components/ReadingProgressBar';
+import KeyboardHelpButton from '@/components/KeyboardHelpButton';
+import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
 import { getColorThemeById } from '@/config/colorThemes';
 
 const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
@@ -48,18 +50,19 @@ const FrontLayout: React.FC = () => {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      const shown = sessionStorage.getItem('login_prompt_shown');
-      if (!shown) {
-        const timer = setTimeout(() => {
-          setLoginModalVisible(true);
-          sessionStorage.setItem('login_prompt_shown', '1');
-        }, 3000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isLoggedIn, setLoginModalVisible]);
+  // 注释掉自动弹窗，避免与 GuestLoginPrompt 浮层重复
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     const shown = sessionStorage.getItem('login_prompt_shown');
+  //     if (!shown) {
+  //       const timer = setTimeout(() => {
+  //         setLoginModalVisible(true);
+  //         sessionStorage.setItem('login_prompt_shown', '1');
+  //       }, 3000);
+  //       return () => clearTimeout(timer);
+  //     }
+  //   }
+  // }, [isLoggedIn, setLoginModalVisible]);
 
   useEffect(() => {
     if (isLoggedIn) return;
@@ -71,6 +74,63 @@ const FrontLayout: React.FC = () => {
     document.addEventListener('copy', handleCopy);
     return () => document.removeEventListener('copy', handleCopy);
   }, [isLoggedIn, setLoginModalVisible]);
+
+  // Keyboard shortcuts
+  const [showHelp, setShowHelp] = useState(false);
+  useEffect(() => {
+    let gPressed = false;
+    let gTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in input/textarea
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+
+      // g h: go home
+      if (key === 'g' && !gPressed) {
+        gPressed = true;
+        if (gTimer) clearTimeout(gTimer);
+        gTimer = setTimeout(() => { gPressed = false; }, 1000);
+        return;
+      }
+      if (gPressed && key === 'h') {
+        gPressed = false;
+        if (gTimer) clearTimeout(gTimer);
+        history.push('/');
+        return;
+      }
+
+      // j: next article
+      if (key === 'j') {
+        const nextLink = document.querySelector('[data-nav-next]') as HTMLAnchorElement;
+        if (nextLink) nextLink.click();
+        return;
+      }
+
+      // k: previous article
+      if (key === 'k') {
+        const prevLink = document.querySelector('[data-nav-prev]') as HTMLAnchorElement;
+        if (prevLink) prevLink.click();
+        return;
+      }
+
+      // ?: show help
+      if (key === '?') {
+        setShowHelp(prev => !prev);
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      if (gTimer) clearTimeout(gTimer);
+    };
+  }, []);
 
   // 获取主题背景色 - 现在由毛玻璃背景组件处理，Layout 使用透明背景
   const getBackgroundStyle = () => {
@@ -546,6 +606,8 @@ const FrontLayout: React.FC = () => {
         )}
         <GithubLoginModal />
         <GuestLoginPrompt />
+        <KeyboardHelpButton />
+        <KeyboardShortcutsHelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
       </Layout>
     </ConfigProvider>
   );

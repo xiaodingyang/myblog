@@ -18,12 +18,14 @@ import {
 } from '@ant-design/icons';
 import { request } from 'umi';
 import dayjs from 'dayjs';
-import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
 import CopyPageUrlButton from '@/components/CopyPageUrlButton';
 import ArticleToc from '@/components/ArticleToc';
 import MarkdownArticleBody from '@/components/MarkdownArticleBody';
+import ArticleReactions from '@/components/ArticleReactions';
+import RelatedArticles from '@/components/RelatedArticles';
+import ArticleDetailSkeleton from '@/components/Skeleton/ArticleDetailSkeleton';
 import useSEO from '@/hooks/useSEO';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
@@ -135,6 +137,8 @@ const ArticleDetailPage: React.FC = () => {
     if (id) {
       fetchArticle();
       fetchComments(1);
+      // Call view count API
+      request(`/api/articles/${id}/view`, { method: 'POST' }).catch(() => {});
     }
   }, [id, fetchComments]);
 
@@ -309,7 +313,7 @@ const ArticleDetailPage: React.FC = () => {
   };
 
   if (loading) {
-    return <Loading />;
+    return <ArticleDetailSkeleton />;
   }
 
   if (!article) {
@@ -376,7 +380,7 @@ const ArticleDetailPage: React.FC = () => {
             </Space>
             <Space>
               <EyeOutlined />
-              <span>{article.views || 0} 阅读</span>
+              <span>👁️ {article.views || 0} 阅读</span>
             </Space>
           </div>
 
@@ -437,7 +441,7 @@ const ArticleDetailPage: React.FC = () => {
                   loading={articleLikeLoading}
                   onClick={handleArticleLike}
                 >
-                  ❤️ 点赞文章{' '}
+                  {article.liked ? '已点赞' : '点赞文章'}{' '}
                   <span className="text-xs opacity-90">({article.likeCount ?? 0})</span>
                 </Button>
                 <Button
@@ -450,6 +454,7 @@ const ArticleDetailPage: React.FC = () => {
                 </Button>
               </Space>
               <Space wrap>
+                <ArticleReactions articleId={article._id} />
                 <CopyPageUrlButton />
                 <ShareButton
                   title={article.title}
@@ -626,6 +631,9 @@ const ArticleDetailPage: React.FC = () => {
               <Empty description="暂无评论，快来抢沙发吧！" />
             )}
           </Card>
+
+          {/* Related articles */}
+          <RelatedArticles categoryId={article.category?._id} excludeId={article._id} />
 
         </div>
       </section>

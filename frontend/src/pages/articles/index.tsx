@@ -4,8 +4,8 @@ import { Typography, Row, Col, Input, Select, Space, Pagination, Tag, Card } fro
 import { SearchOutlined, FilterOutlined, FolderOutlined, TagsOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import ArticleCard from '@/components/ArticleCard';
-import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
+import ArticlesListSkeleton from '@/components/Skeleton/ArticlesListSkeleton';
 
 import useSEO from '@/hooks/useSEO';
 
@@ -214,7 +214,7 @@ const ArticlesPage: React.FC = () => {
 
         {/* 文章列表 */}
         {loading ? (
-          <Loading />
+          <ArticlesListSkeleton />
         ) : articles.length > 0 ? (
           <>
             <Row gutter={[24, 24]}>
