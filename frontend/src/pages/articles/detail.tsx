@@ -459,23 +459,37 @@ const ArticleDetailPage: React.FC = () => {
                     const userLikes = item.likes?.map((l: any) => l.toString()) || [];
                     const isLiked = item.liked || userLikes.includes(githubUser?.id?.toString());
                     const likeCount = item.likeCount ?? (userLikes.length || 0);
+                    const isLiking = likingComments.has(item._id);
                     return (
                       <List.Item
                         className="animate-slide-up !px-0"
                         style={{ animationDelay: `${index * 0.05}s` }}
-                        actions={isLoggedIn ? [
-                          <Button
-                            key="like"
-                            type="text"
-                            size="small"
-                            icon={isLiked ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
-                            onClick={() => handleLikeComment(item._id)}
-                            loading={likingComments.has(item._id)}
-                            className="flex items-center gap-1"
-                          >
-                            {likeCount > 0 && likeCount}
-                          </Button>
-                        ] : undefined}
+                        actions={[
+                          isLoggedIn ? (
+                            <Button
+                              key="like"
+                              type="text"
+                              size="small"
+                              icon={isLiked ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined style={{ color: '#999' }} />}
+                              onClick={() => handleLikeComment(item._id)}
+                              loading={isLiking}
+                              className="flex items-center gap-1 hover:!text-red-500 transition-colors"
+                            >
+                              {likeCount > 0 && <span className="text-xs">{likeCount}</span>}
+                            </Button>
+                          ) : (
+                            <Button
+                              key="like"
+                              type="text"
+                              size="small"
+                              icon={<HeartOutlined style={{ color: '#999' }} />}
+                              onClick={() => requireAuth()}
+                              className="flex items-center gap-1 hover:!text-red-500 transition-colors"
+                            >
+                              {likeCount > 0 && <span className="text-xs">{likeCount}</span>}
+                            </Button>
+                          ),
+                        ]}
                       >
                         <List.Item.Meta
                           avatar={
