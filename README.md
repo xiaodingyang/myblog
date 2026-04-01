@@ -1,6 +1,6 @@
 # 个人博客系统
 
-一个基于 **Umi 4 + Ant Design 5 + Express + MongoDB** 的全栈个人博客系统，支持 Markdown 写作、分类标签管理、留言板、后台管理等功能。
+一个基于 **React 18 + Umi 4 + Ant Design 5 + Express + MongoDB** 的全栈个人博客系统，支持 Markdown 写作、GitHub 登录、评论互动、游戏化排行榜等功能。
 
 ## 预览
 
@@ -10,21 +10,30 @@
 
 ### 前台
 
-- 文章列表、详情展示，支持 Markdown 渲染与代码高亮
-- 文章分类、标签筛选
-- 文章搜索
-- 留言板
-- 响应式设计，支持移动端
-- 粒子动画背景
+- 🏠 文章列表、详情展示，支持 Markdown 渲染与代码高亮
+- 🏷️ 文章分类、标签筛选
+- 🔍 文章搜索
+- 💬 留言板（GitHub OAuth 登录后即可留言）
+- 👍 评论点赞互动
+- 🏆 评论活跃排行榜（游戏化激励）
+- 🌈 粒子动画背景（主题色渐变 + 丁达尔光雨）
+- 📱 响应式设计，支持移动端
 
 ### 后台管理
 
-- 数据统计仪表盘
-- 文章管理（创建、编辑、删除，支持草稿/发布状态）
-- 分类管理
-- 标签管理
-- 留言审核
-- 个人设置
+- 📊 数据统计仪表盘
+- 📝 文章管理（创建、编辑、删除，支持草稿/发布状态）
+- 📂 分类管理
+- 🏷️ 标签管理
+- 💬 留言审核
+- 👤 个人设置（头像、资料）
+
+### 技术亮点
+
+- 🔐 GitHub OAuth 一键登录（无需注册）
+- ⚡ 前端打包体积优化 68%（细粒度分包 + 懒加载）
+- 🧪 Playwright E2E 自动化测试
+- 🔄 自动化 CI/CD 部署
 
 ## 技术栈
 
@@ -35,11 +44,13 @@
 | **样式** | Tailwind CSS 3.x |
 | **状态管理** | Umi Model |
 | **Markdown** | react-markdown + remark-gfm + rehype-highlight |
+| **粒子背景** | react-particle-backgrounds |
 | **后端框架** | Express.js |
 | **数据库** | MongoDB + Mongoose |
-| **认证** | JWT (jsonwebtoken) |
+| **认证** | JWT (jsonwebtoken) + GitHub OAuth |
 | **数据验证** | Joi |
 | **文件上传** | Multer |
+| **测试** | Playwright E2E |
 
 ## 项目结构
 
@@ -57,6 +68,7 @@ myblog/
 │   │   │   ├── categories/  # 分类
 │   │   │   ├── tags/        # 标签
 │   │   │   ├── message/     # 留言板
+│   │   │   ├── rankings/    # 评论排行榜 🏆
 │   │   │   ├── about/       # 关于
 │   │   │   └── admin/       # 后台管理
 │   │   └── app.tsx          # 应用入口
@@ -194,6 +206,20 @@ pnpm dev
 | GET | /api/admin/messages | 获取留言列表（后台） |
 | PUT | /api/admin/messages/:id/review | 审核留言 |
 | DELETE | /api/admin/messages/:id | 删除留言 |
+
+### 评论
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/comments/article/:articleId | 获取文章评论 |
+| POST | /api/comments | 发表评论 |
+| POST | /api/comments/:id/like | 点赞/取消点赞评论 |
+
+### 排行榜
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/rankings/comments | 评论活跃榜 Top 20（5分钟缓存） |
 
 ### 其他
 
