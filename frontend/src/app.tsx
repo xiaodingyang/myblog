@@ -2,22 +2,9 @@ import { message, ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
-import { theme } from 'antd';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 dayjs.locale('zh-cn');
-
-// 深色模式工具
-export const getDarkMode = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return localStorage.getItem('dark-mode') === 'true';
-};
-
-export const setDarkMode = (dark: boolean) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('dark-mode', String(dark));
-  }
-};
 
 // 全局初始化状态
 export async function getInitialState(): Promise<{
@@ -134,26 +121,15 @@ export function rootContainer(container: React.ReactNode) {
         return '#ffb3d9';
     };
 
-    const isDark = getDarkMode();
-
-    // 深色模式 class 切换
-    if (typeof document !== 'undefined') {
-      if (isDark) {
-        document.body.classList.add('dark-mode');
-      } else {
-        document.body.classList.remove('dark-mode');
-      }
-    }
-
     return (
         <ErrorBoundary>
             <ConfigProvider
                 locale={zhCN}
                 theme={{
-                    algorithm: isDark ? theme.darkAlgorithm : undefined,
                     token: {
                         colorPrimary: getDefaultColor(),
                         borderRadius: 8,
+                        colorBgContainer: '#ffffff',
                     },
                     components: {
                         Button: {

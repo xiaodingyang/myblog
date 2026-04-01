@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Tooltip, Drawer, Divider, Switch, Space } from 'antd';
-import { SettingOutlined, BgColorsOutlined, BulbOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Tooltip, Drawer, Divider } from 'antd';
+import { SettingOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { particleThemes, getThemeById } from '@/config/particleThemes';
 import { colorThemes, getColorThemeById } from '@/config/colorThemes';
 import { useModel } from 'umi';
-import { getDarkMode, setDarkMode } from '@/app';
 
 interface ParticleThemeSelectorProps {
   isDark?: boolean;
@@ -12,13 +11,8 @@ interface ParticleThemeSelectorProps {
 
 const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = false }) => {
   const [open, setOpen] = useState(false);
-  const [darkMode, setDarkModeState] = useState(false);
   const { themeId, changeTheme } = useModel('particleModel');
   const { themeId: colorThemeId, changeTheme: changeColorTheme } = useModel('colorModel');
-
-  useEffect(() => {
-    setDarkModeState(getDarkMode());
-  }, []);
   const currentTheme = getThemeById(themeId);
   const currentColorTheme = getColorThemeById(colorThemeId);
 
@@ -63,28 +57,6 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
           body: { padding: 12 },
         }}
       >
-        {/* 深色模式开关 */}
-        <div className="mb-6 p-4 rounded-xl" style={{ background: 'rgba(0,0,0,0.04)' }}>
-          <Space>
-            <BulbOutlined />
-            <span className="font-semibold">深色模式</span>
-            <Switch
-              size="small"
-              checked={darkMode}
-              onChange={(checked) => {
-                setDarkModeState(checked);
-                setDarkMode(checked);
-                window.location.reload();
-              }}
-            />
-            <span className="text-sm text-gray-500">
-              {darkMode ? '🌙 已开启' : '☀️ 已关闭'}
-            </span>
-          </Space>
-        </div>
-
-        <Divider />
-
         {/* 粒子主题选择 */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">

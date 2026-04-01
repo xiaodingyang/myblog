@@ -17,34 +17,6 @@ body {
   min-height: 100vh;
 }
 
-/* 深色模式 */
-body.dark-mode {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #e2e8f0;
-}
-
-/* Ant Design 深色模式覆盖 */
-body.dark-mode .ant-layout {
-  background: #141414 !important;
-}
-
-body.dark-mode .ant-card {
-  background: #1f1f1f !important;
-  border-color: #303030 !important;
-}
-
-body.dark-mode .ant-list {
-  background: transparent !important;
-}
-
-body.dark-mode .ant-timeline-item-content {
-  background: transparent !important;
-}
-
-body.dark-mode .ant-empty-description {
-  color: #888 !important;
-}
-
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 8px;
