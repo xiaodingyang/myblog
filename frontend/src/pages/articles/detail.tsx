@@ -11,6 +11,8 @@ import {
   UserOutlined,
   ArrowLeftOutlined,
   GithubOutlined,
+  HeartOutlined,
+  HeartFilled,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
@@ -40,6 +42,7 @@ const ArticleDetailPage: React.FC = () => {
   const [commentPage, setCommentPage] = useState(1);
   const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
+  const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
   const commentPageSize = 10;
 
   const jsonLd = useMemo(() => {
@@ -153,6 +156,66 @@ const ArticleDetailPage: React.FC = () => {
     });
   };
 
+  // 点赞评论
+  const handleLikeComment = (commentId: string) => {
+    requireAuth(async () => {
+      if (!isLoggedIn || !githubToken) {
+        message.warning('请先登录后再点赞');
+        return;
+      }
+      if (likingComments.has(commentId)) return;
+
+      setLikingComments(prev => new Set(prev).add(commentId));
+
+      // 乐观更新：先在本地更新状态
+      const prevComments = [...comments];
+      setComments(prev =>
+        prev.map(c => {
+          if (c._id === commentId) {
+            const userLikes = c.likes?.map((l: any) => l.toString()) || [];
+            const isLiked = userLikes.includes(githubUser?.id?.toString());
+            return {
+              ...c,
+              likeCount: isLiked ? Math.max(0, (c.likeCount || 0) - 1) : (c.likeCount || 0) + 1,
+              liked: !isLiked,
+            };
+          }
+          return c;
+        })
+      );
+
+      try {
+        const res = await request(`/api/comments/${commentId}/like`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${githubToken}` },
+        });
+        if (res.code === 0) {
+          // 更新本地状态，使用服务器返回的值
+          setComments(prev =>
+            prev.map(c => {
+              if (c._id === commentId) {
+                return { ...c, likeCount: res.data.likeCount, liked: res.data.liked };
+              }
+              return c;
+            })
+          );
+        } else {
+          // 失败则恢复原状态
+          setComments(prevComments);
+          message.error(res.message || '点赞失败');
+        }
+      } catch {
+        setComments(prevComments);
+        message.error('点赞失败');
+      } finally {
+        setLikingComments(prev => {
+          const next = new Set(prev);
+          next.delete(commentId);
+          return next;
+        });
+      }
+    });
+  };
 
 
   if (loading) {
@@ -392,41 +455,59 @@ const ArticleDetailPage: React.FC = () => {
                 <List
                   itemLayout="horizontal"
                   dataSource={comments}
-                  renderItem={(item, index) => (
-                    <List.Item
-                      className="animate-slide-up !px-0"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
-                      <List.Item.Meta
-                        avatar={
-                          <a href={item.user?.htmlUrl} target="_blank" rel="noreferrer">
-                            <Avatar size={40} src={item.user?.avatar} icon={<GithubOutlined />} />
-                          </a>
-                        }
-                        title={
-                          <div className="flex items-center gap-3">
-                            <a
-                              href={item.user?.htmlUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-gray-800 hover:text-blue-500 font-medium"
-                            >
-                              {item.user?.nickname || item.user?.username || '匿名'}
+                  renderItem={(item, index) => {
+                    const userLikes = item.likes?.map((l: any) => l.toString()) || [];
+                    const isLiked = item.liked || userLikes.includes(githubUser?.id?.toString());
+                    const likeCount = item.likeCount ?? userLikes.length || 0;
+                    return (
+                      <List.Item
+                        className="animate-slide-up !px-0"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                        actions={isLoggedIn ? [
+                          <Button
+                            key="like"
+                            type="text"
+                            size="small"
+                            icon={isLiked ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
+                            onClick={() => handleLikeComment(item._id)}
+                            loading={likingComments.has(item._id)}
+                            className="flex items-center gap-1"
+                          >
+                            {likeCount > 0 && likeCount}
+                          </Button>
+                        ] : undefined}
+                      >
+                        <List.Item.Meta
+                          avatar={
+                            <a href={item.user?.htmlUrl} target="_blank" rel="noreferrer">
+                              <Avatar size={40} src={item.user?.avatar} icon={<GithubOutlined />} />
                             </a>
-                            <Text className="text-gray-400 text-sm">
-                              <ClockCircleOutlined className="mr-1" />
-                              {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
-                            </Text>
-                          </div>
-                        }
-                        description={
-                          <Paragraph className="!mb-0 mt-1 text-gray-600">
-                            {item.content}
-                          </Paragraph>
-                        }
-                      />
-                    </List.Item>
-                  )}
+                          }
+                          title={
+                            <div className="flex items-center gap-3">
+                              <a
+                                href={item.user?.htmlUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-gray-800 hover:text-blue-500 font-medium"
+                              >
+                                {item.user?.nickname || item.user?.username || '匿名'}
+                              </a>
+                              <Text className="text-gray-400 text-sm">
+                                <ClockCircleOutlined className="mr-1" />
+                                {dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}
+                              </Text>
+                            </div>
+                          }
+                          description={
+                            <Paragraph className="!mb-0 mt-1 text-gray-600">
+                              {item.content}
+                            </Paragraph>
+                          }
+                        />
+                      </List.Item>
+                    );
+                  }}
                 />
                 {commentTotal > commentPageSize && (
                   <div className="flex justify-center mt-4 pt-4 border-t border-gray-100">

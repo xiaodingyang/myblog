@@ -7,4 +7,7 @@ router.get('/article/:articleId', commentController.getArticleComments);
 
 router.post('/', githubAuth, commentController.createComment);
 
+// 点赞/取消点赞
+router.post('/:id/like', githubAuth, commentController.likeComment);
+
 module.exports = router;

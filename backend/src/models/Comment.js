@@ -23,6 +23,15 @@ const commentSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected'],
     default: 'approved',
   },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'GithubUser',
+    default: []
+  }],
+  likeCount: {
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: true,
 });

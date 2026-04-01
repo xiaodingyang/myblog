@@ -27,6 +27,46 @@ exports.getArticleComments = async (req, res, next) => {
   }
 };
 
+exports.likeComment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.githubUserId;
+
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.status(404).json({ code: 404, message: '评论不存在', data: null });
+    }
+
+    // 检查用户是否已点赞
+    const likedIndex = comment.likes.findIndex(
+      like => like.toString() === userId.toString()
+    );
+
+    let liked;
+    if (likedIndex > -1) {
+      // 已点赞，取消点赞
+      comment.likes.splice(likedIndex, 1);
+      comment.likeCount = Math.max(0, comment.likes.length);
+      liked = false;
+    } else {
+      // 未点赞，添加点赞
+      comment.likes.push(userId);
+      comment.likeCount = comment.likes.length;
+      liked = true;
+    }
+
+    await comment.save();
+
+    res.json({
+      code: 0,
+      message: liked ? '点赞成功' : '已取消点赞',
+      data: { liked, likeCount: comment.likeCount },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createComment = async (req, res, next) => {
   try {
     const { articleId, content } = req.body;
