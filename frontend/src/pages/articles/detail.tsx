@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, Link, history } from 'umi';
-import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message } from 'antd';
+import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import {
@@ -543,7 +543,7 @@ const ArticleDetailPage: React.FC = () => {
 
             {/* 评论列表 */}
             {commentLoading ? (
-              <Loading />
+              <div style={{ textAlign: 'center', padding: 20 }}><Spin size="large" /></div>
             ) : comments.length > 0 ? (
               <>
                 <List

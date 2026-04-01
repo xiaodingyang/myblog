@@ -8,6 +8,7 @@ import {
   HeartOutlined,
   StarOutlined,
   TrophyOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -31,11 +32,37 @@ const GithubLoginModal: React.FC = () => {
       footer={null}
       centered
       width={420}
+      closable={false}
       styles={{
         body: { padding: '32px 24px' },
       }}
     >
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', position: 'relative' }}>
+        <button
+          type="button"
+          aria-label="关闭"
+          onClick={() => setLoginModalVisible(false)}
+          style={{
+            position: 'absolute',
+            top: -8,
+            right: -8,
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            border: 'none',
+            background: 'rgba(0,0,0,0.08)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#666',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,0,0,0.15)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(0,0,0,0.08)')}
+        >
+          <CloseOutlined />
+        </button>
         <div
           style={{
             width: 64,
