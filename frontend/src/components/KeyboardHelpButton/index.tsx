@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { KeyboardOutlined } from '@ant-design/icons';
+import { KeyOutlined } from '@ant-design/icons';
 import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
 
 const KeyboardHelpButton: React.FC = () => {
@@ -12,7 +12,7 @@ const KeyboardHelpButton: React.FC = () => {
         <Button
           type="default"
           shape="circle"
-          icon={<KeyboardOutlined />}
+          icon={<KeyOutlined />}
           size="large"
           onClick={() => setVisible(true)}
           className="fixed bottom-6 right-6 z-50 shadow-lg"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Typography, Space, Divider } from 'antd';
-import { KeyboardOutlined } from '@ant-design/icons';
+import { KeyOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -29,7 +29,7 @@ const KeyboardShortcutsHelpModal: React.FC<KeyboardShortcutsHelpModalProps> = ({
       cancelButtonProps={{ style: { display: 'none' } }}
       title={
         <Space>
-          <KeyboardOutlined />
+          <KeyOutlined />
           <span>键盘快捷键</span>
         </Space>
       }
