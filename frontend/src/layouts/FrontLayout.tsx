@@ -15,6 +15,7 @@ import {
   MenuOutlined,
   CloseOutlined,
   LogoutOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import GlassBackground from '@/components/GlassBackground';
@@ -129,6 +130,7 @@ const FrontLayout: React.FC = () => {
     { key: '/articles', icon: <ReadOutlined />, label: <Link to="/articles">文章</Link> },
     { key: '/categories', icon: <FolderOutlined />, label: <Link to="/categories">分类</Link> },
     { key: '/tags', icon: <TagsOutlined />, label: <Link to="/tags">标签</Link> },
+    { key: '/rankings', icon: <TrophyOutlined />, label: <Link to="/rankings">排行榜</Link> },
     { key: '/message', icon: <MessageOutlined />, label: <Link to="/message">留言</Link> },
     { key: '/about', icon: <UserOutlined />, label: <Link to="/about">关于</Link> },
   ];
@@ -405,7 +407,7 @@ const FrontLayout: React.FC = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="text-lg">{item.icon}</span>
-                    <span className="font-medium">{item.key === '/' ? '首页' : item.key === '/articles' ? '文章' : item.key === '/categories' ? '分类' : item.key === '/tags' ? '标签' : item.key === '/message' ? '留言' : '关于'}</span>
+                    <span className="font-medium">{item.key === '/' ? '首页' : item.key === '/articles' ? '文章' : item.key === '/categories' ? '分类' : item.key === '/tags' ? '标签' : item.key === '/rankings' ? '排行榜' : item.key === '/message' ? '留言' : '关于'}</span>
                   </Link>
                 );
               })}
@@ -480,6 +482,7 @@ const FrontLayout: React.FC = () => {
                     <Link to="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
                     <Link to="/articles" className="text-gray-400 hover:text-white transition-colors">文章</Link>
                     <Link to="/categories" className="text-gray-400 hover:text-white transition-colors">分类</Link>
+                    <Link to="/rankings" className="text-gray-400 hover:text-white transition-colors">排行榜</Link>
                     <Link to="/about" className="text-gray-400 hover:text-white transition-colors">关于我</Link>
                   </Space>
                 </Col>
