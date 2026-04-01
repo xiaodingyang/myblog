@@ -97,6 +97,7 @@ export default defineConfig({
         { path: '/tags', component: '@/pages/tags/index' },
         { path: '/tag/:id', component: '@/pages/tags/detail' },
         { path: '/about', component: '@/pages/about/index' },
+        { path: '/rankings', component: '@/pages/rankings/index' },
         { path: '/message', component: '@/pages/message/index' },
       ],
     },
