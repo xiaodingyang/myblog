@@ -12,6 +12,8 @@ const MAX_DESC_LENGTH = 160;
 
 interface SEOOptions {
   title?: string;
+  /** 用于 og:title / twitter:title，不传则使用「页面标题 - 站点名」 */
+  shareTitle?: string;
   description?: string;
   keywords?: string;
   ogImage?: string;
@@ -99,6 +101,7 @@ function removeJsonLd() {
 export default function useSEO(options: SEOOptions = {}) {
   const {
     title,
+    shareTitle,
     description = DEFAULT_DESCRIPTION,
     keywords = DEFAULT_KEYWORDS,
     ogImage,
@@ -111,6 +114,7 @@ export default function useSEO(options: SEOOptions = {}) {
   useEffect(() => {
     const desc = truncateMetaDescription(description);
     const fullTitle = title ? `${title} - ${SITE_NAME}` : `${SITE_NAME} - 前端技术分享`;
+    const ogTwitterTitle = (shareTitle || fullTitle).trim();
     document.title = fullTitle;
 
     setMetaByName('description', desc);
@@ -122,7 +126,7 @@ export default function useSEO(options: SEOOptions = {}) {
 
     setCanonical(pageUrl);
 
-    setMetaByProperty('og:title', fullTitle);
+    setMetaByProperty('og:title', ogTwitterTitle);
     setMetaByProperty('og:description', desc);
     setMetaByProperty('og:type', ogType);
     setMetaByProperty('og:url', pageUrl);
@@ -139,7 +143,7 @@ export default function useSEO(options: SEOOptions = {}) {
     }
 
     setMetaByName('twitter:card', absoluteImage || !omitOgImage ? 'summary_large_image' : 'summary');
-    setMetaByName('twitter:title', fullTitle);
+    setMetaByName('twitter:title', ogTwitterTitle);
     setMetaByName('twitter:description', desc);
     if (absoluteImage || !omitOgImage) {
       setMetaByName('twitter:image', absoluteImage || `${SITE_ORIGIN}/favicon.png`);
@@ -158,7 +162,7 @@ export default function useSEO(options: SEOOptions = {}) {
     return () => {
       removeJsonLd();
     };
-  }, [title, description, keywords, ogImage, ogUrl, ogType, omitOgImage, jsonLd]);
+  }, [title, shareTitle, description, keywords, ogImage, ogUrl, ogType, omitOgImage, jsonLd]);
 }
 
 export { SITE_NAME, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS };

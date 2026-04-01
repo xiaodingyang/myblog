@@ -17,17 +17,16 @@ import {
   StarFilled,
 } from '@ant-design/icons';
 import { request } from 'umi';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
 import CopyPageUrlButton from '@/components/CopyPageUrlButton';
+import ArticleToc from '@/components/ArticleToc';
+import MarkdownArticleBody from '@/components/MarkdownArticleBody';
 import useSEO from '@/hooks/useSEO';
+import { extractTocFromMarkdown } from '@/utils/markdownToc';
+import { estimateReadingMinutes } from '@/utils/readingTime';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -49,6 +48,16 @@ const ArticleDetailPage: React.FC = () => {
   const [articleLikeLoading, setArticleLikeLoading] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const commentPageSize = 10;
+
+  const toc = useMemo(
+    () => (article ? extractTocFromMarkdown(article.content) : []),
+    [article?.content],
+  );
+
+  const readingMinutes = useMemo(
+    () => (article ? estimateReadingMinutes(article.content) : 0),
+    [article?.content],
+  );
 
   const jsonLd = useMemo(() => {
     if (!article) return undefined;
@@ -77,11 +86,14 @@ const ArticleDetailPage: React.FC = () => {
 
   useSEO({
     title: article?.title,
-    description: article?.summary || `阅读若风的技术博客文章：${article?.title || ''}`,
+    shareTitle: article?.title,
+    description:
+      article?.summary?.trim() ||
+      `阅读若风的技术博客文章：${article?.title || ''}`,
     keywords: article?.tags?.map((t: any) => t.name).join(',') || '技术文章',
     ogImage: article?.cover,
     ogType: 'article',
-    ogUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+    ogUrl: typeof window !== 'undefined' ? window.location.href.split('#')[0] : undefined,
     jsonLd,
   });
 
@@ -340,9 +352,12 @@ const ArticleDetailPage: React.FC = () => {
           </button>
 
           {/* 标题 */}
-          <Title level={1} className="!text-white !mb-6" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
+          <Title level={1} className="!text-white !mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
             {article.title}
           </Title>
+          <div className="text-white/75 text-sm md:text-base mb-6">
+            阅读时间约 {readingMinutes} 分钟
+          </div>
 
           {/* 元信息 */}
           <div className="flex flex-wrap items-center gap-3 md:gap-6 text-white/70 text-sm md:text-base">
@@ -397,8 +412,10 @@ const ArticleDetailPage: React.FC = () => {
 
       {/* 文章内容 */}
       <section className="py-8 md:py-12">
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
           <Card
+            className="flex-1 min-w-0 w-full"
             style={{
               borderRadius: 16,
               border: 'none',
@@ -406,53 +423,7 @@ const ArticleDetailPage: React.FC = () => {
             }}
           >
             <div className="markdown-body">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
-                components={{
-                  img: ({ src, alt, ...props }) => (
-                    <img
-                      src={src}
-                      alt={alt || ''}
-                      loading="lazy"
-                      decoding="async"
-                      className="rounded-lg max-w-full h-auto"
-                      {...props}
-                    />
-                  ),
-                  code({ node, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || '');
-                    const isInline = !match && !className;
-                    return !isInline ? (
-                      <SyntaxHighlighter
-                        style={vscDarkPlus}
-                        language={match ? match[1] : 'text'}
-                        PreTag="div"
-                        customStyle={{
-                          margin: '1em 0',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          overflowX: 'auto',
-                        }}
-                        showLineNumbers
-                        wrapLines
-                        wrapLongLines
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
-                    ) : (
-                      <code
-                        className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
-                        {...props}
-                      >
-                        {children}
-                      </code>
-                    );
-                  },
-                }}
-              >
-                {article.content}
-              </ReactMarkdown>
+              <MarkdownArticleBody content={article.content} toc={toc} />
             </div>
 
             <Divider />
@@ -493,6 +464,9 @@ const ArticleDetailPage: React.FC = () => {
               </Text>
             </div>
           </Card>
+
+          <ArticleToc items={toc} primaryColor={currentColorTheme.primary} />
+          </div>
 
           {/* 评论区 */}
           <Card
