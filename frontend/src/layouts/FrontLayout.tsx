@@ -98,6 +98,7 @@ const FrontLayout: React.FC = () => {
         return;
       }
       if (gPressed && key === 'h') {
+        e.preventDefault();
         gPressed = false;
         if (gTimer) clearTimeout(gTimer);
         history.push('/');
@@ -106,6 +107,7 @@ const FrontLayout: React.FC = () => {
 
       // j: next article
       if (key === 'j') {
+        e.preventDefault();
         const nextLink = document.querySelector('[data-nav-next]') as HTMLAnchorElement;
         if (nextLink) nextLink.click();
         return;
@@ -113,6 +115,7 @@ const FrontLayout: React.FC = () => {
 
       // k: previous article
       if (key === 'k') {
+        e.preventDefault();
         const prevLink = document.querySelector('[data-nav-prev]') as HTMLAnchorElement;
         if (prevLink) prevLink.click();
         return;
@@ -120,6 +123,7 @@ const FrontLayout: React.FC = () => {
 
       // ?: show help
       if (key === '?') {
+        e.preventDefault();
         setShowHelp(prev => !prev);
         return;
       }

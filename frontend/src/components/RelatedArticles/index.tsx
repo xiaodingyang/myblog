@@ -85,8 +85,14 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
         📋 相关推荐
       </Title>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {articles.map((article) => (
-          <Link key={article._id} to={`/article/${article._id}`} className="block group">
+        {articles.map((article, index) => (
+          <Link
+            key={article._id}
+            to={`/article/${article._id}`}
+            className="block group"
+            data-nav-next={index === 0 ? `/article/${article._id}` : undefined}
+            data-nav-prev={index === articles.length - 1 ? `/article/${article._id}` : undefined}
+          >
             <Card
               hoverable
               className="h-full !rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-lg"

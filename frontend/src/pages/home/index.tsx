@@ -146,6 +146,10 @@ const HomePage: React.FC = () => {
     });
   };
 
+  if (loading) {
+    return <HomeSkeleton />;
+  }
+
   return (
     <div
       ref={containerRef}

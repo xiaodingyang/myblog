@@ -137,10 +137,15 @@ const ArticleDetailPage: React.FC = () => {
     if (id) {
       fetchArticle();
       fetchComments(1);
-      // Call view count API
-      request(`/api/articles/${id}/view`, { method: 'POST' }).catch(() => {});
     }
   }, [id, fetchComments]);
+
+  // Call view count API (separate effect to avoid re-calling on fetchComments changes)
+  useEffect(() => {
+    if (id) {
+      request(`/api/articles/${id}/view`, { method: 'POST' }).catch(() => {});
+    }
+  }, [id]);
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {
