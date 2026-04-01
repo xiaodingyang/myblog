@@ -1,6 +1,14 @@
 import React from 'react';
 import { Modal, Button, Typography, Space, Divider } from 'antd';
-import { GithubOutlined, CommentOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
+import {
+  GithubOutlined,
+  CommentOutlined,
+  ShareAltOutlined,
+  CopyOutlined,
+  HeartOutlined,
+  StarOutlined,
+  TrophyOutlined,
+} from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 
@@ -73,6 +81,18 @@ const GithubLoginModal: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <ShareAltOutlined style={{ fontSize: 18, color: theme.primary }} />
               <Text>分享文章链接</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <HeartOutlined style={{ fontSize: 18, color: theme.primary }} />
+              <Text>为文章点赞、为评论互动</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <StarOutlined style={{ fontSize: 18, color: theme.primary }} />
+              <Text>收藏文章，建立个人书单</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <TrophyOutlined style={{ fontSize: 18, color: theme.primary }} />
+              <Text>查看排行榜与更多互动数据</Text>
             </div>
           </Space>
         </div>

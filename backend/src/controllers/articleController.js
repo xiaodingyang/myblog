@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
-const { Article, Category, Tag } = require('../models');
+const { Article, Category, Tag, Favorite } = require('../models');
+
+function articlePublicFields(article) {
+  if (!article) return article;
+  const a = { ...article };
+  delete a.likes;
+  const likeCount = typeof a.likeCount === 'number' ? a.likeCount : 0;
+  return { ...a, likeCount };
+}
 
 /**
  * 获取文章列表（前台）
@@ -30,7 +38,7 @@ exports.getArticles = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [articles, total] = await Promise.all([
       Article.find(query)
-        .select('-content')
+        .select('-content -likes')
         .populate('category', 'name')
         .populate('tags', 'name')
         .populate('author', 'username avatar')
@@ -41,11 +49,13 @@ exports.getArticles = async (req, res, next) => {
       Article.countDocuments(query),
     ]);
 
+    const list = articles.map((a) => articlePublicFields(a));
+
     res.json({
       code: 0,
       message: 'success',
       data: {
-        list: articles,
+        list,
         total,
         page: parseInt(page),
         pageSize: parseInt(pageSize),
@@ -131,13 +141,74 @@ exports.getArticle = async (req, res, next) => {
       });
     }
 
+    const ghId = req.githubUserId;
+    const likeIds = (article.likes || []).map((x) => x.toString());
+    const liked = ghId ? likeIds.includes(ghId.toString()) : false;
+    let favorited = false;
+    if (ghId) {
+      favorited = !!(await Favorite.exists({ user: ghId, article: article._id }));
+    }
+
+    const likeCount = typeof article.likeCount === 'number'
+      ? article.likeCount
+      : likeIds.length;
+
+    const data = articlePublicFields(article);
+    data.likeCount = likeCount;
+    data.liked = liked;
+    data.favorited = favorited;
+
     // 异步增加阅读量，不阻塞响应
     Article.findByIdAndUpdate(id, { $inc: { views: 1 } }).exec();
 
     res.json({
       code: 0,
       message: 'success',
-      data: article,
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 文章点赞/取消点赞（需 GitHub 登录）
+ */
+exports.toggleArticleLike = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.githubUserId;
+
+    const article = await Article.findOne({ _id: id, status: 'published' }).select('likes likeCount');
+    if (!article) {
+      return res.status(404).json({ code: 404, message: '文章不存在', data: null });
+    }
+
+    const already = (article.likes || []).some((x) => x.equals(userId));
+    if (already) {
+      await Article.updateOne(
+        { _id: id },
+        { $pull: { likes: userId }, $inc: { likeCount: -1 } }
+      );
+      await Article.updateOne(
+        { _id: id, likeCount: { $lt: 0 } },
+        { $set: { likeCount: 0 } }
+      );
+    } else {
+      await Article.updateOne(
+        { _id: id },
+        { $addToSet: { likes: userId }, $inc: { likeCount: 1 } }
+      );
+    }
+
+    const updated = await Article.findById(id).select('likes likeCount').lean();
+    const liked = (updated.likes || []).some((x) => x.equals(userId));
+    const likeCount = Math.max(0, updated.likeCount ?? 0);
+
+    res.json({
+      code: 0,
+      message: 'success',
+      data: { likeCount, liked },
     });
   } catch (error) {
     next(error);

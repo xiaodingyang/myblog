@@ -20,6 +20,9 @@ declare namespace API {
     category: Category;
     tags: Tag[];
     views: number;
+    likeCount?: number;
+    liked?: boolean;
+    favorited?: boolean;
     status: 'draft' | 'published';
     author: User;
     createdAt: string;

@@ -35,6 +35,8 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
               <img
                 alt={article.title}
                 src={article.cover}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Outlet, Link, useLocation } from 'umi';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
@@ -16,11 +16,14 @@ import {
   CloseOutlined,
   LogoutOutlined,
   TrophyOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import GlassBackground from '@/components/GlassBackground';
 import GradientText from '@/components/GradientText';
 import GithubLoginModal from '@/components/GithubLoginModal';
+import GuestLoginPrompt from '@/components/GuestLoginPrompt';
+import ReadingProgressBar from '@/components/ReadingProgressBar';
 import { getColorThemeById } from '@/config/colorThemes';
 
 const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
@@ -125,15 +128,21 @@ const FrontLayout: React.FC = () => {
   const headerTextColor = useDarkHeader ? 'rgba(248, 250, 252, 0.95)' : '#1e293b';
   const isDarkTheme = false; // 粒子/毛玻璃底：浅色参数；顶栏单独用 useDarkHeader
 
-  const menuItems = [
-    { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
-    { key: '/articles', icon: <ReadOutlined />, label: <Link to="/articles">文章</Link> },
-    { key: '/categories', icon: <FolderOutlined />, label: <Link to="/categories">分类</Link> },
-    { key: '/tags', icon: <TagsOutlined />, label: <Link to="/tags">标签</Link> },
-    { key: '/rankings', icon: <TrophyOutlined />, label: <Link to="/rankings">排行榜</Link> },
-    { key: '/message', icon: <MessageOutlined />, label: <Link to="/message">留言</Link> },
-    { key: '/about', icon: <UserOutlined />, label: <Link to="/about">关于</Link> },
-  ];
+  const menuItems = useMemo(() => {
+    const items = [
+      { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
+      { key: '/articles', icon: <ReadOutlined />, label: <Link to="/articles">文章</Link> },
+      { key: '/categories', icon: <FolderOutlined />, label: <Link to="/categories">分类</Link> },
+      { key: '/tags', icon: <TagsOutlined />, label: <Link to="/tags">标签</Link> },
+      { key: '/rankings', icon: <TrophyOutlined />, label: <Link to="/rankings">排行榜</Link> },
+      ...(isLoggedIn
+        ? [{ key: '/favorites', icon: <StarOutlined />, label: <Link to="/favorites">我的收藏</Link> }]
+        : []),
+      { key: '/message', icon: <MessageOutlined />, label: <Link to="/message">留言</Link> },
+      { key: '/about', icon: <UserOutlined />, label: <Link to="/about">关于</Link> },
+    ];
+    return items;
+  }, [isLoggedIn]);
 
   const getSelectedKey = () => {
     const path = location.pathname;
@@ -184,6 +193,8 @@ const FrontLayout: React.FC = () => {
         )}
 
         {/* 头部导航 */}
+        <ReadingProgressBar />
+
         <Header
           className={`fixed w-full z-50 px-4 md:px-8 flex items-center justify-between${useDarkHeader ? ' front-header-dark' : ''}`}
           style={{
@@ -407,7 +418,23 @@ const FrontLayout: React.FC = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="text-lg">{item.icon}</span>
-                    <span className="font-medium">{item.key === '/' ? '首页' : item.key === '/articles' ? '文章' : item.key === '/categories' ? '分类' : item.key === '/tags' ? '标签' : item.key === '/rankings' ? '排行榜' : item.key === '/message' ? '留言' : '关于'}</span>
+                    <span className="font-medium">
+                      {item.key === '/'
+                        ? '首页'
+                        : item.key === '/articles'
+                          ? '文章'
+                          : item.key === '/categories'
+                            ? '分类'
+                            : item.key === '/tags'
+                              ? '标签'
+                              : item.key === '/rankings'
+                                ? '排行榜'
+                                : item.key === '/favorites'
+                                  ? '我的收藏'
+                                  : item.key === '/message'
+                                    ? '留言'
+                                    : '关于'}
+                    </span>
                   </Link>
                 );
               })}
@@ -518,6 +545,7 @@ const FrontLayout: React.FC = () => {
           </Footer>
         )}
         <GithubLoginModal />
+        <GuestLoginPrompt />
       </Layout>
     </ConfigProvider>
   );

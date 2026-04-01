@@ -57,7 +57,12 @@ export const request = {
                 const { status, data } = error.response;
 
                 if (status === 401) {
-                    if (!_isRedirectingToLogin && !window.location.pathname.includes('/admin/login')) {
+                    const p = window.location.pathname || '';
+                    if (
+                        p.startsWith('/admin') &&
+                        !p.includes('/admin/login') &&
+                        !_isRedirectingToLogin
+                    ) {
                         _isRedirectingToLogin = true;
                         message.warning('请先登录');
                         localStorage.removeItem('token');
@@ -81,11 +86,15 @@ export const request = {
     },
     requestInterceptors: [
         (config: any) => {
-            const token = localStorage.getItem('token');
-            if (token) {
+            const adminToken = localStorage.getItem('token');
+            const ghToken = localStorage.getItem('github_token');
+            const isAdmin =
+                typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+            const bearer = isAdmin ? adminToken : ghToken || adminToken;
+            if (bearer) {
                 config.headers = {
                     ...config.headers,
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${bearer}`,
                 };
             }
             return config;

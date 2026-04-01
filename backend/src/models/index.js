@@ -5,6 +5,7 @@ const Tag = require('./Tag');
 const Message = require('./Message');
 const GithubUser = require('./GithubUser');
 const Comment = require('./Comment');
+const Favorite = require('./Favorite');
 
 module.exports = {
   User,
@@ -14,4 +15,5 @@ module.exports = {
   Message,
   GithubUser,
   Comment,
+  Favorite,
 };

@@ -9,6 +9,7 @@ const messageRoutes = require('./messages');
 const commentRoutes = require('./comments');
 const uploadRoutes = require('./upload');
 const rankingsRoutes = require('./rankings');
+const favoritesRoutes = require('./favorites');
 const adminRoutes = require('./admin');
 const githubAuthRoutes = require('./githubAuth');
 
@@ -20,6 +21,7 @@ router.use('/tags', tagRoutes);
 router.use('/messages', messageRoutes);
 router.use('/comments', commentRoutes);
 router.use('/rankings', rankingsRoutes);
+router.use('/favorites', favoritesRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/github', githubAuthRoutes);
 

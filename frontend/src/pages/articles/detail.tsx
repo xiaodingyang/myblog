@@ -13,6 +13,8 @@ import {
   GithubOutlined,
   HeartOutlined,
   HeartFilled,
+  StarOutlined,
+  StarFilled,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import ReactMarkdown from 'react-markdown';
@@ -24,6 +26,7 @@ import dayjs from 'dayjs';
 import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import ShareButton from '@/components/ShareButton';
+import CopyPageUrlButton from '@/components/CopyPageUrlButton';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text, Paragraph } = Typography;
@@ -43,6 +46,8 @@ const ArticleDetailPage: React.FC = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
+  const [articleLikeLoading, setArticleLikeLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const commentPageSize = 10;
 
   const jsonLd = useMemo(() => {
@@ -217,6 +222,79 @@ const ArticleDetailPage: React.FC = () => {
     });
   };
 
+  const handleArticleLike = () => {
+    requireAuth(async () => {
+      if (!githubToken || !id) {
+        message.warning('请先登录后再点赞');
+        return;
+      }
+      setArticleLikeLoading(true);
+      try {
+        const res = await request(`/api/articles/${id}/like`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${githubToken}` },
+        });
+        if (res.code === 0 && res.data) {
+          setArticle((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  liked: res.data.liked,
+                  likeCount: res.data.likeCount,
+                }
+              : null
+          );
+        } else {
+          message.error(res.message || '操作失败');
+        }
+      } catch {
+        message.error('操作失败');
+      } finally {
+        setArticleLikeLoading(false);
+      }
+    });
+  };
+
+  const handleToggleFavorite = () => {
+    requireAuth(async () => {
+      if (!githubToken || !id) {
+        message.warning('请先登录后再收藏');
+        return;
+      }
+      setFavoriteLoading(true);
+      const was = article?.favorited;
+      try {
+        if (was) {
+          const res = await request(`/api/favorites/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${githubToken}` },
+          });
+          if (res.code === 0) {
+            setArticle((prev) => (prev ? { ...prev, favorited: false } : null));
+            message.success('已取消收藏');
+          } else {
+            message.error(res.message || '取消收藏失败');
+          }
+        } else {
+          const res = await request('/api/favorites', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${githubToken}` },
+            data: { articleId: id },
+          });
+          if (res.code === 0) {
+            setArticle((prev) => (prev ? { ...prev, favorited: true } : null));
+            message.success('已加入收藏');
+          } else {
+            message.error(res.message || '收藏失败');
+          }
+        }
+      } catch {
+        message.error('操作失败');
+      } finally {
+        setFavoriteLoading(false);
+      }
+    });
+  };
 
   if (loading) {
     return <Loading />;
@@ -332,6 +410,16 @@ const ArticleDetailPage: React.FC = () => {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
+                  img: ({ src, alt, ...props }) => (
+                    <img
+                      src={src}
+                      alt={alt || ''}
+                      loading="lazy"
+                      decoding="async"
+                      className="rounded-lg max-w-full h-auto"
+                      {...props}
+                    />
+                  ),
                   code({ node, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
                     const isInline = !match && !className;
@@ -369,18 +457,40 @@ const ArticleDetailPage: React.FC = () => {
 
             <Divider />
 
-            {/* 分享和操作 */}
-            <div className="flex items-center justify-between">
-              <Space>
-                <Text className="text-gray-500">
-                  最后更新于 {dayjs(article.updatedAt).format('YYYY-MM-DD HH:mm')}
-                </Text>
+            <div className="flex flex-wrap items-center gap-3 justify-between">
+              <Space wrap size="middle">
+                <Button
+                  type={article.liked ? 'primary' : 'default'}
+                  danger={!!article.liked}
+                  icon={article.liked ? <HeartFilled /> : <HeartOutlined />}
+                  loading={articleLikeLoading}
+                  onClick={handleArticleLike}
+                >
+                  ❤️ 点赞文章{' '}
+                  <span className="text-xs opacity-90">({article.likeCount ?? 0})</span>
+                </Button>
+                <Button
+                  type={article.favorited ? 'primary' : 'default'}
+                  icon={article.favorited ? <StarFilled /> : <StarOutlined />}
+                  loading={favoriteLoading}
+                  onClick={handleToggleFavorite}
+                >
+                  {article.favorited ? '已收藏' : '收藏'}
+                </Button>
               </Space>
-              <ShareButton
-                title={article.title}
-                summary={article.summary || ''}
-                cover={article.cover}
-              />
+              <Space wrap>
+                <CopyPageUrlButton />
+                <ShareButton
+                  title={article.title}
+                  summary={article.summary || ''}
+                  cover={article.cover}
+                />
+              </Space>
+            </div>
+            <div className="mt-4">
+              <Text className="text-gray-500 text-sm">
+                最后更新于 {dayjs(article.updatedAt).format('YYYY-MM-DD HH:mm')}
+              </Text>
             </div>
           </Card>
 

@@ -39,6 +39,15 @@ const articleSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'GithubUser',
+  }],
+  likeCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   status: {
     type: String,
     enum: ['draft', 'published'],
