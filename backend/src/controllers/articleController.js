@@ -57,6 +57,60 @@ exports.getArticles = async (req, res, next) => {
 };
 
 /**
+ * 获取文章归档（按年份/月份分组）
+ */
+exports.getArchives = async (req, res, next) => {
+  try {
+    const { limit = 100 } = req.query;
+
+    // 简单内存缓存（5分钟）
+    if (!global._archivesCache || Date.now() - global._archivesCacheTime > 5 * 60 * 1000) {
+      const articles = await Article.find({ status: 'published' })
+        .select('title createdAt category')
+        .populate('category', 'name')
+        .sort({ createdAt: -1 })
+        .limit(parseInt(limit))
+        .lean();
+
+      // 按年份月份分组
+      const yearMap = {};
+      articles.forEach(article => {
+        const date = new Date(article.createdAt);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const key = `${year}-${String(month).padStart(2, '0')}`;
+        if (!yearMap[key]) {
+          yearMap[key] = { year, month, articles: [] };
+        }
+        yearMap[key].articles.push({
+          id: article._id,
+          title: article.title,
+          createdAt: article.createdAt,
+          category: article.category?.name || '未分类',
+        });
+      });
+
+      // 转换为数组并按时间倒序
+      const grouped = Object.values(yearMap).sort((a, b) => {
+        if (b.year !== a.year) return b.year - a.year;
+        return b.month - a.month;
+      });
+
+      global._archivesCache = grouped;
+      global._archivesCacheTime = Date.now();
+    }
+
+    res.json({
+      code: 0,
+      message: 'success',
+      data: global._archivesCache,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * 获取文章详情（前台）
  */
 exports.getArticle = async (req, res, next) => {

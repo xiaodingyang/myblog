@@ -5,6 +5,9 @@ const articleController = require('../controllers/articleController');
 // 获取文章列表（前台）
 router.get('/', articleController.getArticles);
 
+// 获取文章归档
+router.get('/archives', articleController.getArchives);
+
 // 获取文章详情（前台）
 router.get('/:id', articleController.getArticle);
 
