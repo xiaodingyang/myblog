@@ -458,7 +458,7 @@ const ArticleDetailPage: React.FC = () => {
                   renderItem={(item, index) => {
                     const userLikes = item.likes?.map((l: any) => l.toString()) || [];
                     const isLiked = item.liked || userLikes.includes(githubUser?.id?.toString());
-                    const likeCount = item.likeCount ?? userLikes.length || 0;
+                    const likeCount = item.likeCount ?? (userLikes.length || 0);
                     return (
                       <List.Item
                         className="animate-slide-up !px-0"
