@@ -49,14 +49,14 @@ const ArticleToc: React.FC<ArticleTocProps> = ({ items, primaryColor = '#3b82f6'
   const list = (
     <nav aria-label="文章目录" className="text-sm">
       <div className="font-semibold text-slate-800 mb-3 pb-2 border-b border-slate-200">目录</div>
-      <ul className="list-none m-0 p-0 space-y-1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+      <ul className="list-none m-0 p-0 space-y-0.5 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1">
         {items.map((item) => (
           <li key={`${item.level}-${item.id}`}>
             <button
               type="button"
               onClick={() => scrollToId(item.id)}
-              className={`w-full text-left rounded-lg px-2 py-1.5 transition-colors border-l-2 ${
-                item.level === 3 ? 'pl-4' : 'pl-2'
+              className={`w-full text-left rounded-lg px-3 py-2 transition-all duration-200 border-l-2 text-[13px] leading-snug ${
+                item.level === 3 ? 'pl-5' : item.level >= 4 ? 'pl-7' : 'pl-3'
               } ${
                 activeId === item.id
                   ? 'bg-slate-100 font-medium'
@@ -83,7 +83,7 @@ const ArticleToc: React.FC<ArticleTocProps> = ({ items, primaryColor = '#3b82f6'
         style={{ alignSelf: 'flex-start' }}
       >
         <div
-          className="sticky py-2 px-3 rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-sm shadow-sm"
+          className="sticky py-4 px-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm"
           style={{ top: HEADER_OFFSET }}
         >
           {list}

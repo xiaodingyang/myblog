@@ -391,7 +391,7 @@ const ArticleDetailPage: React.FC = () => {
             </Space>
             <Space>
               <EyeOutlined />
-              <span>👁️ {formatViews(article.views || 0)} 阅读</span>
+              <span>{formatViews(article.views || 0)} 阅读</span>
             </Space>
           </div>
 
