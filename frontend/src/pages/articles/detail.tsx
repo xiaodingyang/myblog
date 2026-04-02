@@ -33,6 +33,12 @@ import { estimateReadingMinutes } from '@/utils/readingTime';
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
+function formatViews(views: number): string {
+  if (views >= 10000) return (views / 10000).toFixed(1).replace(/\.0$/, '') + 'w';
+  if (views >= 1000) return (views / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(views);
+}
+
 const ArticleDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
@@ -385,7 +391,7 @@ const ArticleDetailPage: React.FC = () => {
             </Space>
             <Space>
               <EyeOutlined />
-              <span>👁️ {article.views || 0} 阅读</span>
+              <span>👁️ {formatViews(article.views || 0)} 阅读</span>
             </Space>
           </div>
 
@@ -458,8 +464,9 @@ const ArticleDetailPage: React.FC = () => {
                   {article.favorited ? '已收藏' : '收藏'}
                 </Button>
               </Space>
-              <Space wrap>
+              <Space wrap className="flex items-center">
                 <ArticleReactions articleId={article._id} />
+                <Divider type="vertical" style={{ height: 24, margin: '0 4px' }} />
                 <CopyPageUrlButton />
                 <ShareButton
                   title={article.title}
@@ -510,7 +517,7 @@ const ArticleDetailPage: React.FC = () => {
                       showCount
                       maxLength={500}
                     />
-                    <div className="flex items-center justify-between mt-8">
+                    <div className="flex items-center justify-between mt-3">
                       <Text type="secondary" className="text-sm">
                         以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份评论
                       </Text>

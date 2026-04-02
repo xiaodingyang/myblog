@@ -1,6 +1,34 @@
 const mongoose = require('mongoose');
 const { Article, Category, Tag, Favorite } = require('../models');
 
+// ========== 阅读量防刷：内存缓存 ==========
+const viewedMap = new Map(); // key: `${ip}_${articleId}`, value: timestamp
+const VIEW_COOLDOWN = 24 * 60 * 60 * 1000; // 24小时
+
+// 每小时清理过期记录
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of viewedMap) {
+    if (now - timestamp > VIEW_COOLDOWN) {
+      viewedMap.delete(key);
+    }
+  }
+}, 60 * 60 * 1000);
+
+// ========== 文章列表缓存 ==========
+const cacheStore = {
+  data: null,
+  key: null,
+  expireAt: 0,
+};
+const CACHE_TTL = 60 * 1000; // 60秒
+
+function clearArticleListCache() {
+  cacheStore.data = null;
+  cacheStore.key = null;
+  cacheStore.expireAt = 0;
+}
+
 function articlePublicFields(article) {
   if (!article) return article;
   const a = { ...article };
@@ -34,6 +62,12 @@ exports.getArticles = async (req, res, next) => {
       query.tags = tag;
     }
 
+    // 文章列表缓存
+    const cacheKey = JSON.stringify({ keyword, category, tag, page, pageSize });
+    if (cacheStore.key === cacheKey && cacheStore.data && Date.now() < cacheStore.expireAt) {
+      return res.json(cacheStore.data);
+    }
+
     // 分页查询
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [articles, total] = await Promise.all([
@@ -51,7 +85,7 @@ exports.getArticles = async (req, res, next) => {
 
     const list = articles.map((a) => articlePublicFields(a));
 
-    res.json({
+    const responseData = {
       code: 0,
       message: 'success',
       data: {
@@ -60,7 +94,14 @@ exports.getArticles = async (req, res, next) => {
         page: parseInt(page),
         pageSize: parseInt(pageSize),
       },
-    });
+    };
+
+    // 写入缓存
+    cacheStore.key = cacheKey;
+    cacheStore.data = responseData;
+    cacheStore.expireAt = Date.now() + CACHE_TTL;
+
+    res.json(responseData);
   } catch (error) {
     next(error);
   }
@@ -159,8 +200,14 @@ exports.getArticle = async (req, res, next) => {
     data.favorited = favorited;
     data.viewCount = typeof article.viewCount === 'number' ? article.viewCount : 0;
 
-    // 异步增加阅读量，不阻塞响应
-    Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } }).exec();
+    // 阅读量防刷：同一IP对同一文章24小时内只计1次
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const viewKey = `${ip}_${id}`;
+    const lastViewed = viewedMap.get(viewKey);
+    if (!lastViewed || Date.now() - lastViewed > VIEW_COOLDOWN) {
+      viewedMap.set(viewKey, Date.now());
+      Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } }).exec();
+    }
 
     res.json({
       code: 0,
@@ -188,7 +235,14 @@ exports.incArticleView = async (req, res, next) => {
       });
     }
 
-    await Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } });
+    // 阅读量防刷：同一IP对同一文章24小时内只计1次
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const viewKey = `${ip}_${id}`;
+    const lastViewed = viewedMap.get(viewKey);
+    if (!lastViewed || Date.now() - lastViewed > VIEW_COOLDOWN) {
+      viewedMap.set(viewKey, Date.now());
+      await Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } });
+    }
 
     res.json({ success: true });
   } catch (error) {
@@ -354,6 +408,8 @@ exports.createArticle = async (req, res, next) => {
       .populate('tags', 'name')
       .populate('author', 'username avatar');
 
+    clearArticleListCache();
+
     res.status(201).json({
       code: 0,
       message: '创建成功',
@@ -389,6 +445,8 @@ exports.updateArticle = async (req, res, next) => {
       });
     }
 
+    clearArticleListCache();
+
     res.json({
       code: 0,
       message: '更新成功',
@@ -415,6 +473,8 @@ exports.deleteArticle = async (req, res, next) => {
         data: null,
       });
     }
+
+    clearArticleListCache();
 
     res.json({
       code: 0,

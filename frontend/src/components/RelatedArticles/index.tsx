@@ -81,6 +81,12 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
       }}
     >
+      <style>{`
+        @keyframes related-fade-in {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
       <Title level={4} className="!mb-6">
         📋 相关推荐
       </Title>
@@ -90,6 +96,11 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
             key={article._id}
             to={`/article/${article._id}`}
             className="block group"
+            style={{
+              opacity: 0,
+              animation: `related-fade-in 0.5s ease forwards`,
+              animationDelay: `${index * 100}ms`,
+            }}
             data-nav-next={index === 0 ? `/article/${article._id}` : undefined}
             data-nav-prev={index === articles.length - 1 ? `/article/${article._id}` : undefined}
           >

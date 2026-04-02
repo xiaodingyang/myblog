@@ -24,6 +24,7 @@ import GradientText from '@/components/GradientText';
 import GithubLoginModal from '@/components/GithubLoginModal';
 import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import ReadingProgressBar from '@/components/ReadingProgressBar';
+import BackToTop from '@/components/BackToTop';
 import KeyboardHelpButton from '@/components/KeyboardHelpButton';
 import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -610,6 +611,7 @@ const FrontLayout: React.FC = () => {
         )}
         <GithubLoginModal />
         <GuestLoginPrompt />
+        <BackToTop />
         <KeyboardHelpButton />
         <KeyboardShortcutsHelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
       </Layout>

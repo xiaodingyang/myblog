@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { CloseOutlined, GithubOutlined, CommentOutlined, HeartOutlined, StarOutlined, TrophyOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -9,23 +9,44 @@ const GuestLoginPrompt: React.FC = () => {
   const { isLoggedIn, setLoginModalVisible } = useModel('githubUserModel');
   const { themeId } = useModel('colorModel');
   const theme = getColorThemeById(themeId);
-  const [visible, setVisible] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+  const [animateOut, setAnimateOut] = useState(false);
+  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
-      setVisible(false);
+      setShouldRender(false);
+      setAnimateIn(false);
       return;
     }
     const until = Number(localStorage.getItem(STORAGE_KEY) || '0') || 0;
-    setVisible(Date.now() > until);
+    if (Date.now() > until) {
+      // Delay 2 seconds before showing
+      delayTimerRef.current = setTimeout(() => {
+        setShouldRender(true);
+        // Trigger animation after mount
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setAnimateIn(true));
+        });
+      }, 2000);
+    }
+    return () => {
+      if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+    };
   }, [isLoggedIn]);
 
-  if (!visible || isLoggedIn) return null;
+  if (!shouldRender || isLoggedIn) return null;
 
   const dismiss = () => {
     const until = Date.now() + 24 * 60 * 60 * 1000;
     localStorage.setItem(STORAGE_KEY, String(until));
-    setVisible(false);
+    setAnimateOut(true);
+    setTimeout(() => {
+      setShouldRender(false);
+      setAnimateIn(false);
+      setAnimateOut(false);
+    }, 350);
   };
 
   const openLogin = () => {
@@ -36,7 +57,17 @@ const GuestLoginPrompt: React.FC = () => {
   return (
     <div
       className="fixed z-[100] max-w-sm w-[calc(100vw-2rem)] sm:w-[360px]"
-      style={{ right: 16, bottom: 16 }}
+      style={{
+        right: 16,
+        bottom: 16,
+        transform: animateOut
+          ? 'translateX(120%) translateY(0)'
+          : animateIn
+            ? 'translateY(0)'
+            : 'translateY(20px)',
+        opacity: animateOut ? 0 : animateIn ? 1 : 0,
+        transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
     >
       <div
         className="rounded-2xl overflow-hidden shadow-2xl border border-white/20"

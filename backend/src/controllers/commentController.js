@@ -1,5 +1,9 @@
 const { Comment, Article } = require('../models');
 
+// ========== 评论频率限制 ==========
+const commentRateMap = new Map(); // key: userId, value: lastCommentTime
+const COMMENT_COOLDOWN = 30 * 1000; // 30秒
+
 exports.getArticleComments = async (req, res, next) => {
   try {
     const { articleId } = req.params;
@@ -70,6 +74,13 @@ exports.likeComment = async (req, res, next) => {
 exports.createComment = async (req, res, next) => {
   try {
     const { articleId, content } = req.body;
+    const userId = req.githubUserId;
+
+    // 评论频率限制：同一用户30秒内最多1条
+    const lastTime = commentRateMap.get(userId?.toString());
+    if (lastTime && Date.now() - lastTime < COMMENT_COOLDOWN) {
+      return res.status(429).json({ code: 429, message: '评论太频繁，请稍后再试' });
+    }
 
     const article = await Article.findById(articleId);
     if (!article) {
@@ -81,6 +92,9 @@ exports.createComment = async (req, res, next) => {
       user: req.githubUserId,
       content,
     });
+
+    // 记录评论时间
+    commentRateMap.set(userId?.toString(), Date.now());
 
     const populated = await comment.populate('user', 'username nickname avatar htmlUrl');
 
