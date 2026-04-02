@@ -176,7 +176,7 @@ const Rankings: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <a
-                          href={item.htmlUrl || `#/user/${item.username}`}
+                          href={item.htmlUrl || `https://github.com/${item.username}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-gray-800 hover:underline truncate"

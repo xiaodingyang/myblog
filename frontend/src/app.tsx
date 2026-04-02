@@ -8,24 +8,11 @@ import { getRouterPathname } from '@/utils/runtimePath';
 
 dayjs.locale('zh-cn');
 
-/** hash 模式下若用户打开 /admin/login 等「无 # 」的直链，同步为 /#/path，否则路由不会命中 */
-function syncBrowserUrlToHashMode() {
-    if (typeof window === 'undefined') return;
-    const { pathname, hash, search, origin } = window.location;
-    if (pathname.startsWith('/api')) return;
-    const hasHashRoute = hash.startsWith('#/') && hash.length > 2;
-    if (hasHashRoute) return;
-    if (pathname === '/' || pathname === '') return;
-    window.history.replaceState(null, '', `${origin}/#${pathname}${search}`);
-}
-
 // 全局初始化状态
 export async function getInitialState(): Promise<{
     currentUser?: API.User;
     token?: string;
 }> {
-    syncBrowserUrlToHashMode();
-
     const token = localStorage.getItem('token');
 
     if (token) {

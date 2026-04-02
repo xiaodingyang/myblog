@@ -144,7 +144,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
               <ShareButton
                 title={article.title}
                 summary={article.summary || ''}
-                url={articleId ? `https://www.xiaodingyang.art/#/article/${articleId}` : undefined}
+                url={articleId ? `https://www.xiaodingyang.art/article/${articleId}` : undefined}
                 cover={article.cover}
                 mode="icon"
               />

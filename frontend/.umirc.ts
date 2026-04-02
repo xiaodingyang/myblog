@@ -2,9 +2,8 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   title: '若风的博客 - 前端技术分享',
-  hash: true,
-  /** 与线上静态托管一致（#/article/:id），避免未配置 SPA rewrite 时详情 404 */
-  history: { type: 'hash' },
+  /** browser history：线上需 Nginx `try_files $uri $uri/ /index.html;`（见仓库 nginx.conf） */
+  history: { type: 'browser' },
   esbuildMinifyIIFE: true,
   links: [
     { rel: 'icon', href: '/favicon.png', type: 'image/png' },
