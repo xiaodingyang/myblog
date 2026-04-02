@@ -521,13 +521,13 @@ const FrontLayout: React.FC = () => {
 
         {/* 主内容区 */}
         <Content
-          className={isHomePage ? 'pt-16 overflow-hidden home-layout-content' : 'pt-16'}
+          className={isHomePage ? 'pt-16 overflow-hidden home-layout-content' : 'pt-16 flex-1'}
           style={{
             position: 'relative',
             zIndex: isHomePage ? 10 : 2, // 确保内容在毛玻璃背景之上
           }}
         >
-          <div className={isHomePage ? 'h-full min-h-0' : 'min-h-[calc(100vh-64px-200px)]'}>
+          <div className={isHomePage ? 'h-full min-h-0' : ''}>
             <Outlet />
           </div>
         </Content>
