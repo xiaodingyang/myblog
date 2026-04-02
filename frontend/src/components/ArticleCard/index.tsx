@@ -17,9 +17,10 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
-  
+  const articleId = article._id || (article as API.Article & { id?: string }).id;
+
   return (
-    <Link to={`/article/${article._id}`} className="no-underline">
+    <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline">
       <Card
         hoverable
         className="card-hover overflow-hidden"
@@ -143,7 +144,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
               <ShareButton
                 title={article.title}
                 summary={article.summary || ''}
-                url={`https://www.xiaodingyang.art/article/${article._id}`}
+                url={articleId ? `https://www.xiaodingyang.art/#/article/${articleId}` : undefined}
                 cover={article.cover}
                 mode="icon"
               />

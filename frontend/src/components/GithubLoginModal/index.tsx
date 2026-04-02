@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { getOAuthReturnPath } from '@/utils/runtimePath';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -21,7 +22,7 @@ const GithubLoginModal: React.FC = () => {
   const theme = getColorThemeById(themeId);
 
   const handleGithubLogin = () => {
-    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    const returnUrl = encodeURIComponent(getOAuthReturnPath());
     window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
   };
 

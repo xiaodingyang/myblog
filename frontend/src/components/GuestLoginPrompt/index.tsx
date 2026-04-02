@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { CloseOutlined, GithubOutlined, CommentOutlined, HeartOutlined, StarOutlined, TrophyOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { getOAuthReturnPath } from '@/utils/runtimePath';
 
 const STORAGE_KEY = 'guest_login_prompt_dismissed_until';
 
@@ -50,7 +51,7 @@ const GuestLoginPrompt: React.FC = () => {
   };
 
   const openLogin = () => {
-    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    const returnUrl = encodeURIComponent(getOAuthReturnPath());
     window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
   };
 

@@ -482,7 +482,11 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </Card>
 
-          <ArticleToc items={toc} primaryColor={currentColorTheme.primary} />
+          <ArticleToc
+            items={toc}
+            primaryColor={currentColorTheme.primary}
+            gradient={currentColorTheme.gradient}
+          />
           </div>
 
           {/* 评论区 */}

@@ -7,7 +7,9 @@ import {
   FAB_BACKTOP_BOTTOM_PX,
 } from '@/components/floatingActionsConstants';
 
-const BackToTop: React.FC = () => {
+const FAB_RADIUS_PX = 12;
+
+const BackToTop: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
   const rafRef = useRef(0);
@@ -54,13 +56,17 @@ const BackToTop: React.FC = () => {
       aria-label="回到顶部"
       onClick={scrollToTop}
       style={{
-        position: 'fixed',
-        bottom: FAB_BACKTOP_BOTTOM_PX,
-        right: FAB_RIGHT_PX,
-        zIndex: 99,
+        position: embedded ? 'relative' : 'fixed',
+        ...(embedded
+          ? {}
+          : {
+              bottom: FAB_BACKTOP_BOTTOM_PX,
+              right: FAB_RIGHT_PX,
+              zIndex: 99,
+            }),
         width: FAB_SIZE_PX,
         height: FAB_SIZE_PX,
-        borderRadius: FAB_SIZE_PX / 2,
+        borderRadius: FAB_RADIUS_PX,
         border: 'none',
         cursor: 'pointer',
         padding: 0,
@@ -68,6 +74,7 @@ const BackToTop: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         lineHeight: 0,
+        flexShrink: 0,
         background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)',
         color: '#fff',
         boxShadow: '0 4px 16px rgba(255, 77, 79, 0.4)',
@@ -77,7 +84,12 @@ const BackToTop: React.FC = () => {
         pointerEvents: visible ? 'auto' : 'none',
       }}
     >
-      <UpOutlined style={{ fontSize: 18, lineHeight: 1, display: 'flex' }} />
+      <span
+        className="inline-flex items-center justify-center"
+        style={{ width: 22, height: 22 }}
+      >
+        <UpOutlined style={{ fontSize: 20, lineHeight: 1 }} />
+      </span>
     </button>
   );
 };

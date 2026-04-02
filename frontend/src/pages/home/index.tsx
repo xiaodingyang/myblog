@@ -124,7 +124,9 @@ const HomePage: React.FC = () => {
       const scrollTop = container.scrollTop;
       const height = getSectionHeight();
       if (height <= 0) return;
-      const index = Math.round(scrollTop / height);
+      const viewH = container.clientHeight;
+      const center = scrollTop + viewH / 2;
+      const index = Math.floor(center / height);
       setCurrentSection(Math.min(Math.max(0, index), sectionCount - 1));
     };
 
@@ -152,41 +154,6 @@ const HomePage: React.FC = () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [loading, getSectionHeight, sectionCount]);
-
-  // 使用可视区域交叉比做兜底同步，避免不同设备下 scrollTop/高度取整误差导致圆点不高亮
-  useEffect(() => {
-    if (loading) return;
-    const container = containerRef.current;
-    if (!container) return;
-    const sectionEls = Array.from(
-      container.querySelectorAll<HTMLElement>('.home-fullscreen-section'),
-    );
-    if (sectionEls.length === 0) return;
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        let bestIndex = -1;
-        let bestRatio = 0;
-        for (const entry of entries) {
-          const index = sectionEls.indexOf(entry.target as HTMLElement);
-          if (index >= 0 && entry.intersectionRatio > bestRatio) {
-            bestRatio = entry.intersectionRatio;
-            bestIndex = index;
-          }
-        }
-        if (bestIndex >= 0) {
-          setCurrentSection(bestIndex);
-        }
-      },
-      {
-        root: container,
-        threshold: [0.25, 0.5, 0.75],
-      },
-    );
-
-    sectionEls.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [loading]);
 
   const scrollToSection = (index: number) => {
     const container = containerRef.current;

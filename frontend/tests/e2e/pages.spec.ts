@@ -25,7 +25,8 @@ test('TC002 - 文章列表页', async ({ appPage }) => {
   await expect(appPage.getByText('文章列表')).toBeVisible({ timeout: 20_000 });
 
   // 等待文章列表或暂无文章出现（最多30s），兼容网络慢的情况
-  const totalText = appPage.locator('text=/共\\s*\\d+\\s*篇文章/');
+  // 仅匹配页眉副标题，避免与分页 showTotal 的「共 N 篇文章」重复导致 strict/解析错乱
+  const totalText = appPage.getByText(/共\s*\d+\s*篇文章，记录技术成长的点滴/);
   const noArticleText = appPage.getByText('暂无文章');
   
   // 优先等待文章列表文字出现
@@ -107,7 +108,8 @@ test('TC006 - 关于页', async ({ appPage }) => {
   await appPage.goto('/about', { waitUntil: 'domcontentloaded' });
 
   await expect(appPage.getByText('肖定阳', { exact: true })).toBeVisible({ timeout: 20_000 });
-  await expect(appPage.getByText(/8年经验/)).toBeVisible({ timeout: 20_000 });
+  // 关于页多处文案含「8年经验」，strict 模式需收敛到单一匹配
+  await expect(appPage.getByText(/8年经验/).first()).toBeVisible({ timeout: 20_000 });
 });
 
 test('TC007 - 留言板页', async ({ appPage }) => {

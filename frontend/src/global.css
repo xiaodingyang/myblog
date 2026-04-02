@@ -71,10 +71,12 @@ body {
   font-size: 1.5em;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 0.3em;
+  scroll-margin-top: 88px;
 }
 
 .markdown-body h3 {
   font-size: 1.25em;
+  scroll-margin-top: 88px;
 }
 
 .markdown-body p {
@@ -119,6 +121,15 @@ body {
   margin: 0;
   background-color: transparent;
   color: #e2e8f0;
+}
+
+/* Prism 代码块：勿让正文 .markdown-body code 的灰底/字号盖住行内 token 颜色 */
+.markdown-body .article-syntax-block code[class*='language-'] {
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
 }
 
 .markdown-body blockquote {

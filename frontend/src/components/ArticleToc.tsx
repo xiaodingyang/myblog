@@ -6,13 +6,27 @@ import type { TocItem } from '@/utils/markdownToc';
 interface ArticleTocProps {
   items: TocItem[];
   primaryColor?: string;
+  /** 主题渐变，用于标题下装饰条 */
+  gradient?: string;
 }
 
 const HEADER_OFFSET = 80;
 
-const ArticleToc: React.FC<ArticleTocProps> = ({ items, primaryColor = '#3b82f6' }) => {
+/** 与文章区 max-w-7xl（80rem）对齐：大屏时贴在内容区右缘内侧 */
+const FIXED_RIGHT_STYLE: React.CSSProperties = {
+  right: 'max(1rem, calc((100vw - 80rem) / 2 + 1.5rem))',
+};
+
+const ArticleToc: React.FC<ArticleTocProps> = ({
+  items,
+  primaryColor = '#3b82f6',
+  gradient,
+}) => {
   const [activeId, setActiveId] = useState<string>('');
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const railColor = 'rgba(255,255,255,0.22)';
+  const activeBg = `${primaryColor}28`;
 
   const scrollToId = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -39,56 +53,110 @@ const ArticleToc: React.FC<ArticleTocProps> = ({ items, primaryColor = '#3b82f6'
       {
         rootMargin: `-${HEADER_OFFSET}px 0px -55% 0px`,
         threshold: [0, 0.25, 0.5, 1],
-      }
+      },
     );
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [items]);
 
-  const list = (
-    <nav aria-label="文章目录" className="text-sm">
-      <div className="font-semibold text-slate-800 mb-3 pb-2 border-b border-slate-200">目录</div>
-      <ul className="list-none m-0 p-0 space-y-0.5 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1">
-        {items.map((item) => (
-          <li key={`${item.level}-${item.id}`}>
-            <button
-              type="button"
-              onClick={() => scrollToId(item.id)}
-              className={`w-full text-left rounded-lg px-3 py-2 transition-all duration-200 border-l-2 text-[13px] leading-snug ${
-                item.level === 3 ? 'pl-5' : item.level >= 4 ? 'pl-7' : 'pl-3'
-              } ${
-                activeId === item.id
-                  ? 'bg-slate-100 font-medium'
-                  : 'hover:bg-slate-50 text-slate-600'
-              }`}
-              style={{
-                borderLeftColor: activeId === item.id ? primaryColor : 'transparent',
-              }}
-            >
-              <span className="line-clamp-2">{item.text}</span>
-            </button>
-          </li>
-        ))}
+  const heading = (
+    <div className="mb-3 px-1">
+      <div className="text-[11px] font-semibold tracking-[0.12em] uppercase text-white/90">
+        本页目录
+      </div>
+      <div
+        className="mt-2 h-0.5 w-9 rounded-full"
+        style={{ background: gradient || primaryColor }}
+      />
+    </div>
+  );
+
+  const linkList = (opts: { inDrawer?: boolean }) => (
+    <nav aria-label="文章目录" className="text-[13px] leading-snug">
+      <ul
+        className="relative m-0 list-none border-l pl-0"
+        style={{
+          borderLeftWidth: 1,
+          borderLeftColor: opts.inDrawer ? `${primaryColor}35` : railColor,
+          maxHeight: opts.inDrawer ? 'calc(100vh - 8rem)' : 'calc(100vh - 10rem)',
+          overflowY: 'auto',
+        }}
+      >
+        {items.map((item) => {
+          const active = activeId === item.id;
+          const indent = item.level === 3 ? 12 : 0;
+          return (
+            <li key={`${item.level}-${item.id}`} className="m-0 p-0">
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => scrollToId(item.id)}
+                className="group w-full border-0 bg-transparent text-left cursor-pointer rounded-r-md transition-[color,background-color] duration-200"
+                style={{
+                  marginLeft: -1,
+                  paddingLeft: 10 + indent,
+                  paddingRight: 8,
+                  paddingTop: 6,
+                  paddingBottom: 6,
+                  borderLeft: active ? `2px solid ${primaryColor}` : '2px solid transparent',
+                  color: active ? primaryColor : 'rgba(255,255,255,0.88)',
+                  fontWeight: active ? 600 : 400,
+                  backgroundColor: active ? activeBg : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span
+                  className="line-clamp-2"
+                  style={{
+                    fontSize: item.level === 3 ? 12 : 13,
+                    color: active ? primaryColor : item.level === 3 ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.92)',
+                  }}
+                >
+                  {item.text}
+                </span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
 
   if (!items.length) return null;
 
+  const panelClass =
+    'rounded-xl border py-3 px-3 backdrop-blur-md shadow-lg border-white/15 bg-slate-900/78';
+
   return (
     <>
-      <aside
-        className="hidden lg:block w-52 shrink-0"
-        style={{ alignSelf: 'flex-start' }}
+      {/* 占位，与固定目录同宽，避免正文铺满全行 */}
+      <div className="hidden lg:block w-56 shrink-0" aria-hidden="true" />
+
+      <div
+        className="article-toc-fixed hidden lg:block w-56"
+        style={{
+          position: 'fixed',
+          top: HEADER_OFFSET,
+          zIndex: 30,
+          ...FIXED_RIGHT_STYLE,
+        }}
       >
         <div
-          className="sticky py-4 px-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm"
-          style={{ top: HEADER_OFFSET }}
+          className={panelClass}
+          style={{
+            boxShadow: `0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px ${primaryColor}18`,
+          }}
         >
-          {list}
+          {heading}
+          {linkList({ inDrawer: false })}
         </div>
-      </aside>
+      </div>
 
       <div className="lg:hidden fixed right-4 bottom-24 z-40">
         <Button
@@ -98,18 +166,29 @@ const ArticleToc: React.FC<ArticleTocProps> = ({ items, primaryColor = '#3b82f6'
           icon={<UnorderedListOutlined />}
           onClick={() => setMobileOpen(true)}
           aria-label="打开目录"
-          style={{ boxShadow: '0 4px 12px rgba(15,23,42,0.2)' }}
+          style={{
+            background: gradient || primaryColor,
+            borderColor: 'transparent',
+            boxShadow: `0 4px 14px ${primaryColor}55`,
+          }}
         />
       </div>
       <Drawer
-        title="目录"
+        title={<span className="text-base font-semibold text-white">本页目录</span>}
         placement="right"
-        width={280}
+        width={300}
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        styles={{ body: { paddingTop: 8 } }}
+        styles={{
+          body: { paddingTop: 8, background: '#0f172a' },
+          header: {
+            background: '#0f172a',
+            borderBottom: `1px solid ${primaryColor}33`,
+            color: '#fff',
+          },
+        }}
       >
-        {list}
+        <div className="-mt-1">{linkList({ inDrawer: true })}</div>
       </Drawer>
     </>
   );

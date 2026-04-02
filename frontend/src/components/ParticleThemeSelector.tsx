@@ -12,9 +12,14 @@ import {
 
 interface ParticleThemeSelectorProps {
   isDark?: boolean;
+  /** 置于 FrontLayout 悬浮列内时去掉 fixed，与置顶/快捷键共线 */
+  embedded?: boolean;
 }
 
-const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = false }) => {
+const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
+  isDark = false,
+  embedded,
+}) => {
   const [open, setOpen] = useState(false);
   const { themeId, changeTheme } = useModel('particleModel');
   const { themeId: colorThemeId, changeTheme: changeColorTheme } = useModel('colorModel');
@@ -28,10 +33,13 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed z-50 rounded-xl transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 group"
+          className={`rounded-xl transition-transform duration-300 hover:scale-105 group ${
+            embedded ? '' : 'fixed z-50'
+          }`}
           style={{
-            right: FAB_RIGHT_PX,
-            bottom: FAB_THEME_BOTTOM_PX,
+            ...(embedded
+              ? { position: 'relative' }
+              : { right: FAB_RIGHT_PX, bottom: FAB_THEME_BOTTOM_PX }),
             width: FAB_SIZE_PX,
             height: FAB_SIZE_PX,
             padding: 0,
@@ -39,6 +47,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
             alignItems: 'center',
             justifyContent: 'center',
             lineHeight: 0,
+            flexShrink: 0,
             background: 'rgba(255, 255, 255, 0.7)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
@@ -48,7 +57,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
           }}
         >
           <span
-            className="transition-transform duration-300 group-hover:rotate-12 inline-flex items-center justify-center shrink-0"
+            className="transition-transform duration-300 group-hover:rotate-12 inline-flex items-center justify-center shrink-0 overflow-hidden"
             style={{
               width: 22,
               height: 22,

@@ -3,6 +3,7 @@ import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { getRouterPathname } from '@/utils/runtimePath';
 
 dayjs.locale('zh-cn');
 
@@ -57,7 +58,7 @@ export const request = {
                 const { status, data } = error.response;
 
                 if (status === 401) {
-                    const p = window.location.pathname || '';
+                    const p = getRouterPathname();
                     if (
                         p.startsWith('/admin') &&
                         !p.includes('/admin/login') &&
@@ -89,7 +90,7 @@ export const request = {
             const adminToken = localStorage.getItem('token');
             const ghToken = localStorage.getItem('github_token');
             const isAdmin =
-                typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+                typeof window !== 'undefined' && getRouterPathname().startsWith('/admin');
             const bearer = isAdmin ? adminToken : ghToken || adminToken;
             if (bearer) {
                 config.headers = {

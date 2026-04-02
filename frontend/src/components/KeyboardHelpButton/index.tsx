@@ -8,7 +8,7 @@ import {
   FAB_KEYBOARD_BOTTOM_PX,
 } from '@/components/floatingActionsConstants';
 
-const KeyboardHelpButton: React.FC = () => {
+const KeyboardHelpButton: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -18,10 +18,11 @@ const KeyboardHelpButton: React.FC = () => {
           type="button"
           aria-label="键盘快捷键"
           onClick={() => setVisible(true)}
-          className="fixed z-40 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
+          className={`rounded-xl shadow-lg transition-transform duration-300 hover:scale-105 ${embedded ? '' : 'fixed z-40'}`}
           style={{
-            right: FAB_RIGHT_PX,
-            bottom: FAB_KEYBOARD_BOTTOM_PX,
+            ...(embedded
+              ? { position: 'relative' }
+              : { right: FAB_RIGHT_PX, bottom: FAB_KEYBOARD_BOTTOM_PX }),
             width: FAB_SIZE_PX,
             height: FAB_SIZE_PX,
             padding: 0,
@@ -29,12 +30,15 @@ const KeyboardHelpButton: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
             lineHeight: 0,
+            flexShrink: 0,
             background: 'rgba(255, 255, 255, 0.9)',
             border: '1px solid #e0e0e0',
             cursor: 'pointer',
           }}
         >
-          <KeyOutlined style={{ fontSize: 20, lineHeight: 1, display: 'flex' }} />
+          <span className="inline-flex items-center justify-center" style={{ width: 22, height: 22 }}>
+            <KeyOutlined style={{ fontSize: 20, lineHeight: 1 }} />
+          </span>
         </button>
       </Tooltip>
       <KeyboardShortcutsHelpModal visible={visible} onClose={() => setVisible(false)} />

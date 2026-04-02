@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Outlet, Link, useLocation, history } from 'umi';
+import {
+  FAB_RIGHT_PX,
+  FAB_KEYBOARD_BOTTOM_PX,
+  FAB_GAP_PX,
+} from '@/components/floatingActionsConstants';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
@@ -254,9 +259,20 @@ const FrontLayout: React.FC = () => {
         {showParticles && (
           <Suspense fallback={null}>
             <LazyParticlesBackground isDark={isDarkTheme} />
-            <LazyParticleThemeSelector isDark={isDarkTheme} />
           </Suspense>
         )}
+
+        {/* 右侧悬浮按钮：单容器竖向排列，保证同一条垂直线与间距一致 */}
+        <div
+          className="fixed z-[60] flex flex-col items-center"
+          style={{ right: FAB_RIGHT_PX, bottom: FAB_KEYBOARD_BOTTOM_PX, gap: FAB_GAP_PX }}
+        >
+          <BackToTop embedded />
+          <Suspense fallback={null}>
+            <LazyParticleThemeSelector isDark={isDarkTheme} embedded />
+          </Suspense>
+          <KeyboardHelpButton embedded />
+        </div>
 
         {/* 头部导航 */}
         <ReadingProgressBar />
@@ -365,7 +381,7 @@ const FrontLayout: React.FC = () => {
                 onPressEnter={(e) => {
                   const value = (e.target as HTMLInputElement).value;
                   if (value) {
-                    window.location.href = `/articles?keyword=${encodeURIComponent(value)}`;
+                    history.push(`/articles?keyword=${encodeURIComponent(value)}`);
                   }
                 }}
               />
@@ -382,7 +398,7 @@ const FrontLayout: React.FC = () => {
               onClick={() => {
                 const keyword = prompt('请输入搜索关键词');
                 if (keyword) {
-                  window.location.href = `/articles?keyword=${encodeURIComponent(keyword)}`;
+                  history.push(`/articles?keyword=${encodeURIComponent(keyword)}`);
                 }
               }}
             >
@@ -462,7 +478,7 @@ const FrontLayout: React.FC = () => {
                   const value = (e.target as HTMLInputElement).value;
                   if (value) {
                     setMobileMenuOpen(false);
-                    window.location.href = `/articles?keyword=${encodeURIComponent(value)}`;
+                    history.push(`/articles?keyword=${encodeURIComponent(value)}`);
                   }
                 }}
               />
@@ -612,8 +628,6 @@ const FrontLayout: React.FC = () => {
         )}
         <GithubLoginModal />
         <GuestLoginPrompt />
-        <BackToTop />
-        <KeyboardHelpButton />
         <KeyboardShortcutsHelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
       </Layout>
     </ConfigProvider>
