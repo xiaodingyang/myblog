@@ -489,6 +489,8 @@ const ArticleDetailPage: React.FC = () => {
           />
           </div>
 
+          {/* 评论区 + 相关推荐：lg 下为 fixed 目录预留与上方 flex（w-56 + gap-8）同宽的右侧空间，避免白底卡片盖住目录 */}
+          <div className="lg:pr-[calc(14rem+2rem)]">
           {/* 评论区 */}
           <Card
             className="mt-8"
@@ -652,6 +654,7 @@ const ArticleDetailPage: React.FC = () => {
 
           {/* Related articles */}
           <RelatedArticles categoryId={article.category?._id} excludeId={article._id} />
+          </div>
 
         </div>
       </section>

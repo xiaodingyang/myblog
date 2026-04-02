@@ -143,7 +143,8 @@ const ArticleToc: React.FC<ArticleTocProps> = ({
         style={{
           position: 'fixed',
           top: HEADER_OFFSET,
-          zIndex: 30,
+          /* 高于正文 Card / List 等层叠，且低于顶栏 z-50 */
+          zIndex: 45,
           ...FIXED_RIGHT_STYLE,
         }}
       >

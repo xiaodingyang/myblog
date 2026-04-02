@@ -7,26 +7,6 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { message } from 'antd';
 import type { TocItem } from '@/utils/markdownToc';
 
-/** 常见语言别名 → refractor 注册名，避免高亮退化成纯文本 */
-const PRISM_LANG_ALIASES: Record<string, string> = {
-  js: 'javascript',
-  jsx: 'jsx',
-  ts: 'typescript',
-  tsx: 'tsx',
-  sh: 'bash',
-  shell: 'bash',
-  zsh: 'bash',
-  yml: 'yaml',
-  md: 'markdown',
-  rs: 'rust',
-  py: 'python',
-};
-
-function normalizePrismLanguage(lang: string): string {
-  const key = lang.trim().toLowerCase();
-  return PRISM_LANG_ALIASES[key] || key;
-}
-
 const CodeBlockWithCopy: React.FC<{
   language: string;
   code: string;
@@ -44,10 +24,8 @@ const CodeBlockWithCopy: React.FC<{
     }
   }, [code]);
 
-  const lang = normalizePrismLanguage(language || 'text');
-
   return (
-    <div className="article-syntax-block relative group/code my-4 rounded-lg overflow-hidden">
+    <div className="relative group/code my-4 rounded-lg overflow-hidden">
       <button
         type="button"
         onClick={handleCopy}
@@ -57,9 +35,8 @@ const CodeBlockWithCopy: React.FC<{
       </button>
       <SyntaxHighlighter
         style={vscDarkPlus}
-        language={lang}
+        language={language}
         PreTag="div"
-        useInlineStyles
         customStyle={{
           margin: 0,
           borderRadius: '8px',
@@ -90,8 +67,6 @@ const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({ content, toc 
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
-        // 避免外层 <pre> 套在 Prism 外，触发 .markdown-body pre code 覆盖行内高亮色
-        pre: ({ children }) => <>{children}</>,
         img: ({ src, alt, ...props }) => (
           <img
             src={src}
@@ -127,7 +102,7 @@ const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({ content, toc 
           return <h3 {...props}>{children}</h3>;
         },
         code({ className, children, ...props }) {
-          const match = /language-([\w-]+)/.exec(className || '');
+          const match = /language-(\w+)/.exec(className || '');
           const isInline = !match && !className;
           const raw = String(children).replace(/\n$/, '');
           if (!isInline) {

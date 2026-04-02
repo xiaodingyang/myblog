@@ -123,15 +123,6 @@ body {
   color: #e2e8f0;
 }
 
-/* Prism 代码块：勿让正文 .markdown-body code 的灰底/字号盖住行内 token 颜色 */
-.markdown-body .article-syntax-block code[class*='language-'] {
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: transparent !important;
-  border-radius: 0 !important;
-  font-size: inherit !important;
-}
-
 .markdown-body blockquote {
   margin: 0 0 16px;
   padding: 0 1em;
