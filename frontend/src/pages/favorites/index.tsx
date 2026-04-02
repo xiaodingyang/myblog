@@ -68,11 +68,11 @@ const FavoritesPage: React.FC = () => {
     <div className="animate-fade-in py-8 md:py-12 px-4 md:px-6 max-w-6xl mx-auto">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <div>
-          <Title level={2} className="!mb-2 flex items-center gap-2">
+          <Title level={2} className="!mb-2 !text-white flex items-center gap-2" style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}>
             <HeartOutlined style={{ color: '#ff4d4f' }} />
             我的收藏
           </Title>
-          <Text type="secondary">登录后收藏的文章会显示在这里</Text>
+          <Text className="!text-white/75" style={{ textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)' }}>登录后收藏的文章会显示在这里</Text>
         </div>
         <Space>
           <Button icon={<ReadOutlined />} onClick={() => history.push('/articles')}>
