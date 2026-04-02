@@ -59,7 +59,7 @@ const CopyPageUrlButton: React.FC<CopyPageUrlButtonProps> = ({ className }) => {
       }}
     >
       {copied ? <CheckOutlined /> : <LinkOutlined />}
-      {copied ? '已复制 ✓' : '复制链接'}
+      {copied ? '已复制' : '复制链接'}
     </button>
   );
 };
