@@ -15,10 +15,10 @@ const KeyboardHelpButton: React.FC = () => {
           icon={<KeyOutlined />}
           size="large"
           onClick={() => setVisible(true)}
-          className="fixed bottom-6 right-6 z-50 shadow-lg"
+          className="fixed bottom-6 right-6 z-40 shadow-lg"
           style={{
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             background: 'rgba(255, 255, 255, 0.9)',
             border: '1px solid #e0e0e0',
           }}

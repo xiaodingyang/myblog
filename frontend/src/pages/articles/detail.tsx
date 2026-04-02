@@ -509,15 +509,17 @@ const ArticleDetailPage: React.FC = () => {
                     style={{ flexShrink: 0 }}
                   />
                   <div className="flex-1">
-                    <TextArea
-                      value={commentContent}
-                      onChange={(e) => setCommentContent(e.target.value)}
-                      placeholder="写下你的评论..."
-                      rows={3}
-                      showCount
-                      maxLength={500}
-                    />
-                    <div className="flex items-center justify-between mt-3">
+                    <div style={{ marginBottom: 8 }}>
+                      <TextArea
+                        value={commentContent}
+                        onChange={(e) => setCommentContent(e.target.value)}
+                        placeholder="写下你的评论..."
+                        rows={3}
+                        showCount
+                        maxLength={500}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
                       <Text type="secondary" className="text-sm">
                         以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份评论
                       </Text>

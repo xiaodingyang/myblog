@@ -32,7 +32,7 @@ const BackToTop: React.FC = () => {
       onClick={scrollToTop}
       style={{
         position: 'fixed',
-        bottom: 80,
+        bottom: 90,
         right: 24,
         zIndex: 99,
         width: 44,
