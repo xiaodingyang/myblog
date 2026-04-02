@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'umi';
+import { Link, history } from 'umi';
 import { Typography, Row, Col, Card, Statistic, List, Tag, Space, Avatar } from 'antd';
 import {
   FileTextOutlined,
@@ -130,7 +130,7 @@ const DashboardPage: React.FC = () => {
           <Col xs={12} sm={8} lg={6} xl={6} key={item.title}>
             <Card
               hoverable={!!item.link}
-              onClick={() => item.link && (window.location.href = item.link)}
+              onClick={() => item.link && history.push(item.link)}
               className="h-full"
               style={{
                 borderRadius: 12,
