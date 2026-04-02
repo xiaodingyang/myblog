@@ -66,6 +66,29 @@ const AboutPage: React.FC = () => {
   return (
     <div className="animate-fade-in py-8">
       <div className="max-w-4xl mx-auto px-6">
+        {/* 页面标题 */}
+        <div className="text-center mb-12">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ background: currentColorTheme.gradient }}
+          >
+            <UserOutlined className="text-3xl text-white" />
+          </div>
+          <Title
+            level={1}
+            className="!mb-3 !text-white"
+            style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}
+          >
+            关于我
+          </Title>
+          <Text
+            className="!text-white/85 text-lg"
+            style={{ textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)' }}
+          >
+            前端开发工程师 · 8年经验
+          </Text>
+        </div>
+
         {/* 内容区域 - 白色背景，覆盖粒子 */}
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10">
           {/* 个人介绍卡片 */}

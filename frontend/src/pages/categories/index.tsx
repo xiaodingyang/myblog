@@ -5,7 +5,6 @@ import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Row, Col, Card, Tag } from 'antd';
 import { FolderOutlined, FileTextOutlined } from '@ant-design/icons';
 import { request } from 'umi';
-import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import useSEO from '@/hooks/useSEO';
 
@@ -39,9 +38,25 @@ const CategoriesPage: React.FC = () => {
     fetchCategories();
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
+  // 骨架屏
+  const CategoriesSkeleton = () => (
+    <Row gutter={[24, 24]}>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <Col xs={24} sm={12} lg={8} key={i}>
+          <div className="p-5 rounded-2xl border border-gray-100" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-6 w-24 rounded bg-gray-200 animate-pulse" />
+                <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
+                <div className="h-5 w-16 rounded-full bg-gray-100 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  );
 
   return (
     <div className="animate-fade-in py-8">
@@ -75,7 +90,9 @@ const CategoriesPage: React.FC = () => {
         {/* 内容区域 - 白色背景，覆盖粒子 */}
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10" style={{ minHeight: 300 }}>
         {/* 分类列表 */}
-        {categories.length > 0 ? (
+        {loading ? (
+          <CategoriesSkeleton />
+        ) : categories.length > 0 ? (
           <Row gutter={[24, 24]}>
             {categories.map((category, index) => (
               <Col xs={24} sm={12} lg={8} key={category._id}>

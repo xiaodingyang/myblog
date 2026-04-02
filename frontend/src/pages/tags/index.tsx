@@ -5,7 +5,6 @@ import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Card, Tag } from 'antd';
 import { TagsOutlined } from '@ant-design/icons';
 import { request } from 'umi';
-import Loading from '@/components/Loading';
 import Empty from '@/components/Empty';
 import useSEO from '@/hooks/useSEO';
 
@@ -60,9 +59,20 @@ const TagsPage: React.FC = () => {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  // 骨架屏
+  const TagsSkeleton = () => (
+    <div className="p-6 rounded-2xl border border-gray-100" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+      <div className="flex flex-wrap justify-center gap-4 py-8">
+        {[80, 60, 100, 50, 70, 90, 55, 85, 65, 75, 45, 95].map((w, i) => (
+          <div
+            key={i}
+            className="h-10 rounded-full bg-gray-200 animate-pulse"
+            style={{ width: w, animationDelay: `${i * 0.05}s` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="animate-fade-in py-8">
@@ -99,7 +109,9 @@ const TagsPage: React.FC = () => {
         {/* 内容区域 - 白色背景，覆盖粒子 */}
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10" style={{ minHeight: 300 }}>
         {/* 标签云 */}
-        {tags.length > 0 ? (
+        {loading ? (
+          <TagsSkeleton />
+        ) : tags.length > 0 ? (
           <Card
             style={{
               borderRadius: 16,

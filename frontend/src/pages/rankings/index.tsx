@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Typography, Spin, List, Tag, Space } from 'antd';
-import { TrophyOutlined, CommentOutlined } from '@ant-design/icons';
+import { Avatar, Typography, List, Tag, Space } from 'antd';
+import { TrophyOutlined, CommentOutlined, CrownOutlined } from '@ant-design/icons';
+import { request, useModel } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
+import Empty from '@/components/Empty';
 import useSEO from '@/hooks/useSEO';
 
 const { Title, Text } = Typography;
@@ -23,106 +26,185 @@ const getRankIcon = (rank: number) => {
   return null;
 };
 
-const getRankTag = (rank: number) => {
-  if (rank === 1) return <Tag color="gold" style={{ fontSize: 14 }}>🥇 金冠</Tag>;
-  if (rank === 2) return <Tag color="silver" style={{ fontSize: 14 }}>🥈 银冠</Tag>;
-  if (rank === 3) return <Tag color="#cd7f32" style={{ fontSize: 14 }}>🥉 铜冠</Tag>;
-  return <Tag color="blue">#{rank}</Tag>;
-};
+// 骨架屏
+const RankingSkeleton: React.FC = () => (
+  <div className="space-y-3">
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
+        <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse flex-shrink-0" />
+        <div className="flex-1 space-y-2">
+          <div className="h-5 w-32 rounded bg-gray-200 animate-pulse" />
+          <div className="h-4 w-48 rounded bg-gray-100 animate-pulse" />
+        </div>
+        <div className="h-6 w-16 rounded-full bg-gray-100 animate-pulse flex-shrink-0" />
+      </div>
+    ))}
+  </div>
+);
 
 const Rankings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState<RankUser[]>([]);
+  const { themeId: colorThemeId } = useModel('colorModel');
+  const currentColorTheme = getColorThemeById(colorThemeId);
 
-  useSEO({ title: '🏆 评论活跃榜 - 我的博客' });
+  useSEO({
+    title: '评论活跃榜',
+    description: '若风博客评论活跃排行榜，看看谁是最活跃的读者！',
+    keywords: '排行榜,评论,活跃用户',
+  });
 
   useEffect(() => {
-    fetch('/api/rankings/comments?limit=20')
-      .then(res => res.json())
-      .then(data => {
-        if (data.code === 0) {
-          setList(data.data || []);
+    const fetchRankings = async () => {
+      setLoading(true);
+      try {
+        const res = await request<API.Response<RankUser[]>>('/api/rankings/comments', {
+          params: { limit: 20 },
+        });
+        if (res.code === 0) {
+          setList(res.data || []);
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      } catch (error) {
+        // handled
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRankings();
   }, []);
 
-  if (loading) {
+  const getRankBadge = (rank: number) => {
+    const colors: Record<number, { bg: string; text: string; label: string }> = {
+      1: { bg: 'linear-gradient(135deg, #ffd700, #ffb800)', text: '#7a5a00', label: '金冠' },
+      2: { bg: 'linear-gradient(135deg, #c0c0c0, #a8a8a8)', text: '#555', label: '银冠' },
+      3: { bg: 'linear-gradient(135deg, #cd7f32, #b8722d)', text: '#fff', label: '铜冠' },
+    };
+    if (colors[rank]) {
+      return (
+        <span
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
+          style={{ background: colors[rank].bg, color: colors[rank].text }}
+        >
+          {getRankIcon(rank)} {colors[rank].label}
+        </span>
+      );
+    }
     return (
-      <div style={{ textAlign: 'center', padding: 60 }}>
-        <Spin size="large" />
-      </div>
+      <span
+        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+        style={{
+          background: `${currentColorTheme.primary}15`,
+          color: currentColorTheme.primary,
+        }}
+      >
+        #{rank}
+      </span>
     );
-  }
+  };
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
-      <Card
-        title={
-          <Space>
-            <TrophyOutlined style={{ color: '#faad14' }} />
-            <span>评论活跃榜</span>
-          </Space>
-        }
-        style={{ borderRadius: 12 }}
-      >
-        <List
-          dataSource={list}
-          renderItem={(item) => (
-            <List.Item
-              style={{
-                padding: '12px 8px',
-                background: item.rank <= 3 ? 'rgba(250, 173, 20, 0.08)' : 'transparent',
-                borderRadius: 8,
-                marginBottom: 4,
-              }}
-            >
-              <List.Item.Meta
-                avatar={
-                  <div style={{ position: 'relative', width: 56, textAlign: 'center' }}>
-                    {item.rank <= 3 && (
-                      <div style={{ fontSize: 20, position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)' }}>
-                        {getRankIcon(item.rank)}
-                      </div>
-                    )}
-                    <Avatar
-                      src={item.avatar}
-                      size={item.rank <= 3 ? 52 : 44}
-                      style={{ marginTop: item.rank <= 3 ? 8 : 0 }}
-                    />
-                  </div>
-                }
-                title={
-                  <Space>
-                    <a href={item.htmlUrl || `#/user/${item.username}`} target="_blank" rel="noopener noreferrer">
-                      {item.nickname || item.username}
-                    </a>
-                    {getRankTag(item.rank)}
-                  </Space>
-                }
-                description={
-                  <Space size="large">
-                    <Text type="secondary">
-                      <CommentOutlined /> {item.commentCount} 条评论
-                    </Text>
-                    {item.latestCommentTime && (
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        最近：{new Date(item.latestCommentTime).toLocaleDateString('zh-CN')}
-                      </Text>
-                    )}
-                  </Space>
-                }
-              />
-            </List.Item>
-          )}
-        />
-        {list.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
-            暂无数据，快来抢沙发吧！💪
+    <div className="animate-fade-in py-8">
+      <div className="max-w-3xl mx-auto px-4 md:px-6">
+        {/* 页面标题 */}
+        <div className="text-center mb-12">
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ background: currentColorTheme.gradient }}
+          >
+            <TrophyOutlined className="text-3xl text-white" />
           </div>
-        )}
-      </Card>
+          <Title
+            level={1}
+            className="!mb-3 !text-white"
+            style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}
+          >
+            评论活跃榜
+          </Title>
+          <Text
+            className="!text-white/85 text-lg"
+            style={{ textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)' }}
+          >
+            感谢每一位活跃的读者
+          </Text>
+        </div>
+
+        {/* 内容区域 */}
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10" style={{ minHeight: 300 }}>
+          {loading ? (
+            <RankingSkeleton />
+          ) : list.length === 0 ? (
+            <Empty description="暂无数据，快来抢沙发吧！" />
+          ) : (
+            <div className="space-y-2">
+              {list.map((item) => {
+                const isTop3 = item.rank <= 3;
+                return (
+                  <div
+                    key={item.userId}
+                    className={`flex items-center gap-4 p-4 rounded-xl transition-colors ${
+                      isTop3 ? 'hover:bg-yellow-50/50' : 'hover:bg-gray-50'
+                    }`}
+                    style={
+                      isTop3
+                        ? { background: `${currentColorTheme.primary}06` }
+                        : undefined
+                    }
+                  >
+                    {/* 头像 */}
+                    <div className="relative flex-shrink-0">
+                      {isTop3 && (
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-lg z-10">
+                          {getRankIcon(item.rank)}
+                        </div>
+                      )}
+                      <Avatar
+                        src={item.avatar}
+                        size={isTop3 ? 52 : 44}
+                        className={isTop3 ? 'mt-2' : ''}
+                        style={
+                          isTop3
+                            ? {
+                                border: `2px solid ${currentColorTheme.primary}40`,
+                                boxShadow: `0 4px 12px ${currentColorTheme.primary}20`,
+                              }
+                            : undefined
+                        }
+                      />
+                    </div>
+
+                    {/* 信息 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <a
+                          href={item.htmlUrl || `#/user/${item.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-gray-800 hover:underline truncate"
+                          style={isTop3 ? { color: currentColorTheme.primary } : undefined}
+                        >
+                          {item.nickname || item.username}
+                        </a>
+                        {getRankBadge(item.rank)}
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
+                        <span>
+                          <CommentOutlined className="mr-1" />
+                          {item.commentCount} 条评论
+                        </span>
+                        {item.latestCommentTime && (
+                          <span className="text-xs">
+                            最近：{new Date(item.latestCommentTime).toLocaleDateString('zh-CN')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
