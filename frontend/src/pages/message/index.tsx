@@ -23,7 +23,7 @@ const MessagePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [content, setContent] = useState('');
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchMessages = async (currentPage: number) => {
     setLoading(true);
@@ -43,7 +43,7 @@ const MessagePage: React.FC = () => {
 
   useEffect(() => {
     fetchMessages(page);
-  }, [page]);
+  }, [page, pageSize]);
 
   // Bug Fix #2: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmit = () => {
@@ -80,7 +80,7 @@ const MessagePage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
         <div className="text-center mb-12">
           <div
@@ -257,9 +257,15 @@ const MessagePage: React.FC = () => {
                     current={page}
                     total={total}
                     pageSize={pageSize}
-                    showSizeChanger={false}
-                    onChange={(p) => {
-                      setPage(p);
+                    showSizeChanger
+                    pageSizeOptions={['10', '20', '50']}
+                    onChange={(p, size) => {
+                      if (size !== pageSize) {
+                        setPageSize(size);
+                        setPage(1);
+                      } else {
+                        setPage(p);
+                      }
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                   />
