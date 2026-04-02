@@ -4,6 +4,11 @@ import { SettingOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { particleThemes, getThemeById } from '@/config/particleThemes';
 import { colorThemes, getColorThemeById } from '@/config/colorThemes';
 import { useModel } from 'umi';
+import {
+  FAB_SIZE_PX,
+  FAB_RIGHT_PX,
+  FAB_THEME_BOTTOM_PX,
+} from '@/components/floatingActionsConstants';
 
 interface ParticleThemeSelectorProps {
   isDark?: boolean;
@@ -21,9 +26,19 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
       {/* 悬浮触发按钮 - 毛玻璃风格 */}
       <Tooltip title="主题设置" placement="left">
         <button
+          type="button"
           onClick={() => setOpen(true)}
-          className="fixed right-4 bottom-20 z-50 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 group"
+          className="fixed z-50 rounded-xl transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 group"
           style={{
+            right: FAB_RIGHT_PX,
+            bottom: FAB_THEME_BOTTOM_PX,
+            width: FAB_SIZE_PX,
+            height: FAB_SIZE_PX,
+            padding: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: 0,
             background: 'rgba(255, 255, 255, 0.7)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
@@ -32,9 +47,15 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({ isDark = 
             cursor: 'pointer',
           }}
         >
-          <span 
-            className="text-lg transition-transform duration-300 group-hover:rotate-12"
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+          <span
+            className="transition-transform duration-300 group-hover:rotate-12 inline-flex items-center justify-center shrink-0"
+            style={{
+              width: 22,
+              height: 22,
+              fontSize: 20,
+              lineHeight: 1,
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+            }}
           >
             {currentTheme.icon}
           </span>

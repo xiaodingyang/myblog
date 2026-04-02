@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { Button, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { KeyOutlined } from '@ant-design/icons';
 import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
+import {
+  FAB_SIZE_PX,
+  FAB_RIGHT_PX,
+  FAB_KEYBOARD_BOTTOM_PX,
+} from '@/components/floatingActionsConstants';
 
 const KeyboardHelpButton: React.FC = () => {
   const [visible, setVisible] = useState(false);
@@ -9,20 +14,28 @@ const KeyboardHelpButton: React.FC = () => {
   return (
     <>
       <Tooltip title="键盘快捷键 (?)" placement="left">
-        <Button
-          type="default"
-          shape="circle"
-          icon={<KeyOutlined />}
-          size="large"
+        <button
+          type="button"
+          aria-label="键盘快捷键"
           onClick={() => setVisible(true)}
-          className="fixed bottom-6 right-6 z-40 shadow-lg"
+          className="fixed z-40 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
           style={{
-            width: 40,
-            height: 40,
+            right: FAB_RIGHT_PX,
+            bottom: FAB_KEYBOARD_BOTTOM_PX,
+            width: FAB_SIZE_PX,
+            height: FAB_SIZE_PX,
+            padding: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: 0,
             background: 'rgba(255, 255, 255, 0.9)',
             border: '1px solid #e0e0e0',
+            cursor: 'pointer',
           }}
-        />
+        >
+          <KeyOutlined style={{ fontSize: 20, lineHeight: 1, display: 'flex' }} />
+        </button>
       </Tooltip>
       <KeyboardShortcutsHelpModal visible={visible} onClose={() => setVisible(false)} />
     </>

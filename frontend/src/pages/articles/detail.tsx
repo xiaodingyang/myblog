@@ -149,7 +149,7 @@ const ArticleDetailPage: React.FC = () => {
   // Call view count API (separate effect to avoid re-calling on fetchComments changes)
   useEffect(() => {
     if (id) {
-      request(`/api/articles/${id}/view`, { method: 'POST' }).catch(() => {});
+      request(`/api/articles/${id}/view`).catch(() => {});
     }
   }, [id]);
 

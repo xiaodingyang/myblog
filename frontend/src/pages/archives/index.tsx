@@ -10,7 +10,8 @@ import useSEO from '@/hooks/useSEO';
 const { Title, Text } = Typography;
 
 interface ArticleItem {
-  id: string;
+  id?: string;
+  _id?: string;
   title: string;
   createdAt: string;
   category: string;
@@ -177,10 +178,13 @@ const Archives: React.FC = () => {
                             </span>
                           </div>
                           <div className="space-y-2">
-                            {group.articles.map((article) => (
-                              <Link
-                                key={article.id}
-                                to={`/article/${article.id}`}
+                            {group.articles.map((article) => {
+                              const articleId = article.id || article._id;
+                              if (!articleId) return null;
+                              return (
+                                <Link
+                                key={articleId}
+                                to={`/article/${articleId}`}
                                 className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors group"
                               >
                                 <Text className="text-gray-400 text-xs flex-shrink-0" style={{ minWidth: 48 }}>
@@ -206,8 +210,9 @@ const Archives: React.FC = () => {
                                 >
                                   {article.category}
                                 </Tag>
-                              </Link>
-                            ))}
+                                </Link>
+                              );
+                            })}
                           </div>
                         </div>
                       ),

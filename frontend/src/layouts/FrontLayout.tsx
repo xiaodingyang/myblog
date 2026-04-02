@@ -212,6 +212,7 @@ const FrontLayout: React.FC = () => {
   const getSelectedKey = () => {
     const path = location.pathname;
     if (path === '/') return '/';
+    if (path.startsWith('/article/')) return '/articles';
     const firstPath = '/' + path.split('/')[1];
     return firstPath;
   };

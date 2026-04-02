@@ -83,7 +83,13 @@ const GuestLoginPrompt: React.FC = () => {
             type="button"
             aria-label="关闭"
             onClick={dismiss}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
+            style={{
+              color: theme.primary,
+              background: `${theme.primary}26`,
+              border: `1px solid ${theme.primary}55`,
+              boxShadow: `0 2px 8px ${theme.primary}33`,
+            }}
           >
             <CloseOutlined />
           </button>

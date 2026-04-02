@@ -49,6 +49,7 @@ const HomePage: React.FC = () => {
   const currentColorTheme = getColorThemeById(colorThemeId);
 
   const sections = ['hero', 'featured', 'latest', 'explore', 'cta'];
+  const sectionCount = sections.length;
 
   const heroParticles = useMemo(() =>
     Array.from({ length: 10 }, (_, i) => ({
@@ -104,42 +105,93 @@ const HomePage: React.FC = () => {
     }
   }, [fetchData]);
 
-  // 计算实际 section 高度
-  // Bug Fix #7: 动态获取导航栏高度，不再硬编码 64px
-  // 导航栏高度定义在 FrontLayout.tsx 的 Header style 中 (height: 64)
-  // 使用固定值 64 是安全的，因为导航栏高度本身是固定的 64px
-  // 此处保留注释说明：如果未来导航栏高度变化，需要同步更新此值
-  const NAVBAR_HEIGHT = 64; // 固定导航栏高度，与 FrontLayout.tsx 保持一致
-  const getActualSectionHeight = () => window.innerHeight - NAVBAR_HEIGHT;
+  /** 与 CSS `.home-fullscreen-section` 实际高度一致（含 100dvh），避免 innerHeight 与 dvh 不一致导致圆点错位 */
+  const getSectionHeight = useCallback(() => {
+    const container = containerRef.current;
+    const el = container?.querySelector('.home-fullscreen-section') as HTMLElement | null;
+    if (el && el.offsetHeight > 0) return el.offsetHeight;
+    const NAVBAR_HEIGHT = 64;
+    return window.innerHeight - NAVBAR_HEIGHT;
+  }, []);
 
   useEffect(() => {
+    if (loading) return;
     const container = containerRef.current;
     if (!container) return;
 
     let rafId = 0;
+    const syncFromScroll = () => {
+      const scrollTop = container.scrollTop;
+      const height = getSectionHeight();
+      if (height <= 0) return;
+      const index = Math.round(scrollTop / height);
+      setCurrentSection(Math.min(Math.max(0, index), sectionCount - 1));
+    };
+
     const handleScroll = () => {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
-        const scrollTop = container.scrollTop;
-        const height = getActualSectionHeight();
-        const index = Math.round(scrollTop / height);
-        setCurrentSection(Math.min(index, sections.length - 1));
+        syncFromScroll();
         rafId = 0;
       });
     };
 
+    const ro = new ResizeObserver(() => {
+      syncFromScroll();
+    });
+    ro.observe(container);
+    const firstSection = container.querySelector('.home-fullscreen-section');
+    if (firstSection) ro.observe(firstSection);
+
     container.addEventListener('scroll', handleScroll, { passive: true });
+    syncFromScroll();
+
     return () => {
+      ro.disconnect();
       container.removeEventListener('scroll', handleScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [loading, getSectionHeight, sectionCount]);
 
-  // 滚动到指定区域
+  // 使用可视区域交叉比做兜底同步，避免不同设备下 scrollTop/高度取整误差导致圆点不高亮
+  useEffect(() => {
+    if (loading) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const sectionEls = Array.from(
+      container.querySelectorAll<HTMLElement>('.home-fullscreen-section'),
+    );
+    if (sectionEls.length === 0) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        let bestIndex = -1;
+        let bestRatio = 0;
+        for (const entry of entries) {
+          const index = sectionEls.indexOf(entry.target as HTMLElement);
+          if (index >= 0 && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestIndex = index;
+          }
+        }
+        if (bestIndex >= 0) {
+          setCurrentSection(bestIndex);
+        }
+      },
+      {
+        root: container,
+        threshold: [0.25, 0.5, 0.75],
+      },
+    );
+
+    sectionEls.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [loading]);
+
   const scrollToSection = (index: number) => {
     const container = containerRef.current;
     if (!container) return;
-    const height = getActualSectionHeight();
+    const height = getSectionHeight();
     container.scrollTo({
       top: index * height,
       behavior: 'smooth',
@@ -165,8 +217,6 @@ const HomePage: React.FC = () => {
       <div className="hidden md:flex fixed right-4 lg:right-6 top-1/2 transform -translate-y-1/2 z-50 flex-col gap-3">
         {sections.map((_, index) => {
           const isActive = currentSection === index;
-          // 根据当前屏幕决定颜色（深色屏用白色，浅色屏用深色）
-          const isDarkSection = currentSection === 0 || currentSection === 4;
           return (
             <button
               key={index}
@@ -181,12 +231,10 @@ const HomePage: React.FC = () => {
                 transition: 'all 0.3s ease',
                 transform: isActive ? 'scale(1.3)' : 'scale(1)',
                 background: isActive
-                  ? isDarkSection ? '#fff' : '#1f2937'
-                  : isDarkSection ? 'rgba(255,255,255,0.3)' : 'rgba(107,114,128,0.5)',
+                  ? currentColorTheme.primary
+                  : `${currentColorTheme.primary}55`,
                 boxShadow: isActive
-                  ? isDarkSection
-                    ? '0 0 12px rgba(255,255,255,0.6)'
-                    : '0 0 12px rgba(0,0,0,0.3)'
+                  ? `0 0 12px ${currentColorTheme.primary}99`
                   : 'none',
               }}
             />
