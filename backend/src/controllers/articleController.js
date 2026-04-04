@@ -74,7 +74,7 @@ exports.getArticles = async (req, res, next) => {
       oldest: { createdAt: 1 },        // 最旧优先
       hottest: { views: -1, createdAt: -1 }, // 热门优先（浏览量降序，相同时按时间）
     };
-    const sortOrder = sortOptions[sort as keyof typeof sortOptions] || sortOptions.latest;
+    const sortOrder = sortOptions[sort] || sortOptions.latest;
 
     // 分页查询
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
