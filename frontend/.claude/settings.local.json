@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd C:/Users/34662/Desktop/work/myblog/frontend/node_modules/.pnpm/@xdy-npm+react-particle-bac*/node_modules/@xdy-npm/react-particle-backgrounds)",
+      "Bash(cat node_modules/.pnpm/@xdy-npm+react-particle-bac*/node_modules/@xdy-npm/react-particle-backgrounds/package.json)"
+    ]
+  }
+}

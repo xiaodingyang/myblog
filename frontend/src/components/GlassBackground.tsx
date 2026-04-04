@@ -42,8 +42,9 @@ const GlassBackground: React.FC<GlassBackgroundProps> = ({ isDark = true }) => {
     <div
       className="fixed inset-0 pointer-events-none"
       style={{
-        zIndex: 0,
+        zIndex: -1,
         transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+        opacity: 0,
       }}
     >
       {/* 基础背景层 - 主题色衍生的柔和渐变 */}

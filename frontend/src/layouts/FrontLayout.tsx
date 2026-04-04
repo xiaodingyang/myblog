@@ -253,7 +253,7 @@ const FrontLayout: React.FC = () => {
         } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string }}
       >
         {/* 毛玻璃背景层 - 先渲染，作为底层背景 */}
-        <GlassBackground isDark={isDarkTheme} />
+        {/* <GlassBackground isDark={isDarkTheme} /> */}
 
         {/* 粒子背景 - 延迟加载，首屏渲染完成后再加载 Three.js (~973KB) */}
         {showParticles && (

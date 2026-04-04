@@ -214,31 +214,32 @@ const HomePage: React.FC = () => {
       >
         {/* 动态背景 - 动态渐变 + 毛玻璃覆盖 */}
         <div className="absolute inset-0">
-          {/* 动态渐变背景 */}
+          {/* 动态渐变背景 - 完全透明，让粒子特效完全显示 */}
           <div
             className="absolute inset-0 hero-gradient-bg"
             style={{
               background: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e, #0f0c29)',
               backgroundSize: '300% 300%',
               animation: 'heroGradientShift 8s ease infinite',
+              opacity: 0,
             }}
           />
-          {/* 毛玻璃覆盖层 */}
+          {/* 毛玻璃覆盖层 - 移除以显示粒子特效 */}
           <div
             className="absolute inset-0"
             style={{
-              backdropFilter: 'blur(2px)',
-              background: 'rgba(0, 0, 0, 0.15)',
+              backdropFilter: 'blur(0px)',
+              background: 'rgba(0, 0, 0, 0)',
             }}
           />
-          {/* 渐变光晕 */}
+          {/* 渐变光晕 - 移除以显示粒子特效 */}
           <div
-            className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-30 blur-3xl"
-            style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
+            className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-0 blur-3xl"
+            style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }}
           />
           <div
-            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
-            style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }} // 主题色光晕
+            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-0 blur-3xl"
+            style={{ background: `radial-gradient(circle, ${currentColorTheme.primary} 0%, transparent 70%)` }}
           />
           {/* 浮动粒子 */}
           {heroParticles.map((p) => (
