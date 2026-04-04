@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { Link } from 'umi';
+import { Link, request } from 'umi';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -16,6 +16,8 @@ import {
   CodeOutlined,
   BookOutlined,
 } from '@ant-design/icons';
+import DailyQuote from '@/components/DailyQuote';
+import ReadingHistory from '@/components/ReadingHistory';
 import useSEO from '@/hooks/useSEO';
 
 // 轻量日期格式化
@@ -26,11 +28,8 @@ const formatDate = (date: string) => {
 
 const { Title, Paragraph, Text } = Typography;
 
-// 动态获取 request
-const getRequest = () => {
-  // @ts-ignore
-  return require('umi').request;
-};
+// request 从 umi 的 useRequest hook 获取（通过组件内调用保证类型安全）
+// 注意：此组件内部通过 request from 'umi' 调用 API
 
 const HomePage: React.FC = () => {
   useSEO({
@@ -74,7 +73,6 @@ const HomePage: React.FC = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const request = getRequest();
       const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
         request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
           params: { page: 1, pageSize: 6 },
@@ -214,15 +212,23 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex items-center justify-center overflow-hidden"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        {/* 动态背景 */}
+        {/* 动态背景 - 动态渐变 + 毛玻璃覆盖 */}
         <div className="absolute inset-0">
-          {/* 网格背景 */}
+          {/* 动态渐变背景 */}
           <div
-            className="absolute inset-0 opacity-5"
+            className="absolute inset-0 hero-gradient-bg"
             style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                               linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-              backgroundSize: '50px 50px',
+              background: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e, #0f0c29)',
+              backgroundSize: '300% 300%',
+              animation: 'heroGradientShift 8s ease infinite',
+            }}
+          />
+          {/* 毛玻璃覆盖层 */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backdropFilter: 'blur(2px)',
+              background: 'rgba(0, 0, 0, 0.15)',
             }}
           />
           {/* 渐变光晕 */}
@@ -301,8 +307,9 @@ const HomePage: React.FC = () => {
             </h1>
 
             <Paragraph className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              在这里分享编程技术、学习心得与项目经验。
-              <br className="hidden md:block" />每一行代码都是通往未来的阶梯。
+              <span className="typewriter-text">
+                热爱编程 ✨ 分享技术 🚀 记录成长
+              </span>
             </Paragraph>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5">
@@ -430,7 +437,7 @@ const HomePage: React.FC = () => {
         <div
           onClick={() => scrollToSection(1)}
           className="absolute bottom-3 md:bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
-          style={{ animation: 'bounce 2s infinite' }}
+          style={{ animation: 'modernBounce 2s ease-in-out infinite' }}
         >
           <div className="flex flex-col items-center gap-1 md:gap-2">
             <span
@@ -577,6 +584,11 @@ const HomePage: React.FC = () => {
           ) : (
             <div className="text-center text-gray-400">暂无文章</div>
           )}
+
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DailyQuote />
+            <ReadingHistory />
+          </div>
 
           <div className="text-center mt-10">
             <Link to="/articles">

@@ -42,7 +42,7 @@ function articlePublicFields(article) {
  */
 exports.getArticles = async (req, res, next) => {
   try {
-    const { page = 1, pageSize = 10, keyword, category, tag } = req.query;
+    const { page = 1, pageSize = 10, keyword, category, tag, sort = 'latest' } = req.query;
 
     // 构建查询条件
     const query = { status: 'published' };
@@ -68,6 +68,14 @@ exports.getArticles = async (req, res, next) => {
       return res.json(cacheStore.data);
     }
 
+    // 排序规则
+    const sortOptions = {
+      latest: { createdAt: -1 },       // 最新优先
+      oldest: { createdAt: 1 },        // 最旧优先
+      hottest: { views: -1, createdAt: -1 }, // 热门优先（浏览量降序，相同时按时间）
+    };
+    const sortOrder = sortOptions[sort as keyof typeof sortOptions] || sortOptions.latest;
+
     // 分页查询
     const skip = (parseInt(page) - 1) * parseInt(pageSize);
     const [articles, total] = await Promise.all([
@@ -76,7 +84,7 @@ exports.getArticles = async (req, res, next) => {
         .populate('category', 'name')
         .populate('tags', 'name')
         .populate('author', 'username avatar')
-        .sort({ createdAt: -1 })
+        .sort(sortOrder)
         .skip(skip)
         .limit(parseInt(pageSize))
         .lean(),

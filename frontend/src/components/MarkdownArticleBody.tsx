@@ -1,11 +1,23 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { message } from 'antd';
 import type { TocItem } from '@/utils/markdownToc';
+// @ts-ignore - SyntaxHighlighter types are incomplete
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// @ts-ignore
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+// 预加载代码高亮样式（vscDarkPlus 体积较大，闲置时预加载可改善首次渲染体验）
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+  const preload = () => import('react-syntax-highlighter/dist/esm/styles/prism');
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => preload(), { timeout: 3000 });
+  } else {
+    setTimeout(() => preload(), 2000);
+  }
+}
 
 const CodeBlockWithCopy: React.FC<{
   language: string;

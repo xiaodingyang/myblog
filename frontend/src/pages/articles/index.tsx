@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'umi';
 import { Typography, Row, Col, Input, Select, Space, Pagination, Tag, Card } from 'antd';
-import { SearchOutlined, FilterOutlined, FolderOutlined, TagsOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterOutlined, FolderOutlined, TagsOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import ArticleCard from '@/components/ArticleCard';
 import Empty from '@/components/Empty';
@@ -31,6 +31,7 @@ const ArticlesPage: React.FC = () => {
   const keyword = searchParams.get('keyword') || '';
   const categoryId = searchParams.get('category') || '';
   const tagId = searchParams.get('tag') || '';
+  const sort = searchParams.get('sort') || 'latest';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +45,7 @@ const ArticlesPage: React.FC = () => {
               keyword: keyword || undefined,
               category: categoryId || undefined,
               tag: tagId || undefined,
+              sort,
             },
           }),
           request<API.Response<API.Category[]>>('/api/categories'),
@@ -63,7 +65,7 @@ const ArticlesPage: React.FC = () => {
     };
 
     fetchData();
-  }, [page, keyword, categoryId, tagId]);
+  }, [page, keyword, categoryId, tagId, sort]);
 
   const updateParams = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -163,6 +165,19 @@ const ArticlesPage: React.FC = () => {
                     {tag.name}
                   </Option>
                 ))}
+              </Select>
+            </Col>
+            <Col xs={12} md={4}>
+              <Select
+                value={sort}
+                onChange={(value) => updateParams('sort', value)}
+                size="large"
+                className="w-full"
+                suffixIcon={<SortAscendingOutlined />}
+              >
+                <Option value="latest">最新优先</Option>
+                <Option value="oldest">最旧优先</Option>
+                <Option value="hottest">热门优先</Option>
               </Select>
             </Col>
             <Col xs={24} md={4}>

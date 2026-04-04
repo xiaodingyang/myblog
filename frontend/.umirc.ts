@@ -92,6 +92,7 @@ export default defineConfig({
       routes: [
         { path: '/', component: '@/pages/home/index' },
         { path: '/articles', component: '@/pages/articles/index' },
+        { path: '/tools', component: '@/pages/tools' },
         { path: '/article/:id', component: '@/pages/articles/detail' },
         { path: '/archives', component: '@/pages/archives/index' },
         { path: '/categories', component: '@/pages/categories/index' },

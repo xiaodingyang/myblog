@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'umi';
 import { Card, Tag, Space, Typography, Avatar } from 'antd';
-import { EyeOutlined, ClockCircleOutlined, FolderOutlined, UserOutlined } from '@ant-design/icons';
+import { EyeOutlined, ClockCircleOutlined, FolderOutlined, UserOutlined, FireOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import ShareButton from '@/components/ShareButton';
@@ -14,10 +14,26 @@ interface ArticleCardProps {
   style?: React.CSSProperties;
 }
 
+// 判断文章是否为"新"（7天内发布）
+const isNewArticle = (createdAt: string): boolean => {
+  const publishDate = dayjs(createdAt);
+  const now = dayjs();
+  return now.diff(publishDate, 'day') <= 7;
+};
+
+// 判断文章是否为"热门"（浏览量超过 1000）
+const isHotArticle = (views?: number): boolean => {
+  return (views || 0) >= 1000;
+};
+
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const articleId = article._id || (article as API.Article & { id?: string }).id;
+
+  // 计算文章状态
+  const isNew = useMemo(() => isNewArticle(article.createdAt), [article.createdAt]);
+  const isHot = useMemo(() => isHotArticle(article.views), [article.views]);
 
   return (
     <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline">
@@ -25,9 +41,13 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
         hoverable
         className="card-hover overflow-hidden"
         style={{ 
-          borderRadius: 16,
-          border: 'none',
+          borderRadius: 12,
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          background: 'rgba(255, 255, 255, 0.15)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           ...style,
         }}
         cover={
@@ -41,10 +61,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              {/* 左下角：分类标签 */}
               <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4">
-                <Tag 
+                <Tag
                   className="!border-none !text-white !px-2 md:!px-3 !py-0.5 md:!py-1 !rounded-lg !text-xs md:!text-sm"
-                  style={{ 
+                  style={{
                     background: 'rgba(255, 255, 255, 0.2)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)',
@@ -55,6 +76,36 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
                   {article.category?.name || '未分类'}
                 </Tag>
               </div>
+              {/* 右上角：新/热门标签 */}
+              {(isNew || isHot) && (
+                <div className="absolute top-3 md:top-4 right-3 md:right-4 flex gap-2">
+                  {isHot && (
+                    <Tag
+                      className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
+                      style={{
+                        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                        color: '#fff',
+                        boxShadow: '0 2px 8px rgba(255, 107, 107, 0.4)',
+                      }}
+                    >
+                      <FireOutlined className="mr-1" />
+                      热门
+                    </Tag>
+                  )}
+                  {isNew && (
+                    <Tag
+                      className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: '#fff',
+                        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.4)',
+                      }}
+                    >
+                      新
+                    </Tag>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div 

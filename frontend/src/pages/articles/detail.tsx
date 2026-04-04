@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
@@ -15,6 +15,7 @@ import {
   HeartFilled,
   StarOutlined,
   StarFilled,
+  CommentOutlined,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import dayjs from 'dayjs';
@@ -26,6 +27,8 @@ import MarkdownArticleBody from '@/components/MarkdownArticleBody';
 import ArticleReactions from '@/components/ArticleReactions';
 import RelatedArticles from '@/components/RelatedArticles';
 import ArticleDetailSkeleton from '@/components/Skeleton/ArticleDetailSkeleton';
+import Breadcrumb from '@/components/Breadcrumb';
+import { addReadingHistory } from '@/components/ReadingHistory';
 import useSEO from '@/hooks/useSEO';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
@@ -55,7 +58,9 @@ const ArticleDetailPage: React.FC = () => {
   const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
   const [articleLikeLoading, setArticleLikeLoading] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [showCommentButton, setShowCommentButton] = useState(false);
   const commentPageSize = 10;
+  const commentsRef = useRef<HTMLDivElement>(null);
 
   const toc = useMemo(
     () => (article ? extractTocFromMarkdown(article.content) : []),
@@ -130,6 +135,13 @@ const ArticleDetailPage: React.FC = () => {
         const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
         if (res.code === 0) {
           setArticle(res.data);
+          addReadingHistory({
+            articleId: id!,
+            title: res.data.title,
+            cover: res.data.cover,
+            summary: res.data.summary,
+            readAt: new Date().toISOString(),
+          });
         } else {
           message.error(res.message || '文章不存在');
         }
@@ -152,6 +164,26 @@ const ArticleDetailPage: React.FC = () => {
       request(`/api/articles/${id}/view`).catch(() => {});
     }
   }, [id]);
+
+  // 监听滚动，显示/隐藏"跳到评论"按钮
+  useEffect(() => {
+    const handleScroll = () => {
+      const commentsSection = commentsRef.current;
+      if (!commentsSection) return;
+
+      const rect = commentsSection.getBoundingClientRect();
+      // 当评论区顶部在视口上方时显示按钮
+      setShowCommentButton(rect.top > window.innerHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // 初始化检查
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToComments = () => {
+    commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {
@@ -352,6 +384,8 @@ const ArticleDetailPage: React.FC = () => {
         }}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <Breadcrumb />
+
           {/* 返回按钮 - 玻璃质感 */}
           <button
             onClick={() => history.back()}
@@ -489,11 +523,36 @@ const ArticleDetailPage: React.FC = () => {
           />
           </div>
 
+          {/* 跳到评论浮动按钮 */}
+          <Button
+            shape="circle"
+            size="large"
+            icon={<CommentOutlined />}
+            onClick={scrollToComments}
+            className="!flex items-center justify-center"
+            style={{
+              position: 'fixed',
+              bottom: 100,
+              right: 24,
+              zIndex: 100,
+              opacity: showCommentButton ? 1 : 0,
+              transform: showCommentButton ? 'scale(1)' : 'scale(0.8)',
+              pointerEvents: showCommentButton ? 'auto' : 'none',
+              transition: 'opacity 0.3s ease, transform 0.3s ease',
+              background: currentColorTheme.gradient,
+              color: '#fff',
+              border: 'none',
+              boxShadow: `0 4px 14px ${currentColorTheme.primary}55`,
+            }}
+            aria-label="跳到评论区"
+          />
+
           {/* 评论区 + 相关推荐：lg 下为 fixed 目录预留与上方 flex（w-56 + gap-8）同宽的右侧空间，避免白底卡片盖住目录 */}
           <div className="lg:pr-[calc(14rem+2rem)]">
           {/* 评论区 */}
           <Card
             className="mt-8"
+            ref={commentsRef as any}
             style={{
               borderRadius: 16,
               border: 'none',

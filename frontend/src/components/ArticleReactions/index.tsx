@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Tooltip } from 'antd';
-import { request } from 'umi';
 
 const EMOJIS = ['🔥', '👏', '🎉', '😢', '💡'];
 

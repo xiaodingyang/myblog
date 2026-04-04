@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Popover, message } from 'antd';
 import { ShareAltOutlined, LinkOutlined, QqOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { QRCodeSVG } from 'qrcode.react';
@@ -18,6 +18,34 @@ function getShareUrl() {
   if (typeof window === 'undefined') return '';
   const { pathname, search, hash } = window.location;
   return `${PROD_ORIGIN}${pathname}${search}${hash}`;
+}
+
+/**
+ * 检查是否支持 Web Share API（移动端）
+ */
+function canUseNativeShare(): boolean {
+  return typeof navigator !== 'undefined' && 'share' in navigator && !!navigator.share;
+}
+
+/**
+ * 使用原生分享（移动端）
+ */
+async function nativeShare(title: string, url: string, text?: string): Promise<boolean> {
+  if (!canUseNativeShare()) return false;
+  try {
+    await navigator.share({
+      title,
+      text: text || '',
+      url,
+    });
+    return true;
+  } catch (err) {
+    // 用户取消分享不报错
+    if ((err as Error).name !== 'AbortError') {
+      console.warn('Native share failed:', err);
+    }
+    return false;
+  }
 }
 
 function shareToQQ(title: string, summary: string, url: string, cover?: string) {
@@ -54,8 +82,13 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   mode = 'button',
 }) => {
   const [open, setOpen] = useState(false);
+  const [supportsNativeShare, setSupportsNativeShare] = useState(false);
   const { isLoggedIn, requireAuth } = useModel('githubUserModel');
   const shareUrl = url || getShareUrl();
+
+  useEffect(() => {
+    setSupportsNativeShare(canUseNativeShare());
+  }, []);
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen && !isLoggedIn) {
@@ -63,6 +96,13 @@ const ShareButton: React.FC<ShareButtonProps> = ({
       return;
     }
     setOpen(newOpen);
+  };
+
+  const handleNativeShare = async () => {
+    const success = await nativeShare(title, shareUrl, summary);
+    if (success) {
+      setOpen(false);
+    }
   };
 
   const content = (
@@ -74,6 +114,22 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+        {/* 原生分享按钮（移动端） */}
+        {supportsNativeShare && (
+          <button
+            onClick={handleNativeShare}
+            style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px',
+              borderRadius: 8, transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+          >
+            <ShareAltOutlined style={{ fontSize: 22, color: '#1677ff' }} />
+            <span style={{ fontSize: 11, color: '#666' }}>分享</span>
+          </button>
+        )}
         <button
           onClick={() => { shareToQQ(title, summary, shareUrl, cover); setOpen(false); }}
           style={{

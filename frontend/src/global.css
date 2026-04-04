@@ -21,24 +21,23 @@ body {
   min-height: 100vh;
 }
 
-/* 自定义滚动条 */
+/* 自定义滚动条 - 细线风格 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #94a3b8, #64748b);
-  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #64748b, #475569);
+  background: rgba(100, 116, 139, 0.6);
 }
 
 /* Markdown 样式 */
@@ -178,6 +177,61 @@ body {
   border: 0;
 }
 
+/* 页面切换动画 */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+/* 文字选中主题色 */
+::selection {
+  background: var(--theme-primary, #ffb3d9);
+  color: #fff;
+}
+
+::-moz-selection {
+  background: var(--theme-primary, #ffb3d9);
+  color: #fff;
+}
+
+/* Hero 动态渐变动画 */
+@keyframes heroGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 打字机效果 */
+.typewriter-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--theme-primary, #ffb3d9);
+  animation: typing 3.5s steps(20, end), blinkCaret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blinkCaret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--theme-primary, #ffb3d9); }
+}
+
+/* 现代弹跳动画 */
+@keyframes modernBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-12px); }
+}
+
 /* 动画类 */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out;
@@ -209,14 +263,15 @@ body {
   }
 }
 
-/* 卡片悬浮效果 */
+/* 卡片悬浮效果 - 玻璃拟态升级 */
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* 渐变文字 */
