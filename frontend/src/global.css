@@ -16,8 +16,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Source Han Sans SC', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
-  /* zinc 中性灰，避免 slate 系列的冷蓝底色在换主题时一直透出来 */
-  background: linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%);
+  /* 使用纯白背景，让 GlassBackground 组件完全控制主题色背景 */
+  background: #ffffff;
   min-height: 100vh;
 }
 
