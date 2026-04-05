@@ -1,70 +1,81 @@
 import React from 'react';
-import { Card, Skeleton, Row, Col } from 'antd';
+
+/**
+ * ArticlesListSkeleton — 匹配 杂志Hero + 瀑布流时间线 布局
+ */
+const shimmer = 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[skeleton-shimmer_1.5s_ease_infinite]';
+
+const CardSkeleton: React.FC<{ showCover?: boolean }> = ({ showCover = true }) => (
+  <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    {showCover && <div className={`h-36 sm:h-44 ${shimmer}`} />}
+    <div className="p-4 space-y-2.5">
+      <div className={`h-3 w-24 rounded ${shimmer}`} />
+      <div className={`h-4 w-3/4 rounded ${shimmer}`} />
+      <div className={`h-3 w-full rounded ${shimmer}`} />
+      <div className={`h-3 w-5/6 rounded ${shimmer}`} />
+      <div className="flex gap-2 pt-1">
+        <div className={`h-5 w-14 rounded ${shimmer}`} />
+        <div className={`h-5 w-14 rounded ${shimmer}`} />
+      </div>
+      <div className="flex justify-between pt-2 border-t border-gray-50">
+        <div className={`h-3 w-16 rounded ${shimmer}`} />
+        <div className={`h-3 w-12 rounded ${shimmer}`} />
+      </div>
+    </div>
+  </div>
+);
 
 const ArticlesListSkeleton: React.FC = () => {
+  const pattern = [true, false, true, true, false, true, false, false];
+
   return (
-    <div className="animate-fade-in py-6 md:py-8">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
-        {/* Title skeleton */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="h-10 w-48 rounded-lg bg-gray-200 animate-pulse mx-auto mb-3" />
-          <div className="h-5 w-64 rounded bg-gray-200 animate-pulse mx-auto" />
-        </div>
+    <div className="space-y-10">
+      {/* Hero skeleton */}
+      <div className={`h-[260px] sm:h-[340px] md:h-[420px] rounded-2xl ${shimmer}`} />
 
-        {/* Filter card skeleton */}
-        <Card
-          className="mb-8"
-          style={{ borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: 'none' }}
-          bodyStyle={{ padding: 16 }}
-        >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={8}>
-              <div className="h-10 rounded-lg bg-gray-200 animate-pulse" />
-            </Col>
-            <Col xs={12} md={6}>
-              <div className="h-10 rounded-lg bg-gray-200 animate-pulse" />
-            </Col>
-            <Col xs={12} md={6}>
-              <div className="h-10 rounded-lg bg-gray-200 animate-pulse" />
-            </Col>
-            <Col xs={24} md={4}>
-              <div className="h-4 w-20 rounded bg-gray-200 animate-pulse" />
-            </Col>
-          </Row>
-        </Card>
+      {/* Section divider */}
+      <div className="flex items-center gap-3">
+        <div className={`w-8 h-8 rounded-full ${shimmer}`} />
+        <div className="h-px flex-1 bg-gray-100" />
+        <div className={`h-3 w-16 rounded ${shimmer}`} />
+        <div className="h-px flex-1 bg-gray-100" />
+      </div>
 
-        {/* Articles grid skeleton */}
-        <Row gutter={[24, 24]}>
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Col xs={24} sm={12} lg={8} key={i}>
-              <Card
-                hoverable
-                className="h-full overflow-hidden"
-                style={{ borderRadius: 16, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                cover={
-                  <div className="h-52 bg-gray-200 animate-pulse" />
-                }
-                bodyStyle={{ padding: 16 }}
-              >
-                <div className="space-y-3">
-                  <div className="h-6 w-3/4 rounded bg-gray-200 animate-pulse" />
-                  <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
-                  <div className="h-4 w-5/6 rounded bg-gray-100 animate-pulse" />
-                  <div className="h-4 w-2/3 rounded bg-gray-100 animate-pulse" />
-                  <div className="pt-3 border-t border-gray-100 flex justify-between">
-                    <div className="h-4 w-20 rounded bg-gray-100 animate-pulse" />
-                    <div className="h-4 w-16 rounded bg-gray-100 animate-pulse" />
-                  </div>
-                </div>
-              </Card>
-            </Col>
+      {/* Mobile skeleton */}
+      <div className="md:hidden relative pl-8 space-y-5">
+        <div className="absolute left-[11px] top-0 bottom-0 w-[2px] bg-gray-100 rounded-full" />
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="relative">
+            <div className="absolute w-[10px] h-[10px] rounded-full bg-gray-200 ring-[3px] ring-white" style={{ left: -28, top: 16 }} />
+            <CardSkeleton showCover={pattern[i % pattern.length]} />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop skeleton */}
+      <div className="hidden md:flex gap-10 relative">
+        <div className="absolute left-1/2 -translate-x-[1px] top-0 bottom-0 w-[2px] bg-gray-100 rounded-full" />
+        <div className="w-1/2 space-y-6">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="relative">
+              <div className="absolute -right-[23px] top-5 w-[10px] h-[10px] rounded-full bg-gray-200 ring-[3px] ring-white z-10" />
+              <CardSkeleton showCover={pattern[(i * 2) % pattern.length]} />
+            </div>
           ))}
-        </Row>
-
-        {/* Pagination skeleton */}
-        <div className="flex justify-center mt-8 md:mt-12">
-          <div className="h-10 w-64 rounded-lg bg-gray-200 animate-pulse" />
         </div>
+        <div className="w-1/2 space-y-6 pt-20">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="relative">
+              <div className="absolute -left-[23px] top-5 w-[10px] h-[10px] rounded-full bg-gray-200 ring-[3px] ring-white z-10" />
+              <CardSkeleton showCover={pattern[(i * 2 + 1) % pattern.length]} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex justify-center">
+        <div className={`h-8 w-64 rounded-lg ${shimmer}`} />
       </div>
     </div>
   );
