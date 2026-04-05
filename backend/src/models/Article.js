@@ -58,6 +58,14 @@ const articleSchema = new mongoose.Schema({
     enum: ['draft', 'published'],
     default: 'draft',
   },
+  series: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Series',
+  },
+  seriesOrder: {
+    type: Number,
+    default: 0,
+  },
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

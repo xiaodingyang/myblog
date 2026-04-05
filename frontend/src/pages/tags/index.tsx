@@ -5,6 +5,7 @@ import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Card, Tag } from 'antd';
 import { TagsOutlined } from '@ant-design/icons';
 import { request } from 'umi';
+import { cachedRequest } from '@/utils/apiCache';
 import Empty from '@/components/Empty';
 import useSEO from '@/hooks/useSEO';
 
@@ -23,7 +24,7 @@ const TagsPage: React.FC = () => {
     const fetchTags = async () => {
       setLoading(true);
       try {
-        const res = await request<API.Response<API.Tag[]>>('/api/tags');
+        const res = await cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000);
         if (res.code === 0) {
           setTags(res.data);
         }

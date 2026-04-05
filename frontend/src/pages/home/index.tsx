@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Link, request } from 'umi';
+import { cachedRequest } from '@/utils/apiCache';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -18,6 +19,7 @@ import {
 } from '@ant-design/icons';
 import DailyQuote from '@/components/DailyQuote';
 import ReadingHistory from '@/components/ReadingHistory';
+import { getReadArticleIds, sortByPopularity } from '@/utils/recommend';
 import useSEO from '@/hooks/useSEO';
 
 // 轻量日期格式化
@@ -47,7 +49,7 @@ const HomePage: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
 
-  const sections = ['hero', 'featured', 'latest', 'explore', 'cta'];
+  const sections = ['hero', 'featured', 'latest', ...(articles.length > 0 ? ['recommend'] : []), 'explore', 'cta'];
   const sectionCount = sections.length;
 
   const heroParticles = useMemo(() =>
@@ -68,17 +70,21 @@ const HomePage: React.FC = () => {
     [articles],
   );
 
+  const recommendArticles = useMemo(() => {
+    const readIds = getReadArticleIds();
+    const unread = articles.filter(a => !readIds.has(a._id || ''));
+    return sortByPopularity(unread).slice(0, 3);
+  }, [articles]);
+
   // Bug Fix #4: 将 fetchData 提取到 useCallback 中，确保 cleanup 函数引用最新版本
   // 避免组件重渲染或依赖变化时 cleanup 引用旧版 fetchData 导致数据不更新或内存泄漏
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
-        request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
-          params: { page: 1, pageSize: 6 },
-        }),
-        request<API.Response<API.Category[]>>('/api/categories'),
-        request<API.Response<API.Tag[]>>('/api/tags'),
+        cachedRequest<API.Response<API.PageResult<API.Article>>>('/api/articles', { page: '1', pageSize: '6' }, 5 * 60 * 1000),
+        cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000),
+        cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000),
       ]);
 
       if (articlesRes.code === 0) {
@@ -750,6 +756,116 @@ const HomePage: React.FC = () => {
         </div>
         </div>
       </section>
+
+      {/* ========== 猜你喜欢 ========== */}
+      {recommendArticles.length > 0 && (
+        <section
+          className="home-fullscreen-section w-full relative flex flex-col"
+          style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
+        >
+          <div className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-8">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
+            <div className="text-center mb-4 md:mb-8 lg:mb-12 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+              <div
+                className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 md:mb-4 text-sm md:text-base"
+                style={{
+                  background: `${currentColorTheme.primary}20`,
+                  color: currentColorTheme.primary,
+                }}
+              >
+                <FireOutlined />
+                <span className="font-medium">个性推荐</span>
+              </div>
+              <Title
+                level={2}
+                className="!text-2xl md:!text-4xl lg:!text-5xl !mb-2 md:!mb-4"
+                style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}
+              >
+                猜你喜欢
+              </Title>
+              <Text
+                className="text-gray-500 text-sm md:text-lg"
+                style={{ textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)' }}
+              >
+                基于你的阅读偏好推荐
+              </Text>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+              {recommendArticles.map((article, index) => (
+                <Link key={article._id} to={`/article/${article._id}`} className="block group">
+                  <div
+                    className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
+                    style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.08)' }}
+                  >
+                    <div className="relative h-52 overflow-hidden">
+                      {article.cover ? (
+                        <img
+                          src={article.cover}
+                          alt={article.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          style={{ backgroundColor: '#f3f4f6' }}
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-full flex items-center justify-center"
+                          style={{
+                            background: `linear-gradient(135deg, hsl(${(index * 60) % 360}, 70%, 60%) 0%, hsl(${(index * 60 + 40) % 360}, 70%, 50%) 100%)`,
+                          }}
+                        >
+                          <BookOutlined className="text-6xl text-white/30" />
+                        </div>
+                      )}
+                      <div className="absolute top-4 left-4">
+                        <Tag className="!border-none !rounded-full !px-3 !py-1 !bg-white/95 !backdrop-blur">
+                          <FolderOutlined className="mr-1" />
+                          {article.category?.name || '未分类'}
+                        </Tag>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <Title
+                        level={5}
+                        className="!mb-3 transition-colors truncate"
+                        style={{
+                          '--hover-color': currentColorTheme.primary,
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        } as React.CSSProperties & { '--hover-color': string }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = currentColorTheme.primary}
+                        onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                      >
+                        {article.title}
+                      </Title>
+                      <Paragraph
+                        className="!text-gray-500 !mb-4 !text-sm line-clamp-2"
+                        style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)' }}
+                      >
+                        {article.summary || '暂无摘要'}
+                      </Paragraph>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <Space className="text-gray-400 text-xs">
+                          <span><EyeOutlined /> {article.views || 0}</span>
+                          <span><ClockCircleOutlined /> {formatDate(article.createdAt)}</span>
+                        </Space>
+                        <span
+                          className="text-sm font-medium group-hover:underline"
+                          style={{ color: currentColorTheme.primary }}
+                        >
+                          阅读 →
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          </div>
+        </section>
+      )}
 
       {/* ========== 第四屏：分类与标签 ========== */}
       <section

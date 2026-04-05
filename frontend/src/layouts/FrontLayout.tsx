@@ -32,6 +32,10 @@ import ReadingProgressBar from '@/components/ReadingProgressBar';
 import BackToTop from '@/components/BackToTop';
 import KeyboardHelpButton from '@/components/KeyboardHelpButton';
 import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
+import GlobalSearch from '@/components/GlobalSearch';
+import NotificationBell from '@/components/NotificationBell';
+import ReadingStatsModal from '@/components/ReadingStats';
+import MobileTabBar from '@/components/MobileTabBar';
 import { getColorThemeById } from '@/config/colorThemes';
 
 const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
@@ -46,6 +50,21 @@ const FrontLayout: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const goOffline = () => setIsOffline(true);
+    const goOnline = () => setIsOffline(false);
+    setIsOffline(!navigator.onLine);
+    window.addEventListener('offline', goOffline);
+    window.addEventListener('online', goOnline);
+    return () => {
+      window.removeEventListener('offline', goOffline);
+      window.removeEventListener('online', goOnline);
+    };
+  }, []);
   const [showParticles, setShowParticles] = useState(false);
   const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');
 
@@ -54,6 +73,28 @@ const FrontLayout: React.FC = () => {
       setTimeout(() => setShowParticles(true), 100);
     });
     return () => cancelAnimationFrame(id);
+  }, []);
+
+  // 关键路由预加载：首屏渲染后，浏览器空闲时预加载高频页面 JS chunk
+ useEffect(() => {
+    const prefetchRoutes = () => {
+      // 预加载文章列表页和文章详情页的 chunk
+      const prefetchPaths = ['/articles', '/article/prefetch'];
+      prefetchPaths.forEach((path) => {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = path;
+        link.as = 'document';
+        document.head?.appendChild(link);
+      });
+    };
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(prefetchRoutes, { timeout: 5000 });
+      return () => cancelIdleCallback(id as number);
+    } else {
+      const timer = setTimeout(prefetchRoutes, 2000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // 注释掉自动弹窗，避免与 GuestLoginPrompt 浮层重复
@@ -95,6 +136,13 @@ const FrontLayout: React.FC = () => {
       }
 
       const key = e.key.toLowerCase();
+
+      // Ctrl+K / Cmd+K: 全局搜索
+      if ((e.ctrlKey || e.metaKey) && key === 'k') {
+        e.preventDefault();
+        setSearchOpen(prev => !prev);
+        return;
+      }
 
       // g h: go home
       if (key === 'g' && !gPressed) {
@@ -277,6 +325,18 @@ const FrontLayout: React.FC = () => {
         {/* 头部导航 */}
         <ReadingProgressBar />
 
+        {isOffline && (
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9998,
+              background: '#fbbf24', color: '#78350f', textAlign: 'center',
+              padding: '6px 16px', fontSize: 13, fontWeight: 500,
+            }}
+          >
+            当前处于离线模式，部分内容可能不是最新
+          </div>
+        )}
+
         <Header
           className={`fixed w-full z-50 px-4 md:px-8 flex items-center justify-between${useDarkHeader ? ' front-header-dark' : ''}`}
           style={{
@@ -318,6 +378,8 @@ const FrontLayout: React.FC = () => {
 
           {/* 右侧操作区 */}
           <div className="flex items-center gap-3 shrink-0">
+            {/* 通知铃铛 */}
+            {isLoggedIn && <NotificationBell />}
             {/* GitHub 用户状态 */}
             {isLoggedIn && githubUser ? (
               <Dropdown
@@ -331,6 +393,12 @@ const FrontLayout: React.FC = () => {
                         </a>
                       ),
                       icon: <GithubOutlined />,
+                    },
+                    {
+                      key: 'stats',
+                      label: '阅读统计',
+                      icon: <StarOutlined />,
+                      onClick: () => setStatsOpen(true),
                     },
                     { type: 'divider' },
                     {
@@ -366,11 +434,31 @@ const FrontLayout: React.FC = () => {
                   cursor: 'pointer',
                 }}
                 onClick={() => setLoginModalVisible(true)}
+                aria-label="GitHub 登录"
               >
                 <GithubOutlined />
                 登录
               </button>
             )}
+
+            {/* RSS 订阅 */}
+            <a
+              href="/rss"
+              target="_blank"
+              rel="noreferrer"
+              title="RSS 订阅"
+              aria-label="RSS 订阅"
+              className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full transition-colors"
+              style={{
+                background: useDarkHeader ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.05)',
+                color: headerTextColor,
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <circle cx="6.18" cy="17.82" r="2.18"/>
+                <path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/>
+              </svg>
+            </a>
 
             {/* 搜索框 - PC端显示 */}
             <div className="hidden sm:block" style={{ width: 160 }}>
@@ -414,6 +502,7 @@ const FrontLayout: React.FC = () => {
                 cursor: 'pointer',
               }}
               onClick={() => setMobileMenuOpen(true)}
+              aria-label="打开导航菜单"
             >
               <MenuOutlined style={{ color: headerTextColor, fontSize: 18 }} />
             </button>
@@ -538,7 +627,7 @@ const FrontLayout: React.FC = () => {
 
         {/* 主内容区 */}
         <Content
-          className={isHomePage ? 'pt-16 overflow-hidden home-layout-content' : 'pt-16 flex-1'}
+          className={isHomePage ? 'pt-16 overflow-hidden home-layout-content' : 'pt-16 pb-14 md:pb-0 flex-1'}
           style={{
             position: 'relative',
             zIndex: isHomePage ? 10 : 2, // 确保内容在毛玻璃背景之上
@@ -629,6 +718,9 @@ const FrontLayout: React.FC = () => {
         <GithubLoginModal />
         <GuestLoginPrompt />
         <KeyboardShortcutsHelpModal visible={showHelp} onClose={() => setShowHelp(false)} />
+        <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+        <ReadingStatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
+        <MobileTabBar />
       </Layout>
     </ConfigProvider>
   );

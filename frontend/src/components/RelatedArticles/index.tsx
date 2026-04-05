@@ -5,12 +5,20 @@ import { EyeOutlined, FolderOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import { useModel } from 'umi';
+import { getReadArticleIds } from '@/utils/recommend';
 
 const { Title, Text } = Typography;
 
-const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = ({
+interface RelatedArticlesProps {
+  categoryId?: string;
+  excludeId?: string;
+  tagIds?: string[];
+}
+
+const RelatedArticles: React.FC<RelatedArticlesProps> = ({
   categoryId,
   excludeId,
+  tagIds,
 }) => {
   const [articles, setArticles] = useState<API.Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +26,7 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
   const currentColorTheme = getColorThemeById(colorThemeId);
 
   useEffect(() => {
-    if (!categoryId) {
+    if (!categoryId && (!tagIds || tagIds.length === 0)) {
       setLoading(false);
       return;
     }
@@ -26,15 +34,65 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
     const fetchRelated = async () => {
       setLoading(true);
       try {
-        const res = await request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
-          params: { page: 1, pageSize: 4, category: categoryId },
-        });
-        if (res.code === 0) {
-          const filtered = (res.data.list || []).filter(
-            (a) => a._id !== excludeId
-          );
-          setArticles(filtered.slice(0, 3));
+        const readIds = getReadArticleIds();
+        let collected: API.Article[] = [];
+        const excludeIds = new Set<string>(excludeId ? [excludeId] : []);
+
+        // 1. 先按标签查询（取前2个标签）
+        if (tagIds && tagIds.length > 0) {
+          const topTags = tagIds.slice(0, 2);
+          for (const tagId of topTags) {
+            if (collected.length >= 3) break;
+            const res = await request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
+              params: { page: 1, pageSize: 6, tag: tagId },
+            });
+            if (res.code === 0) {
+              for (const a of res.data.list || []) {
+                const aid = a._id || '';
+                if (!excludeIds.has(aid) && !readIds.has(aid)) {
+                  collected.push(a);
+                  excludeIds.add(aid);
+                }
+              }
+            }
+          }
         }
+
+        // 2. 不足3个，补同分类
+        if (collected.length < 3 && categoryId) {
+          const res = await request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
+            params: { page: 1, pageSize: 6, category: categoryId },
+          });
+          if (res.code === 0) {
+            for (const a of res.data.list || []) {
+              if (collected.length >= 3) break;
+              const aid = a._id || '';
+              if (!excludeIds.has(aid) && !readIds.has(aid)) {
+                collected.push(a);
+                excludeIds.add(aid);
+              }
+            }
+          }
+        }
+
+        // 3. 仍不足，补热门（不排除已读）
+        if (collected.length < 3) {
+          const res = await request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
+            params: { page: 1, pageSize: 6, sort: '-views' },
+          });
+          if (res.code === 0) {
+            for (const a of res.data.list || []) {
+              if (collected.length >= 3) break;
+              const aid = a._id || '';
+              if (!excludeIds.has(aid)) {
+                collected.push(a);
+                excludeIds.add(aid);
+              }
+            }
+          }
+        }
+
+        setArticles(collected.slice(0, 3));
       } catch {
         // ignore
       } finally {
@@ -43,7 +101,7 @@ const RelatedArticles: React.FC<{ categoryId?: string; excludeId?: string }> = (
     };
 
     fetchRelated();
-  }, [categoryId, excludeId]);
+  }, [categoryId, excludeId, tagIds?.join(',')]);
 
   if (loading) {
     return (

@@ -5,6 +5,8 @@ import { EyeOutlined, ClockCircleOutlined, FolderOutlined, UserOutlined, FireOut
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import ShareButton from '@/components/ShareButton';
+import OptimizedImage from '@/components/OptimizedImage';
+import { fetchArticleDetail } from '@/utils/prefetch';
 import dayjs from 'dayjs';
 
 const { Title, Paragraph, Text } = Typography;
@@ -26,7 +28,7 @@ const isHotArticle = (views?: number): boolean => {
   return (views || 0) >= 1000;
 };
 
-const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
+const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const articleId = article._id || (article as API.Article & { id?: string }).id;
@@ -36,7 +38,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
   const isHot = useMemo(() => isHotArticle(article.views), [article.views]);
 
   return (
-    <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline">
+    <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline" onMouseEnter={() => { if (articleId) fetchArticleDetail(articleId); }}>
       <Card
         hoverable
         className="card-hover overflow-hidden"
@@ -53,11 +55,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
         cover={
           article.cover ? (
             <div className="relative h-40 md:h-48 overflow-hidden">
-              <img
+              <OptimizedImage
                 alt={article.title}
                 src={article.cover}
                 loading="lazy"
-                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -205,6 +206,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, style }) => {
       </Card>
     </Link>
   );
-};
+});
 
 export default ArticleCard;

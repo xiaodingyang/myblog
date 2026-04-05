@@ -5,6 +5,7 @@ import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Row, Col, Card, Tag } from 'antd';
 import { FolderOutlined, FileTextOutlined } from '@ant-design/icons';
 import { request } from 'umi';
+import { cachedRequest } from '@/utils/apiCache';
 import Empty from '@/components/Empty';
 import useSEO from '@/hooks/useSEO';
 
@@ -25,7 +26,7 @@ const CategoriesPage: React.FC = () => {
     const fetchCategories = async () => {
       setLoading(true);
       try {
-        const res = await request<API.Response<API.Category[]>>('/api/categories');
+        const res = await cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000);
         if (res.code === 0) {
           setCategories(res.data);
         }

@@ -3,6 +3,7 @@ import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { getPrefetchedArticle } from '@/utils/prefetch';
 import {
   ClockCircleOutlined,
   EyeOutlined,
@@ -26,9 +27,13 @@ import ArticleToc from '@/components/ArticleToc';
 import MarkdownArticleBody from '@/components/MarkdownArticleBody';
 import ArticleReactions from '@/components/ArticleReactions';
 import RelatedArticles from '@/components/RelatedArticles';
+import SeriesNav from '@/components/SeriesNav';
 import ArticleDetailSkeleton from '@/components/Skeleton/ArticleDetailSkeleton';
 import Breadcrumb from '@/components/Breadcrumb';
 import { addReadingHistory } from '@/components/ReadingHistory';
+import { checkAchievements } from '@/utils/achievements';
+import Lightbox from '@/components/Lightbox';
+import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
@@ -53,6 +58,9 @@ const ArticleDetailPage: React.FC = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [commentTotal, setCommentTotal] = useState(0);
   const [commentPage, setCommentPage] = useState(1);
+
+  // Lightbox for article images
+  const lightbox = useLightbox('.markdown-body', [article]);
   const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
@@ -130,6 +138,21 @@ const ArticleDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchArticle = async () => {
+      const cached = getPrefetchedArticle(id!);
+      if (cached && cached.code === 0) {
+        setArticle(cached.data);
+        addReadingHistory({
+          articleId: id!,
+          title: cached.data.title,
+          cover: cached.data.cover,
+          summary: cached.data.summary,
+          readAt: new Date().toISOString(),
+        });
+        const ach1 = checkAchievements();
+        if (ach1) message.success(`🏆 成就解锁：${ach1.title} — ${ach1.desc}`, 3);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
@@ -142,6 +165,8 @@ const ArticleDetailPage: React.FC = () => {
             summary: res.data.summary,
             readAt: new Date().toISOString(),
           });
+          const ach2 = checkAchievements();
+          if (ach2) message.success(`🏆 成就解锁：${ach2.title} — ${ach2.desc}`, 3);
         } else {
           message.error(res.message || '文章不存在');
         }
@@ -374,6 +399,13 @@ const ArticleDetailPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
+      {/* Skip to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:bg-white focus:px-4 focus:py-2 focus:rounded focus:shadow-lg"
+      >
+        跳到主内容
+      </a>
       {/* 文章头部 */}
       <section
         className="relative py-16 md:py-24 overflow-hidden"
@@ -471,7 +503,7 @@ const ArticleDetailPage: React.FC = () => {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           >
-            <div className="markdown-body">
+            <div className="markdown-body" id="main-content">
               <MarkdownArticleBody content={article.content} toc={toc} />
             </div>
 
@@ -711,12 +743,28 @@ const ArticleDetailPage: React.FC = () => {
             )}
           </Card>
 
+          {/* Series navigation */}
+          {article.series && (
+            <SeriesNav
+              seriesId={typeof article.series === 'object' ? (article.series as any)._id : article.series}
+              seriesTitle={typeof article.series === 'object' ? (article.series as any).title : undefined}
+              currentArticleId={article._id!}
+            />
+          )}
+
           {/* Related articles */}
-          <RelatedArticles categoryId={article.category?._id} excludeId={article._id} />
+          <RelatedArticles categoryId={article.category?._id} excludeId={article._id} tagIds={article.tags?.map((t: any) => t._id).filter(Boolean)} />
           </div>
 
         </div>
       </section>
+      <Lightbox
+        visible={lightbox.visible}
+        images={lightbox.images}
+        currentIndex={lightbox.currentIndex}
+        onClose={lightbox.close}
+        onIndexChange={lightbox.setCurrentIndex}
+      />
     </div>
   );
 };

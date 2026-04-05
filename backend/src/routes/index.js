@@ -13,6 +13,8 @@ const favoritesRoutes = require('./favorites');
 const adminRoutes = require('./admin');
 const githubAuthRoutes = require('./githubAuth');
 const followRoutes = require('./follow');
+const notificationRoutes = require('./notifications');
+const seriesRoutes = require('./series');
 
 // 公开路由
 router.use('/auth', authRoutes);
@@ -31,5 +33,11 @@ router.use('/admin', adminRoutes);
 
 // 关注功能
 router.use('/follow', followRoutes);
+
+// 通知
+router.use('/notifications', notificationRoutes);
+
+// 系列/专栏
+router.use('/series', seriesRoutes);
 
 module.exports = router;

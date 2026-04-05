@@ -1,4 +1,4 @@
-const { Comment, Article } = require('../models');
+const { Comment, Article, Notification } = require('../models');
 
 // ========== 评论频率限制 ==========
 const commentRateMap = new Map(); // key: userId, value: lastCommentTime
@@ -97,6 +97,31 @@ exports.createComment = async (req, res, next) => {
     commentRateMap.set(userId?.toString(), Date.now());
 
     const populated = await comment.populate('user', 'username nickname avatar htmlUrl');
+
+    // 创建通知：给该文章下的其他评论者发通知
+    try {
+      const otherComments = await Comment.find({
+        articleId,
+        user: { $ne: req.githubUserId },
+        status: 'approved',
+      }).distinct('user');
+
+      if (otherComments.length > 0) {
+        const contentPreview = content.length > 50 ? content.slice(0, 50) + '...' : content;
+        const notifications = otherComments.map(toUserId => ({
+          type: 'reply',
+          fromUser: req.githubUserId,
+          toUser: toUserId,
+          articleId,
+          commentId: comment._id,
+          content: contentPreview,
+        }));
+        await Notification.insertMany(notifications);
+      }
+    } catch (notifErr) {
+      // 通知创建失败不影响评论发表
+      console.error('Failed to create notifications:', notifErr);
+    }
 
     res.status(201).json({
       code: 0,

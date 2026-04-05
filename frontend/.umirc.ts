@@ -10,6 +10,8 @@ export default defineConfig({
     { rel: 'preconnect', href: 'https://www.xiaodingyang.art' },
     { rel: 'dns-prefetch', href: 'https://www.xiaodingyang.art' },
     { rel: 'preload', href: '/umi.css', as: 'style' },
+    // 首屏关键字体预加载
+    { rel: 'preload', href: 'https://at.alicdn.com/t/webfont_6e11nqgmpm.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
@@ -27,13 +29,21 @@ export default defineConfig({
       function inject(){
         try {
           var style = document.createElement('style');
-          style.textContent = '.gradient-text-white{background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.gradient-text-dynamic{background:linear-gradient(135deg,var(--gradient-color) 0%,var(--gradient-color-end) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}h1.ant-typography{font-display:swap}';
+          style.textContent = '.gradient-text-white{background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.gradient-text-dynamic{background:linear-gradient(135deg,var(--gradient-color) 0%,var(--gradient-color-end) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}h1.ant-typography{font-display:swap}.ant-layout-header.front-header-dark{background:linear-gradient(90deg,rgba(15,23,42,.78) 0%,rgba(59,130,246,.22) 50%,rgba(15,23,42,.78) 100%)!important;backdrop-filter:blur(20px) saturate(180%)!important;border-bottom:1px solid rgba(255,255,255,.12)!important;position:fixed!important;width:100%!important;z-index:50!important;height:64px!important}.reading-progress-bar{position:fixed;top:0;left:0;height:3px;z-index:9999;transition:width .1s linear}.home-fullscreen-section{height:100dvh;width:100%}';
           var head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
           head.appendChild(style);
         } catch (e) {}
       }
       if (document.head) inject();
       else document.addEventListener('DOMContentLoaded', inject, { once: true });
+    })();`,
+    // Service Worker 注册
+    `(function(){
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function(){});
+        });
+      }
     })();`,
     // 异步 chunk 加载失败时自动刷新页面（仅重试一次，防止死循环）
     `(function(){
@@ -48,24 +58,21 @@ export default defineConfig({
         }
       }, true);
     })();`,
-    // 百度自动推送 - 用户访问页面时自动通知百度收录
+    // 百度自动推送 - 使用 requestIdleCallback 延迟到浏览器空闲时执行，不阻塞首屏
     `(function(){
       function inject(){
         try {
           var bp = document.createElement('script');
+          bp.async = true;
           var curProtocol = window.location.protocol.split(':')[0];
-          if (curProtocol === 'https') {
-            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-          } else {
-            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-          }
-          var s = document.getElementsByTagName('script')[0];
-          if (s && s.parentNode) s.parentNode.insertBefore(bp, s);
-          else (document.head || document.documentElement).appendChild(bp);
+          bp.src = curProtocol === 'https'
+            ? 'https://zz.bdstatic.com/linksubmit/push.js'
+            : 'http://push.zhanzhang.baidu.com/push.js';
+          (document.head || document.documentElement).appendChild(bp);
         } catch (e) {}
       }
-      if (document.body || document.head) inject();
-      else document.addEventListener('DOMContentLoaded', inject, { once: true });
+      if ('requestIdleCallback' in window) requestIdleCallback(inject, { timeout: 3000 });
+      else setTimeout(inject, 1000);
     })();`,
   ],
   
@@ -123,6 +130,7 @@ export default defineConfig({
         { path: '/admin/comments', component: '@/pages/admin/comments/index' },
         { path: '/admin/users', component: '@/pages/admin/users/index' },
         { path: '/admin/settings', component: '@/pages/admin/settings/index' },
+        { path: '/admin/series', component: '@/pages/admin/series/index' },
       ],
     },
     // 404

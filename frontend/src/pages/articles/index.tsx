@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, Link } from 'umi';
 import { Typography, Row, Col, Input, Select, Space, Pagination, Tag, Card } from 'antd';
 import { SearchOutlined, FilterOutlined, FolderOutlined, TagsOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import { request } from 'umi';
+import { cachedRequest } from '@/utils/apiCache';
 import ArticleCard from '@/components/ArticleCard';
 import Empty from '@/components/Empty';
 import ArticlesListSkeleton from '@/components/Skeleton/ArticlesListSkeleton';
@@ -48,8 +49,8 @@ const ArticlesPage: React.FC = () => {
               sort,
             },
           }),
-          request<API.Response<API.Category[]>>('/api/categories'),
-          request<API.Response<API.Tag[]>>('/api/tags'),
+          cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000),
+          cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000),
         ]);
 
         if (articlesRes.code === 0) {
@@ -67,7 +68,7 @@ const ArticlesPage: React.FC = () => {
     fetchData();
   }, [page, keyword, categoryId, tagId, sort]);
 
-  const updateParams = (key: string, value: string) => {
+  const updateParams = useCallback((key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key, value);
@@ -76,11 +77,18 @@ const ArticlesPage: React.FC = () => {
     }
     newParams.set('page', '1'); // 重置页码
     setSearchParams(newParams);
-  };
+  }, [searchParams, setSearchParams]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchParams({});
-  };
+  }, [setSearchParams]);
+
+  const handlePageChange = useCallback((p: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', String(p));
+    setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="animate-fade-in py-6 md:py-8">
@@ -259,12 +267,7 @@ const ArticlesPage: React.FC = () => {
                   )}
                   size="default"
                   responsive
-                  onChange={(p) => {
-                    const newParams = new URLSearchParams(searchParams);
-                    newParams.set('page', String(p));
-                    setSearchParams(newParams);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                  onChange={handlePageChange}
                 />
               </div>
             )}

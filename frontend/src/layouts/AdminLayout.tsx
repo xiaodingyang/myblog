@@ -15,6 +15,7 @@ import {
   HomeOutlined,
   TeamOutlined,
   CommentOutlined,
+  OrderedListOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -87,6 +88,12 @@ const AdminLayout: React.FC = () => {
       icon: <SettingOutlined />,
       label: '个人设置',
       onClick: () => navigate('/admin/settings'),
+    },
+    {
+      key: '/admin/series',
+      icon: <OrderedListOutlined />,
+      label: '系列管理',
+      onClick: () => navigate('/admin/series'),
     },
   ];
 
