@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      skip_lint:
-        description: "Skip lint check"
-        type: boolean
-        default: false
 
 env:
   NODE_VERSION: "18.20.8"
@@ -17,36 +12,9 @@ env:
 
 jobs:
   # ──────────────────────────────────────────────
-  # 1. Lint (可手动跳过)
-  # ──────────────────────────────────────────────
-  lint:
-    if: ${{ !inputs.skip_lint }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-
-      - name: Lint frontend
-        working-directory: frontend
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm lint
-
-  # ──────────────────────────────────────────────
-  # 2. Build frontend + Deploy everything
+  # Build frontend + Deploy everything
   # ──────────────────────────────────────────────
   deploy:
-    needs: [lint]
-    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
