@@ -3,74 +3,86 @@ name: Deploy Blog
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_lint:
+        description: "Skip lint check"
+        type: boolean
+        default: false
 
 env:
-  SERVER_HOST: ${{ secrets.SERVER_HOST }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
+  NODE_VERSION: "18.20.8"
+  PNPM_VERSION: "10"
+  REMOTE_DIR: /var/www/myblog
 
 jobs:
-  deploy:
+  # ──────────────────────────────────────────────
+  # 1. Lint (可手动跳过)
+  # ──────────────────────────────────────────────
+  lint:
+    if: ${{ !inputs.skip_lint }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: ${{ env.PNPM_VERSION }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.20.8
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: pnpm install --frozen-lockfile
-
-      # 包未导出 package.json 子路径，需从 resolve 入口向上找包根目录（pnpm 下入口可能在 dist/）
-      - name: Verify react-particle-backgrounds version
+      - name: Lint frontend
         working-directory: frontend
         run: |
-          node -e "const fs=require('fs');const p=require('path');let d=p.dirname(require.resolve('@xdy-npm/react-particle-backgrounds'));for(let i=0;i<8;i++){const j=p.join(d,'package.json');if(fs.existsSync(j)){console.log(JSON.parse(fs.readFileSync(j,'utf8')).version);process.exit(0);}d=p.dirname(d);}throw new Error('package root not found');"
+          pnpm install --frozen-lockfile
+          pnpm lint
 
-      - name: Build frontend
+  # ──────────────────────────────────────────────
+  # 2. Build frontend + Deploy everything
+  # ──────────────────────────────────────────────
+  deploy:
+    needs: [lint]
+    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      # ── Build ──
+      - name: Install & build frontend
         working-directory: frontend
-        run: pnpm build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
 
-      - name: Setup SSH key
+      # ── SSH Setup ──
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Deploy to server
+      # ── Rsync: 先传所有文件，再远程操作 ──
+      - name: Upload frontend dist
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_deploy" \
             frontend/dist/ \
-            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/frontend/dist/
-
-      - name: Install backend dependencies & restart services
-        run: |
-          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
-            cd /var/www/myblog
-
-            # Sync backend source from latest code (via rsync in next step)
-            cd backend
-            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-            pm2 restart blog-api 2>/dev/null || pm2 start src/index.js --name blog-api
-            pm2 save
-
-            # Reload Nginx
-            nginx -s reload
-
-            echo "✅ Server deployment complete"
-          EOF
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/frontend/dist/
 
       - name: Upload backend source
         run: |
@@ -80,19 +92,47 @@ jobs:
             --exclude uploads \
             -e "ssh -i ~/.ssh/id_deploy" \
             backend/ \
-            ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:/var/www/myblog/backend/
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/backend/
 
-      - name: Restart backend after sync
+      # ── Remote: 安装依赖 + 重启服务（一次 SSH） ──
+      - name: Install deps & restart services
         run: |
-          ssh -i ~/.ssh/id_deploy ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
-            cd /var/www/myblog/backend
-            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-            pm2 restart blog-api
-            pm2 save
-            echo "✅ Backend restarted"
-          EOF
+          ssh -i ~/.ssh/id_deploy ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'REMOTE'
+            set -e
 
-      - name: Notify WeChat on success
+            echo "📦 Installing backend dependencies..."
+            cd ${{ env.REMOTE_DIR }}/backend
+            pnpm install --frozen-lockfile 2>/dev/null || pnpm install --no-optional
+
+            echo "🔄 Restarting backend (pm2)..."
+            pm2 restart blog-api 2>/dev/null || pm2 start src/index.js --name blog-api
+            pm2 save
+
+            echo "🔄 Reloading Nginx..."
+            nginx -t && nginx -s reload
+
+            echo "✅ Remote operations complete"
+          REMOTE
+
+      # ── Health check ──
+      - name: Health check
+        run: |
+          echo "⏳ Waiting for service to stabilize..."
+          sleep 5
+          for i in 1 2 3; do
+            STATUS=$(curl -sf -o /dev/null -w "%{http_code}" https://www.xiaodingyang.art/api/health || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check passed (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "⏳ Attempt $i: HTTP $STATUS, retrying in 5s..."
+            sleep 5
+          done
+          echo "❌ Health check failed after 3 attempts"
+          exit 1
+
+      # ── 微信通知：成功 ──
+      - name: Notify WeChat (success)
         if: success()
         run: |
           COMMIT_MSG=$(git log -1 --pretty=format:'%s')
@@ -100,7 +140,7 @@ jobs:
           COMMIT_SHA=$(git log -1 --pretty=format:'%h')
           DEPLOY_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
 
-          curl -s -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
+          curl -sf -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
             -d "title=✅ 博客部署成功" \
             -d "desp=## 部署通知
 
@@ -112,20 +152,21 @@ jobs:
 
           **提交信息**: ${COMMIT_MSG}
 
-          **Commit**: ${COMMIT_SHA}
+          **Commit**: [\`${COMMIT_SHA}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
 
-          **站点**: [https://www.xiaodingyang.art](https://www.xiaodingyang.art)
+          **站点**: [xiaodingyang.art](https://www.xiaodingyang.art)
 
           ---
-          *GitHub Actions 自动部署*"
+          *GitHub Actions · Run [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
 
-      - name: Notify WeChat on failure
+      # ── 微信通知：失败 ──
+      - name: Notify WeChat (failure)
         if: failure()
         run: |
           COMMIT_MSG=$(git log -1 --pretty=format:'%s')
           DEPLOY_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
 
-          curl -s -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
+          curl -sf -X POST "https://sctapi.ftqq.com/${{ secrets.WECHAT_SEND_KEY }}.send" \
             -d "title=❌ 博客部署失败" \
             -d "desp=## 部署通知
 
@@ -135,7 +176,7 @@ jobs:
 
           **提交信息**: ${COMMIT_MSG}
 
-          **详情**: [查看 GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          **详情**: [查看日志](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
           ---
           *请检查构建日志排查问题*"
