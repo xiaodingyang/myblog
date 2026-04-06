@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客统计后台 UI 预览 - 玻璃拟态风格</title>
+  <style>
+    :root {
+      --theme-primary: #10b981;
+      --theme-primary-rgb: 16, 185, 129;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Han Sans SC', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+      position: relative;
+      min-height: 100vh;
+      padding: 24px;
+      color: #1e293b;
+    }
+
+    /* 背景光晕 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(var(--theme-primary-rgb), 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(var(--theme-primary-rgb), 0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 噪点纹理 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 玻璃拟态卡片基础样式 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* 页面标题 */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .time-range-switch {
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .time-range-switch button {
+      padding: 6px 16px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .time-range-switch button.active {
+      background: var(--theme-primary);
+      color: white;
+    }
+
+    /* 区域 1：数据卡片 */
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--theme-primary);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .stat-trend {
+      font-size: 12px;
+      color: #10b981;
+    }
+
+    .stat-trend.down {
+      color: #ef4444;
+    }
+
+    /* 区域 2：趋势图 */
+    .trend-chart {
+      margin-bottom: 24px;
+      height: 360px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--theme-primary);
+    }
+
+    .legend-dot.uv {
+      opacity: 0.5;
+    }
+
+    .chart-canvas {
+      width: 100%;
+      height: 280px;
+      background: linear-gradient(to bottom, rgba(var(--theme-primary-rgb), 0.02) 0%, transparent 100%);
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    /* 区域 3+4：并排布局 */
+    .two-column {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* 区域 3：热门页面 */
+    .top-pages table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .top-pages th {
+      text-align: left;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+      padding: 12px 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .top-pages td {
+      padding: 12px 8px;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .top-pages tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .top-pages tr:hover {
+      background: rgba(var(--theme-primary-rgb), 0.05);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--theme-primary);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* 区域 4：来源饼图 */
+    .source-pie {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+    }
+
+    .pie-placeholder {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--theme-primary) 0deg 120deg,
+        #60a5fa 120deg 200deg,
+        #a78bfa 200deg 260deg,
+        #f472b6 260deg 310deg,
+        #cbd5e1 310deg 360deg
+      );
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-center {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-total {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .pie-label {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .pie-legend {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: #334155;
+    }
+
+    /* 区域 5：访问记录 */
+    .visit-records {
+      margin-bottom: 24px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar input,
+    .filter-bar button {
+      padding: 8px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      font-size: 14px;
+    }
+
+    .filter-bar button {
+      background: var(--theme-primary);
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    .filter-bar button:hover {
+      opacity: 0.9;
+    }
+
+    .records-table {
+      overflow-x: auto;
+    }
+
+    .records-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .records-table th {
+      text-align: left;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+      padding: 12px 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .records-table td {
+      padding: 12px 8px;
+      font-size: 14px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* 响应式 */
+    @media (max-width: 1024px) {
+      .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .two-column {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
+      .stats-cards {
+        grid-template-columns: 1fr;
+      }
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+      .trend-chart {
+        height: 240px;
+      }
+      .chart-canvas {
+        height: 180px;
+      }
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h1 class="page-title">📊 访客统计</h1>
+      <div class="time-range-switch">
+        <button class="active">今日</button>
+        <button>昨日</button>
+        <button>本周</button>
+        <button>本月</button>
+      </div>
+    </div>
+
+    <!-- 区域 1：数据卡片 -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          <span class="stat-label">今日 PV</span>
+        </div>
+        <div class="stat-value">1,234</div>
+        <div class="stat-trend">↑ 12.5% 较昨日</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span class="stat-label">今日 UV</span>
+        </div>
+        <div class="stat-value">567</div>
+        <div class="stat-trend">↑ 8.3% 较昨日</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="stat-label">平均停留</span>
+        </div>
+        <div class="stat-value">2m 34s</div>
+        <div class="stat-trend">↓ 5.2% 较昨日</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+          <span class="stat-label">PV 趋势</span>
+        </div>
+        <div class="stat-value">+15.7%</div>
+        <div class="stat-trend">本周 vs 上周</div>
+      </div>
+    </div>
+
+    <!-- 区域 2：趋势图 -->
+    <div class="glass-card trend-chart">
+      <div class="chart-header">
+        <h2 class="chart-title">访问趋势</h2>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-dot"></span>
+            <span>PV</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot uv"></span>
+            <span>UV</span>
+          </div>
+        </div>
+        <div class="time-range-switch">
+          <button class="active">7天</button>
+          <button>30天</button>
+        </div>
+      </div>
+      <div class="chart-canvas">
+        Canvas 趋势图区域（实际开发中用 Canvas 绘制曲线）
+      </div>
+    </div>
+
+    <!-- 区域 3+4：热门页面 + 来源饼图 -->
+    <div class="two-column">
+      <!-- 区域 3：热门页面 -->
+      <div class="glass-card top-pages">
+        <h2 class="chart-title">热门页面 Top 10</h2>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 60px;">排名</th>
+              <th>页面路径</th>
+              <th style="width: 80px; text-align: right;">PV</th>
+              <th style="width: 80px; text-align: right;">UV</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-badge">1</span></td>
+              <td>/blog/react-hooks</td>
+              <td style="text-align: right;">456</td>
+              <td style="text-align: right;">234</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge">2</span></td>
+              <td>/blog/typescript-tips</td>
+              <td style="text-align: right;">389</td>
+              <td style="text-align: right;">198</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge">3</span></td>
+              <td>/blog/css-grid</td>
+              <td style="text-align: right;">312</td>
+              <td style="text-align: right;">167</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: #64748b;">4</td>
+              <td>/about</td>
+              <td style="text-align: right;">245</td>
+              <td style="text-align: right;">134</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: #64748b;">5</td>
+              <td>/projects</td>
+              <td style="text-align: right;">198</td>
+              <td style="text-align: right;">102</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 区域 4：来源饼图 -->
+      <div class="glass-card source-pie">
+        <h2 class="chart-title">访客来源</h2>
+        <div class="pie-placeholder">
+          <div class="pie-center">
+            <div class="pie-total">1,234</div>
+            <div class="pie-label">总访问</div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="legend-item"><span class="legend-dot"></span> 直接访问 (35%)</div>
+          <div class="legend-item"><span class="legend-dot" style="background: #60a5fa;"></span> 搜索引擎 (28%)</div>
+          <div class="legend-item"><span class="legend-dot" style="background: #a78bfa;"></span> 社交媒体 (18%)</div>
+          <div class="legend-item"><span class="legend-dot" style="background: #f472b6;"></span> 外链 (12%)</div>
+          <div class="legend-item"><span class="legend-dot" style="background: #cbd5e1;"></span> 其他 (7%)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 区域 5：访问记录 -->
+    <div class="glass-card visit-records">
+      <h2 class="chart-title">访问记录</h2>
+      <div class="filter-bar">
+        <input type="text" placeholder="输入页面路径筛选">
+        <input type="date" value="2026-04-01">
+        <span style="color: #64748b;">~</span>
+        <input type="date" value="2026-04-06">
+        <button>搜索</button>
+        <button style="background: transparent; color: #64748b; border: 1px solid rgba(255,255,255,0.3);">重置</button>
+      </div>
+      <div class="records-table">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 180px;">时间</th>
+              <th>页面路径</th>
+              <th style="width: 140px;">IP</th>
+              <th style="width: 160px;">来源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2026-04-06 18:45:23</td>
+              <td>/blog/react-hooks</td>
+              <td>192.168.1.100</td>
+              <td>google.com</td>
+            </tr>
+            <tr>
+              <td>2026-04-06 18:42:15</td>
+              <td>/blog/typescript-tips</td>
+              <td>192.168.1.101</td>
+              <td>直接访问</td>
+            </tr>
+            <tr>
+              <td>2026-04-06 18:38:47</td>
+              <td>/about</td>
+              <td>192.168.1.102</td>
+              <td>twitter.com</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 主题色切换演示
+    const colors = {
+      '薄荷绿': '#10b981',
+      '天空蓝': '#0ea5e9',
+      '紫罗兰': '#8b5cf6',
+      '玫瑰红': '#ec4899'
+    };
+
+    // 可以在控制台运行：changeTheme('#0ea5e9')
+    window.changeTheme = (color) => {
+      document.documentElement.style.setProperty('--theme-primary', color);
+      const rgb = hexToRgb(color);
+      document.documentElement.style.setProperty('--theme-primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+    };
+
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+
+    // 时间范围切换交互
+    document.querySelectorAll('.time-range-switch button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

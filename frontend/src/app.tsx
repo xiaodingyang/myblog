@@ -5,8 +5,14 @@ import 'dayjs/locale/zh-cn';
 import { history } from 'umi';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { getRouterPathname } from '@/utils/runtimePath';
+import analytics from '@/utils/analytics';
 
 dayjs.locale('zh-cn');
+
+// 初始化访客统计埋点 SDK
+if (typeof window !== 'undefined') {
+    analytics.init();
+}
 
 // 全局初始化状态
 export async function getInitialState(): Promise<{
