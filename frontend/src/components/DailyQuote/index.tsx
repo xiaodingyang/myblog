@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Typography } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -56,49 +55,19 @@ const DailyQuote: React.FC = () => {
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl p-5 md:p-6"
-      style={{
-        background: 'rgba(255, 255, 255, 0.75)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.3)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-      }}
+      className="text-center max-w-md cursor-pointer select-none"
+      onClick={() => setOffset(prev => prev + 1)}
+      title="点击换一条"
     >
-      {/* 引号装饰 */}
-      <div
-        className="absolute top-2 left-3 text-5xl md:text-6xl font-serif select-none opacity-10"
-        style={{
-          background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
+      <Text
+        className="!text-xs md:!text-sm !leading-relaxed italic block"
+        style={{ color: 'rgba(255, 255, 255, 0.4)' }}
       >
-        &ldquo;
-      </div>
-
-      <div className="relative z-10">
-        <Text
-          className="!text-sm md:!text-base !leading-relaxed block mb-3"
-          style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 30%, #ec4899 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          {quote.text}
-        </Text>
-        <div className="flex items-center justify-between">
-          <Text className="!text-xs !text-gray-400">—— {quote.author}</Text>
-          <button
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-purple-500 transition-colors"
-            onClick={() => setOffset(prev => prev + 1)}
-            title="换一条"
-          >
-            <ReloadOutlined style={{ fontSize: 12 }} />
-            换一条
-          </button>
-        </div>
-      </div>
+        "{quote.text}"
+      </Text>
+      <Text style={{ color: 'rgba(255, 255, 255, 0.25)', fontSize: 11 }} className="mt-1 block">
+        —— {quote.author}
+      </Text>
     </div>
   );
 };

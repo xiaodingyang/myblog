@@ -37,9 +37,9 @@ export default defineConfig({
       if (document.head) inject();
       else document.addEventListener('DOMContentLoaded', inject, { once: true });
     })();`,
-    // Service Worker 注册
+    // Service Worker 注册（仅生产环境）
     `(function(){
-      if ('serviceWorker' in navigator) {
+      if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/sw.js').catch(function(){});
         });
@@ -153,6 +153,11 @@ export default defineConfig({
   
   // Mock 配置 - 设置为 false 使用真实后端 API
   mock: false,
+
+  // MFSU 配置 - 关闭 eager 策略，解决 HMR 热更新失效问题
+  mfsu: {
+    strategy: 'normal',
+  },
 
   // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
   chainWebpack(config: any, { env }: any) {
