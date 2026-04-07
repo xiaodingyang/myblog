@@ -29,7 +29,7 @@ exports.recordVisit = async (req, res, next) => {
 
     // 创建访问记录
     const visit = await Visit.create({
-      url,
+      url: visitUrl,
       title: title || '',
       referrer: referrer || '',
       userAgent: userAgent || req.headers['user-agent'] || '',
