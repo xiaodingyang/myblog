@@ -8,8 +8,11 @@ exports.recordVisit = async (req, res, next) => {
   try {
     const { url, title, referrer, userAgent, sessionId, userId } = req.body;
 
+    // 兼容前端旧版本（发送 path 而非 url）
+    const visitUrl = url || req.body.path;
+
     // 验证必填字段
-    if (!url || !sessionId) {
+    if (!visitUrl || !sessionId) {
       return res.status(400).json({
         code: 400,
         message: 'url 和 sessionId 不能为空',
