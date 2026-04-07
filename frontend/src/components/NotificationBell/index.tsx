@@ -208,7 +208,7 @@ const NotificationBell: React.FC = () => {
           style={{
             fontSize: 18,
             cursor: 'pointer',
-            color: unreadCount > 0 ? '#3b82f6' : undefined,
+            color: unreadCount > 0 ? '#3b82f6' : 'rgba(248, 250, 252, 0.85)',
             transition: 'color 0.2s',
           }}
         />
