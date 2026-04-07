@@ -10,8 +10,6 @@ export default defineConfig({
     { rel: 'preconnect', href: 'https://www.xiaodingyang.art' },
     { rel: 'dns-prefetch', href: 'https://www.xiaodingyang.art' },
     { rel: 'preload', href: '/umi.css', as: 'style' },
-    // 首屏关键字体预加载
-    { rel: 'preload', href: 'https://at.alicdn.com/t/webfont_6e11nqgmpm.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
   ],
   metas: [
     { name: 'baidu-site-verification', content: 'codeva-T2MxTzyMwa' },
