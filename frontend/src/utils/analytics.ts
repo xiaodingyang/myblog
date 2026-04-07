@@ -7,7 +7,7 @@
  */
 
 interface VisitData {
-  path: string;
+  url: string;
   title: string;
   referrer: string;
   sessionId: string;
@@ -92,7 +92,7 @@ class Analytics {
     }
 
     const visitData: VisitData = {
-      path: window.location.pathname,
+      url: window.location.pathname,
       title: document.title,
       referrer: document.referrer,
       sessionId: this.sessionId,
