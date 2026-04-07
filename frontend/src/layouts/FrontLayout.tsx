@@ -37,6 +37,7 @@ import NotificationBell from '@/components/NotificationBell';
 import ReadingStatsModal from '@/components/ReadingStats';
 import MobileTabBar from '@/components/MobileTabBar';
 import { getColorThemeById } from '@/config/colorThemes';
+import analytics from '@/utils/analytics';
 
 const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
 const LazyParticleThemeSelector = lazy(() => import('@/components/ParticleThemeSelector'));
@@ -64,6 +65,12 @@ const FrontLayout: React.FC = () => {
       window.removeEventListener('offline', goOffline);
       window.removeEventListener('online', goOnline);
     };
+  }, []);
+
+  // 初始化访客统计 SDK
+  useEffect(() => {
+    analytics.init();
+    return () => { analytics.destroy(); };
   }, []);
   const [showParticles, setShowParticles] = useState(false);
   const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');

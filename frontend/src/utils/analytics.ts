@@ -1,148 +1,140 @@
 /**
  * 访客统计埋点 SDK
- * 功能：
- * 1. 自动记录页面访问（PV）
- * 2. 生成并管理 sessionId
- * 3. 调用后端 API 记录访问数据
+ *
+ * 三层去重机制：
+ * 1. pathname 对比 — replaceState 只在路径真正变化时上报
+ * 2. 5 分钟间隔 — 同一页面短时间内不重复计数
+ * 3. 50ms 防抖 — 合并同一时刻的多次触发
  */
-
-interface VisitData {
-  url: string;
-  title: string;
-  referrer: string;
-  sessionId: string;
-  userAgent: string;
-  timestamp: number;
-}
 
 class Analytics {
   private sessionId: string;
-  private isInitialized: boolean = false;
-  private apiEndpoint: string = '/api/visits';
+  private lastPath: string = '';
   private lastVisitTime: number = 0;
-  private readonly VISIT_INTERVAL: number = 5 * 60 * 1000; // 5分钟防重复提交
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private originalPushState: typeof history.pushState;
+  private originalReplaceState: typeof history.replaceState;
+
+  private readonly VISIT_INTERVAL = 5 * 60 * 1000; // 5 分钟
+  private readonly DEBOUNCE_MS = 50; // 50ms 防抖
 
   constructor() {
     this.sessionId = this.getOrCreateSessionId();
+    this.originalPushState = history.pushState.bind(history);
+    this.originalReplaceState = history.replaceState.bind(history);
   }
 
   /**
-   * 获取或创建 sessionId
-   * sessionId 存储在 localStorage 中，用于标识唯一访客
+   * 获取或创建 sessionId（存于 localStorage）
    */
   private getOrCreateSessionId(): string {
-    const storageKey = 'visitor_session_id';
-    let sessionId = localStorage.getItem(storageKey);
-
-    if (!sessionId) {
-      // 生成新的 sessionId：时间戳 + 随机字符串
-      sessionId = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-      localStorage.setItem(storageKey, sessionId);
+    const key = 'visitor_session_id';
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      localStorage.setItem(key, id);
     }
-
-    return sessionId;
+    return id;
   }
 
   /**
-   * 初始化埋点 SDK
-   * 监听路由变化，自动记录页面访问
+   * 初始化 SDK：记录首次访问 + 监听路由变化
    */
   public init(): void {
-    if (this.isInitialized) {
-      console.warn('[Analytics] SDK 已经初始化');
-      return;
-    }
-
-    this.isInitialized = true;
-
-    // 记录首次页面访问
     this.trackPageView();
 
-    // 监听路由变化（Umi 4 使用 history API）
-    if (typeof window !== 'undefined') {
-      // 监听 popstate 事件（浏览器前进/后退）
-      window.addEventListener('popstate', () => {
+    // popstate：浏览器前进/后退
+    window.addEventListener('popstate', this.handleRouteChange);
+
+    // pushState：代码跳转
+    history.pushState = (...args: Parameters<typeof history.pushState>) => {
+      this.originalPushState(...args);
+      this.trackPageView();
+    };
+
+    // replaceState：仅 pathname 变化时上报
+    history.replaceState = (...args: Parameters<typeof history.replaceState>) => {
+      const prev = location.pathname;
+      this.originalReplaceState(...args);
+      if (location.pathname !== prev) {
         this.trackPageView();
-      });
+      }
+    };
+  }
 
-      // 监听 pushState 和 replaceState（需要重写原生方法）
-      const originalPushState = window.history.pushState;
-      const originalReplaceState = window.history.replaceState;
+  private handleRouteChange = (): void => {
+    this.trackPageView();
+  };
 
-      window.history.pushState = (...args) => {
-        originalPushState.apply(window.history, args);
-        this.trackPageView();
-      };
-
-      window.history.replaceState = (...args) => {
-        originalReplaceState.apply(window.history, args);
-        this.trackPageView();
-      };
-
-      console.log('[Analytics] SDK 初始化成功');
+  /**
+   * 记录页面访问（第 3 层：50ms 防抖）
+   */
+  public trackPageView(): void {
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
     }
+    this.debounceTimer = window.setTimeout(() => {
+      this.doTrackPageView();
+    }, this.DEBOUNCE_MS);
   }
 
   /**
-   * 记录页面访问
+   * 实际上报逻辑（第 2 层：5 分钟间隔去重）
    */
-  public trackPageView(): void {
-    if (typeof window === 'undefined') {
+  private doTrackPageView(): void {
+    const currentPath = location.pathname;
+    const now = Date.now();
+
+    if (currentPath === this.lastPath && now - this.lastVisitTime < this.VISIT_INTERVAL) {
       return;
     }
 
-    const visitData: VisitData = {
-      url: window.location.pathname,
-      title: document.title,
-      referrer: document.referrer,
-      sessionId: this.sessionId,
-      userAgent: navigator.userAgent,
-      timestamp: Date.now(),
-    };
+    this.lastPath = currentPath;
+    this.lastVisitTime = now;
 
-    // 发送访问数据到后端
-    this.sendVisitData(visitData);
+    this.sendData({
+      path: currentPath,
+      title: document.title,
+      referer: document.referrer,
+      sessionId: this.sessionId,
+    });
   }
 
   /**
-   * 发送访问数据到后端
+   * 使用 sendBeacon 发送数据（不阻塞页面，页面关闭也能发出）
    */
-  private async sendVisitData(data: VisitData): Promise<void> {
+  private sendData(data: Record<string, unknown>): void {
     try {
-      const response = await fetch(this.apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        console.error('[Analytics] 发送访问数据失败:', response.statusText);
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      if (!navigator.sendBeacon('/api/stats/visit', blob)) {
+        fetch('/api/stats/visit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          keepalive: true,
+        }).catch(() => {});
       }
-    } catch (error) {
-      // 静默失败，不影响用户体验
-      console.error('[Analytics] 发送访问数据异常:', error);
+    } catch {
+      // 静默失败
     }
   }
 
   /**
-   * 手动记录自定义事件（扩展功能）
+   * 清理所有监听器和劫持（组件卸载时调用）
    */
-  public trackEvent(eventName: string, eventData?: Record<string, any>): void {
-    console.log('[Analytics] 自定义事件:', eventName, eventData);
-    // 可以扩展为发送自定义事件到后端
+  public destroy(): void {
+    window.removeEventListener('popstate', this.handleRouteChange);
+    history.pushState = this.originalPushState;
+    history.replaceState = this.originalReplaceState;
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+    }
   }
 
-  /**
-   * 获取当前 sessionId
-   */
   public getSessionId(): string {
     return this.sessionId;
   }
 }
 
-// 导出单例实例
 const analytics = new Analytics();
-
 export default analytics;

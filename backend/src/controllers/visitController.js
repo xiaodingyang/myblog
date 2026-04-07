@@ -1,207 +1,205 @@
 const { Visit } = require('../models');
 
+// ==================== 工具函数 ====================
+
 /**
- * 记录访问
- * POST /api/visits
+ * 根据北京时间计算日期范围，返回 UTC 日期用于 MongoDB 查询
  */
-exports.recordVisit = async (req, res, next) => {
+function getDateRange(range) {
+  const now = new Date();
+  const BJ_MS = 8 * 3600000;
+  // 当前北京时间
+  const bjMs = now.getTime() + now.getTimezoneOffset() * 60000 + BJ_MS;
+  const bjNow = new Date(bjMs);
+  const bjTodayStart = new Date(bjNow.getFullYear(), bjNow.getMonth(), bjNow.getDate());
+
+  let startBj, endBj;
+  switch (range) {
+    case 'yesterday':
+      startBj = new Date(bjTodayStart.getTime() - 86400000);
+      endBj = new Date(bjTodayStart.getTime());
+      break;
+    case 'week': {
+      const dow = bjNow.getDay() || 7; // 周一=1
+      startBj = new Date(bjTodayStart.getTime() - (dow - 1) * 86400000);
+      endBj = new Date(bjTodayStart.getTime() + 86400000);
+      break;
+    }
+    case 'month':
+      startBj = new Date(bjNow.getFullYear(), bjNow.getMonth(), 1);
+      endBj = new Date(bjTodayStart.getTime() + 86400000);
+      break;
+    default: // today
+      startBj = new Date(bjTodayStart.getTime());
+      endBj = new Date(bjTodayStart.getTime() + 86400000);
+      break;
+  }
+
+  // 北京时间 → UTC
+  return {
+    startDate: new Date(startBj.getTime() - BJ_MS),
+    endDate: new Date(endBj.getTime() - BJ_MS),
+  };
+}
+
+/**
+ * 获取最近 N 天的北京时间日期字符串数组 ['2026-04-01', ...]
+ */
+function getRecentDates(days) {
+  const now = new Date();
+  const BJ_MS = 8 * 3600000;
+  const bjMs = now.getTime() + now.getTimezoneOffset() * 60000 + BJ_MS;
+  const bjNow = new Date(bjMs);
+  const bjTodayStart = new Date(bjNow.getFullYear(), bjNow.getMonth(), bjNow.getDate());
+
+  const dates = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(bjTodayStart.getTime() - i * 86400000);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+  return dates;
+}
+
+/**
+ * 从 referer URL 提取域名
+ */
+function extractDomain(referer) {
+  if (!referer) return null;
   try {
-    const { url, title, referrer, userAgent, sessionId, userId } = req.body;
+    return new URL(referer).hostname.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
 
-    // 兼容前端旧版本（发送 path 而非 url）
-    const visitUrl = url || req.body.path;
+const VALID_RANGES = ['today', 'yesterday', 'week', 'month'];
 
-    // 验证必填字段
-    if (!visitUrl || !sessionId) {
-      return res.status(400).json({
-        code: 400,
-        message: 'url 和 sessionId 不能为空',
-        data: null,
-      });
+// ==================== 控制器 ====================
+
+/**
+ * 记录访问 — POST /api/stats/visit
+ * 无需登录，静默失败（存储失败也返回成功）
+ */
+exports.recordVisit = async (req, res) => {
+  try {
+    const path = req.body.path || req.body.url;
+    const { sessionId } = req.body;
+
+    if (!path || !sessionId) {
+      return res.json({ code: 0, message: '记录成功' });
     }
 
-    // 获取访客 IP（从请求头或连接信息中获取）
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                req.headers['x-real-ip'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                '';
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || req.headers['x-real-ip']
+      || req.connection?.remoteAddress
+      || '';
 
-    // 创建访问记录
-    const visit = await Visit.create({
-      url: visitUrl,
-      title: title || '',
-      referrer: referrer || '',
-      userAgent: userAgent || req.headers['user-agent'] || '',
+    await Visit.create({
+      path,
+      title: req.body.title || '',
+      referer: req.body.referer || req.body.referrer || '',
+      userAgent: req.headers['user-agent'] || '',
       ip,
       sessionId,
-      userId: userId || null,
-      timestamp: new Date(),
+      duration: req.body.duration || null,
     });
-
-    res.status(201).json({
-      code: 0,
-      message: '访问记录成功',
-      data: { id: visit._id },
-    });
-  } catch (error) {
-    next(error);
+  } catch {
+    // 静默失败，不影响前端
   }
+  res.json({ code: 0, message: '记录成功' });
 };
 
 /**
- * 获取总览统计
- * GET /api/stats/overview
+ * 获取统计概览 — GET /api/stats/overview?range=today
  */
 exports.getOverview = async (req, res, next) => {
   try {
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterdayStart = new Date(todayStart);
-    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    const range = VALID_RANGES.includes(req.query.range) ? req.query.range : 'today';
+    const { startDate, endDate } = getDateRange(range);
+    const match = { createdAt: { $gte: startDate, $lt: endDate } };
 
-    // 并行查询多个统计数据
-    const [
-      totalPV,
-      totalUV,
-      todayPV,
-      todayUV,
-      yesterdayPV,
-      yesterdayUV,
-    ] = await Promise.all([
-      // 总 PV（总访问量）
-      Visit.countDocuments(),
-      
-      // 总 UV（独立访客数）
-      Visit.distinct('sessionId').then(sessions => sessions.length),
-      
-      // 今日 PV
-      Visit.countDocuments({ timestamp: { $gte: todayStart } }),
-      
-      // 今日 UV
-      Visit.distinct('sessionId', { timestamp: { $gte: todayStart } })
-        .then(sessions => sessions.length),
-      
-      // 昨日 PV
-      Visit.countDocuments({
-        timestamp: { $gte: yesterdayStart, $lt: todayStart },
-      }),
-      
-      // 昨日 UV
-      Visit.distinct('sessionId', {
-        timestamp: { $gte: yesterdayStart, $lt: todayStart },
-      }).then(sessions => sessions.length),
+    const [pv, uvSet, avgResult] = await Promise.all([
+      Visit.countDocuments(match),
+      Visit.distinct('sessionId', match),
+      Visit.aggregate([
+        { $match: { ...match, duration: { $ne: null, $gt: 0 } } },
+        { $group: { _id: null, avg: { $avg: '$duration' } } },
+      ]),
     ]);
 
     res.json({
       code: 0,
-      message: 'success',
+      message: 'ok',
       data: {
-        total: {
-          pv: totalPV,
-          uv: totalUV,
-        },
-        today: {
-          pv: todayPV,
-          uv: todayUV,
-        },
-        yesterday: {
-          pv: yesterdayPV,
-          uv: yesterdayUV,
-        },
+        pv,
+        uv: uvSet.length,
+        avgDuration: avgResult[0]?.avg ? Math.round(avgResult[0].avg) : 0,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
 /**
- * 获取页面统计（热门页面排行）
- * GET /api/stats/pages
+ * 获取热门页面 — GET /api/stats/top-pages?limit=10&range=today
  */
-exports.getPageStats = async (req, res, next) => {
+exports.getTopPages = async (req, res, next) => {
   try {
-    const { limit = 10, days = 30 } = req.query;
-    const limitNum = Math.min(parseInt(limit, 10), 100);
-    const daysNum = parseInt(days, 10);
+    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 100);
+    const range = VALID_RANGES.includes(req.query.range) ? req.query.range : 'today';
+    const { startDate, endDate } = getDateRange(range);
 
-    // 计算时间范围
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysNum);
-
-    // 聚合查询：按 URL 分组统计 PV 和 UV
-    const pageStats = await Visit.aggregate([
-      // 筛选时间范围
-      { $match: { timestamp: { $gte: startDate } } },
-      
-      // 按 URL 分组
+    const list = await Visit.aggregate([
+      { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
       {
         $group: {
-          _id: '$url',
+          _id: '$path',
           title: { $first: '$title' },
           pv: { $sum: 1 },
           sessions: { $addToSet: '$sessionId' },
         },
       },
-      
-      // 计算 UV
       {
         $project: {
           _id: 0,
-          url: '$_id',
+          path: '$_id',
           title: 1,
           pv: 1,
           uv: { $size: '$sessions' },
         },
       },
-      
-      // 按 PV 降序排序
       { $sort: { pv: -1 } },
-      
-      // 限制返回数量
-      { $limit: limitNum },
+      { $limit: limit },
     ]);
 
-    res.json({
-      code: 0,
-      message: 'success',
-      data: {
-        list: pageStats,
-        days: daysNum,
-      },
-    });
-  } catch (error) {
-    next(error);
+    res.json({ code: 0, message: 'ok', data: list });
+  } catch (err) {
+    next(err);
   }
 };
 
 /**
- * 获取访问趋势（按日期聚合）
- * GET /api/stats/trend
+ * 获取访问趋势 — GET /api/stats/trend?days=7
  */
 exports.getTrend = async (req, res, next) => {
   try {
-    const { days = 7 } = req.query;
-    const daysNum = Math.min(parseInt(days, 10), 90);
+    const days = [7, 30].includes(parseInt(req.query.days, 10))
+      ? parseInt(req.query.days, 10) : 7;
+    const dates = getRecentDates(days);
 
-    // 计算时间范围
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysNum);
-    startDate.setHours(0, 0, 0, 0);
+    // dates[0] 的北京时间 00:00 对应的 UTC 时间
+    const BJ_MS = 8 * 3600000;
+    const startUTC = new Date(new Date(dates[0]).getTime() + BJ_MS);
 
-    // 聚合查询：按日期分组统计
-    const trendData = await Visit.aggregate([
-      // 筛选时间范围
-      { $match: { timestamp: { $gte: startDate } } },
-      
-      // 按日期分组
+    const rows = await Visit.aggregate([
+      { $match: { createdAt: { $gte: startUTC } } },
       {
         $group: {
           _id: {
             $dateToString: {
               format: '%Y-%m-%d',
-              date: '$timestamp',
+              date: '$createdAt',
               timezone: 'Asia/Shanghai',
             },
           },
@@ -209,8 +207,6 @@ exports.getTrend = async (req, res, next) => {
           sessions: { $addToSet: '$sessionId' },
         },
       },
-      
-      // 计算 UV
       {
         $project: {
           _id: 0,
@@ -219,39 +215,117 @@ exports.getTrend = async (req, res, next) => {
           uv: { $size: '$sessions' },
         },
       },
-      
-      // 按日期升序排序
-      { $sort: { date: 1 } },
     ]);
 
-    // 填充缺失的日期（确保每天都有数据，即使是 0）
-    const result = [];
-    const currentDate = new Date(startDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    while (currentDate <= today) {
-      const dateStr = currentDate.toISOString().split('T')[0];
-      const found = trendData.find(item => item.date === dateStr);
-      
-      result.push({
-        date: dateStr,
-        pv: found ? found.pv : 0,
-        uv: found ? found.uv : 0,
-      });
-
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
+    const pvMap = Object.fromEntries(rows.map(r => [r.date, r.pv]));
+    const uvMap = Object.fromEntries(rows.map(r => [r.date, r.uv]));
 
     res.json({
       code: 0,
-      message: 'success',
+      message: 'ok',
       data: {
-        list: result,
-        days: daysNum,
+        dates,
+        pv: dates.map(d => pvMap[d] || 0),
+        uv: dates.map(d => uvMap[d] || 0),
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * 获取访客来源分布 — GET /api/stats/referers?limit=5&range=today
+ */
+exports.getReferers = async (req, res, next) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 5, 20);
+    const range = VALID_RANGES.includes(req.query.range) ? req.query.range : 'today';
+    const { startDate, endDate } = getDateRange(range);
+
+    const rows = await Visit.aggregate([
+      { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
+      { $project: { referer: { $ifNull: ['$referer', ''] } } },
+      { $group: { _id: '$referer', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    // 提取域名并归类
+    const sourceMap = {};
+    let directCount = 0;
+
+    rows.forEach(({ _id, count }) => {
+      const domain = extractDomain(_id);
+      if (!domain) {
+        directCount += count;
+      } else {
+        sourceMap[domain] = (sourceMap[domain] || 0) + count;
+      }
+    });
+
+    const sorted = Object.entries(sourceMap).sort((a, b) => b[1] - a[1]);
+    const top = sorted.slice(0, limit).map(([source, count]) => ({ source, count }));
+    const otherCount = sorted.slice(limit).reduce((sum, [, c]) => sum + c, 0);
+
+    const data = [];
+    if (directCount > 0) data.push({ source: '直接访问', count: directCount });
+    data.push(...top);
+    if (otherCount > 0) data.push({ source: '其他', count: otherCount });
+
+    res.json({ code: 0, message: 'ok', data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * 获取访问记录列表 — GET /api/stats/visits?page=1&pageSize=20&path=/blog&startDate=...&endDate=...
+ */
+exports.getVisits = async (req, res, next) => {
+  try {
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const pageSize = Math.min(Math.max(parseInt(req.query.pageSize, 10) || 20, 1), 100);
+    const { path, startDate: sd, endDate: ed } = req.query;
+
+    const query = {};
+    if (path) query.path = { $regex: path, $options: 'i' };
+    if (sd || ed) {
+      query.createdAt = {};
+      if (sd) query.createdAt.$gte = new Date(sd);
+      if (ed) {
+        const end = new Date(ed);
+        end.setDate(end.getDate() + 1);
+        query.createdAt.$lt = end;
+      }
+    }
+
+    const [total, data] = await Promise.all([
+      Visit.countDocuments(query),
+      Visit.find(query, { path: 1, title: 1, ip: 1, referer: 1, createdAt: 1 })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .lean(),
+    ]);
+
+    res.json({
+      code: 0,
+      message: 'ok',
+      data: {
+        total,
+        page,
+        pageSize,
+        data: data.map(v => ({
+          _id: v._id,
+          path: v.path,
+          title: v.title,
+          ip: v.ip,
+          referer: v.referer,
+          timestamp: v.createdAt,
+        })),
+      },
+    });
+  } catch (err) {
+    next(err);
   }
 };

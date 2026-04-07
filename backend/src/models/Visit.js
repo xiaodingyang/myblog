@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const visitSchema = new mongoose.Schema({
-  // 访问的页面 URL
-  url: {
+  // 访问路径（如 /blog/123）
+  path: {
     type: String,
-    required: [true, '访问 URL 不能为空'],
+    required: [true, '访问路径不能为空'],
     trim: true,
-    maxlength: [500, 'URL 不能超过500个字符'],
+    maxlength: [500, '路径不能超过500个字符'],
   },
   // 页面标题
   title: {
@@ -15,14 +15,14 @@ const visitSchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, '标题不能超过200个字符'],
   },
-  // 来源页面
-  referrer: {
+  // 来源页面 URL（与 HTTP 标准一致用 referer）
+  referer: {
     type: String,
     default: '',
     trim: true,
     maxlength: [500, '来源 URL 不能超过500个字符'],
   },
-  // 用户代理（浏览器信息）
+  // 浏览器 User-Agent
   userAgent: {
     type: String,
     default: '',
@@ -34,20 +34,18 @@ const visitSchema = new mongoose.Schema({
     default: '',
     maxlength: [50, 'IP 地址不能超过50个字符'],
   },
-  // 访问时间戳
-  timestamp: {
-    type: Date,
-    default: Date.now,
-    index: true,
-  },
-  // 会话 ID（用于区分 UV）
+  // 会话 ID（前端生成，用于 UV 统计）
   sessionId: {
     type: String,
     required: [true, '会话 ID 不能为空'],
     trim: true,
-    index: true,
   },
-  // 用户 ID（可选，已登录用户）
+  // 停留时长（秒）
+  duration: {
+    type: Number,
+    default: null,
+  },
+  // 用户 ID（已登录用户关联）
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -57,10 +55,10 @@ const visitSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// 索引优化查询性能
-visitSchema.index({ url: 1, timestamp: -1 });
-visitSchema.index({ sessionId: 1, timestamp: -1 });
-visitSchema.index({ timestamp: -1 });
+// PRD 索引设计
 visitSchema.index({ createdAt: -1 });
+visitSchema.index({ path: 1 });
+visitSchema.index({ sessionId: 1 });
+visitSchema.index({ path: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Visit', visitSchema);

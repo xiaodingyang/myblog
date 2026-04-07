@@ -1,267 +1,417 @@
 /**
  * 访客统计后台页面
- * 功能：
- * 1. 总览卡片：总访问量、UV、PV、今日访问
- * 2. 热门页面列表
- * 3. 访问趋势图表
+ * 5 区域：数据卡片 / 趋势图 / 热门页面 / 来源饼图 / 访问记录
  */
 
-import { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Table, message, Spin } from 'antd';
+import { useEffect, useState, useCallback } from 'react';
 import {
-  EyeOutlined,
-  UserOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
+  Card, Row, Col, Statistic, Table, Segmented, Input, DatePicker, Button,
+  Spin, Empty, Skeleton, Pagination, message,
+} from 'antd';
+import {
+  EyeOutlined, UserOutlined, ClockCircleOutlined, BarChartOutlined,
+  ExclamationCircleOutlined, InboxOutlined, ReloadOutlined, SearchOutlined,
 } from '@ant-design/icons';
-import { Line, Column } from '@ant-design/charts';
+import { Pie } from '@ant-design/charts';
 import { request } from 'umi';
+import { useModel } from 'umi';
+import { getColorThemeById } from '@/config/colorThemes';
+import TrendChart from '@/components/TrendChart';
 
-interface StatsOverview {
-  totalVisits: number;
-  uniqueVisitors: number;
-  pageViews: number;
-  todayVisits: number;
+// ========== 类型 ==========
+
+interface OverviewData { pv: number; uv: number; avgDuration: number; }
+interface TopPageItem { path: string; title: string; pv: number; uv: number; }
+interface TrendData { dates: string[]; pv: number[]; uv: number[]; }
+interface RefererItem { source: string; count: number; }
+interface VisitItem {
+  _id: string; path: string; title: string; ip: string; referer: string; timestamp: string;
+}
+interface VisitsResponse {
+  total: number; page: number; pageSize: number; data: VisitItem[];
 }
 
-interface PopularPage {
-  path: string;
-  title: string;
-  visits: number;
-  uniqueVisitors: number;
+type RegionState = 'loading' | 'success' | 'error';
+
+// ========== 玻璃拟态卡片样式 ==========
+
+const glassStyle: React.CSSProperties = {
+  background: 'rgba(255, 255, 255, 0.6)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  borderRadius: 12,
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+};
+
+// ========== 工具函数 ==========
+
+function formatDuration(seconds: number): string {
+  if (!seconds) return '--';
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  if (seconds < 3600) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60);
+    return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  }
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-interface TrendData {
-  date: string;
-  visits: number;
-  type: string;
-}
+const RANGE_MAP: Record<string, string> = {
+  '今日': 'today', '昨日': 'yesterday', '本周': 'week', '本月': 'month',
+};
+
+const RANGE_KEYS = ['today', 'yesterday', 'week', 'month'];
+
+// ========== 子组件 ==========
+
+const ErrorBlock: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
+    <ExclamationCircleOutlined style={{ fontSize: 32, color: '#f59e0b' }} />
+    <p style={{ color: '#64748b', fontSize: 14, marginTop: 12 }}>数据加载失败</p>
+    <Button type="primary" ghost onClick={onRetry} icon={<ReloadOutlined />}>重试</Button>
+  </div>
+);
+
+const EmptyBlock: React.FC = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
+    <InboxOutlined style={{ fontSize: 48, color: '#cbd5e1' }} />
+    <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 8 }}>暂无数据</p>
+  </div>
+);
+
+const LoadingBlock: React.FC = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+    <Spin />
+  </div>
+);
+
+// ========== 主组件 ==========
 
 const StatsPage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [overview, setOverview] = useState<StatsOverview>({
-    totalVisits: 0,
-    uniqueVisitors: 0,
-    pageViews: 0,
-    todayVisits: 0,
+  const { themeId } = useModel('colorModel');
+  const themeColor = getColorThemeById(themeId)?.primary || '#10b981';
+
+  // 全局状态
+  const [timeRange, setTimeRange] = useState<string>('today');
+  const [trendDays, setTrendDays] = useState<number>(7);
+
+  // 数据
+  const [overview, setOverview] = useState<OverviewData | null>(null);
+  const [trend, setTrend] = useState<TrendData | null>(null);
+  const [topPages, setTopPages] = useState<TopPageItem[]>([]);
+  const [referers, setReferers] = useState<RefererItem[]>([]);
+  const [visits, setVisits] = useState<VisitsResponse | null>(null);
+
+  // 各区域加载状态
+  const [states, setStates] = useState<Record<string, RegionState>>({
+    overview: 'loading', trend: 'loading', topPages: 'loading', referers: 'loading', visits: 'loading',
   });
-  const [popularPages, setPopularPages] = useState<PopularPage[]>([]);
-  const [trendData, setTrendData] = useState<TrendData[]>([]);
 
-  // 获取统计数据
-  const fetchStats = async () => {
-    setLoading(true);
-    try {
-      // 获取总览数据
-      const overviewRes = await request('/api/stats/overview');
-      if (overviewRes.code === 0) {
-        setOverview(overviewRes.data);
-      }
+  // 访问记录筛选
+  const [filter, setFilter] = useState({ page: 1, pageSize: 20, path: '', startDate: '', endDate: '' });
 
-      // 获取热门页面
-      const popularRes = await request('/api/stats/popular-pages', {
-        params: { limit: 10 },
-      });
-      if (popularRes.code === 0) {
-        setPopularPages(popularRes.data);
-      }
-
-      // 获取访问趋势（最近 7 天）
-      const trendRes = await request('/api/stats/trend', {
-        params: { days: 7 },
-      });
-      if (trendRes.code === 0) {
-        setTrendData(trendRes.data);
-      }
-    } catch (error) {
-      message.error('获取统计数据失败');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStats();
+  // 设置区域状态
+  const setRegion = useCallback((region: string, state: RegionState) => {
+    setStates(prev => ({ ...prev, [region]: state }));
   }, []);
 
-  // 热门页面表格列配置
-  const columns = [
-    {
-      title: '排名',
-      key: 'rank',
-      width: 80,
-      render: (_: any, __: any, index: number) => (
-        <span className="font-semibold text-gray-600">{index + 1}</span>
-      ),
-    },
-    {
-      title: '页面路径',
-      dataIndex: 'path',
-      key: 'path',
-      ellipsis: true,
-      render: (path: string) => (
-        <span className="text-blue-600 font-mono text-sm">{path}</span>
-      ),
-    },
-    {
-      title: '页面标题',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
-    },
-    {
-      title: '访问次数',
-      dataIndex: 'visits',
-      key: 'visits',
-      width: 120,
-      sorter: (a: PopularPage, b: PopularPage) => a.visits - b.visits,
-      render: (visits: number) => (
-        <span className="font-semibold text-green-600">{visits.toLocaleString()}</span>
-      ),
-    },
-    {
-      title: '独立访客',
-      dataIndex: 'uniqueVisitors',
-      key: 'uniqueVisitors',
-      width: 120,
-      sorter: (a: PopularPage, b: PopularPage) => a.uniqueVisitors - b.uniqueVisitors,
-      render: (uv: number) => (
-        <span className="font-semibold text-purple-600">{uv.toLocaleString()}</span>
-      ),
-    },
-  ];
+  // ===== 数据获取 =====
 
-  // 访问趋势折线图配置
-  const lineConfig = {
-    data: trendData,
-    xField: 'date',
-    yField: 'visits',
-    seriesField: 'type',
-    smooth: true,
-    animation: {
-      appear: {
-        animation: 'path-in',
-        duration: 1000,
-      },
-    },
-    legend: {
-      position: 'top' as const,
-    },
-    xAxis: {
-      label: {
-        autoRotate: false,
-      },
-    },
-    yAxis: {
-      label: {
-        formatter: (v: string) => `${Number(v).toLocaleString()}`,
-      },
-    },
-    tooltip: {
-      formatter: (datum: any) => {
-        return {
-          name: datum.type,
-          value: datum.visits.toLocaleString(),
-        };
-      },
-    },
-  };
+  const fetchData = useCallback(async () => {
+    setStates({ overview: 'loading', trend: 'loading', topPages: 'loading', referers: 'loading', visits: 'loading' });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Spin size="large" tip="加载统计数据中..." />
-      </div>
-    );
-  }
+    const results = await Promise.allSettled([
+      request('/api/stats/overview', { params: { range: timeRange } }),
+      request('/api/stats/trend', { params: { days: trendDays } }),
+      request('/api/stats/top-pages', { params: { limit: 10, range: timeRange } }),
+      request('/api/stats/referers', { params: { limit: 5, range: timeRange } }),
+      request('/api/stats/visits', { params: filter }),
+    ]);
+
+    const handlers: Array<{ region: string; setter: (data: any) => void }> = [
+      { region: 'overview', setter: setOverview },
+      { region: 'trend', setter: setTrend },
+      { region: 'topPages', setter: setTopPages },
+      { region: 'referers', setter: setReferers },
+      { region: 'visits', setter: setVisits },
+    ];
+
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled' && r.value?.code === 0) {
+        handlers[i].setter(r.value.data);
+        setRegion(handlers[i].region, 'success');
+      } else {
+        setRegion(handlers[i].region, 'error');
+      }
+    });
+  }, [timeRange, trendDays, filter, setRegion]);
+
+  // 初始加载 + 依赖变化时重新加载
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  // 60s 静默刷新卡片
+  useEffect(() => {
+    const timer = setInterval(() => {
+      request('/api/stats/overview', { params: { range: timeRange } })
+        .then((res: any) => { if (res?.code === 0) setOverview(res.data); })
+        .catch(() => {});
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [timeRange]);
+
+  // ===== 事件处理 =====
+
+  const handleVisitsSearch = useCallback(() => {
+    setFilter(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  const handlePageChange = useCallback((page: number, pageSize: number) => {
+    setFilter(prev => ({ ...prev, page, pageSize }));
+  }, []);
+
+  const handleResetFilter = useCallback(() => {
+    setFilter({ page: 1, pageSize: 20, path: '', startDate: '', endDate: '' });
+  }, []);
+
+  // ===== 渲染 =====
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* 页面标题 */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">访客统计</h1>
-        <p className="text-gray-500 mt-1">实时监控网站访问数据</p>
+    <div style={{ padding: 24, minHeight: '100vh' }}>
+      {/* 页面标题 + 时间范围切换 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#1e293b', margin: 0 }}>访客统计</h1>
+        <Segmented
+          options={['今日', '昨日', '本周', '本月']}
+          onChange={(val) => setTimeRange(RANGE_MAP[val as string] || 'today')}
+        />
       </div>
 
-      {/* 总览卡片 */}
-      <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={12} lg={6}>
-          <Card
-            bordered={false}
-            className="shadow-sm hover:shadow-md transition-shadow"
-          >
-            <Statistic
-              title="总访问量"
-              value={overview.totalVisits}
-              prefix={<EyeOutlined className="text-blue-500" />}
-              valueStyle={{ color: '#1890ff' }}
+      {/* ===== 区域 1：数据卡片 ===== */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        {([
+          { icon: <EyeOutlined />, label: 'PV（页面浏览）', value: overview?.pv ?? 0, isNum: true },
+          { icon: <UserOutlined />, label: 'UV（独立访客）', value: overview?.uv ?? 0, isNum: true },
+          { icon: <ClockCircleOutlined />, label: '平均停留', value: formatDuration(overview?.avgDuration ?? 0), isNum: false },
+          { icon: <BarChartOutlined />, label: '昨日 UV', value: '--', isNum: false },
+        ] as const).map((card, i) => (
+          <Col xs={24} sm={12} lg={6} key={i}>
+            <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
+              {states.overview === 'loading' ? (
+                <Skeleton active paragraph={{ rows: 2 }} />
+              ) : states.overview === 'error' ? (
+                <ErrorBlock onRetry={fetchData} />
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <span style={{ color: themeColor, fontSize: 20 }}>{card.icon}</span>
+                    <span style={{ fontSize: 14, color: '#64748b' }}>{card.label}</span>
+                  </div>
+                  <Statistic
+                    value={card.value}
+                    valueStyle={{ fontSize: 32, fontWeight: 600, color: '#1e293b' }}
+                    formatter={(val: any) =>
+                      card.isNum && typeof val === 'number' ? val.toLocaleString() : String(val)
+                    }
+                  />
+                </>
+              )}
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
+      {/* ===== 区域 2：访问趋势图（Canvas 占位） ===== */}
+      <Card bordered={false} style={{ ...glassStyle, padding: 24, marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <span style={{ fontSize: 16, fontWeight: 500, color: '#1e293b' }}>访问趋势</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
+              <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: themeColor }} /> PV</span>
+              <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: themeColor, opacity: 0.5 }} /> UV</span>
+            </div>
+            <Segmented
+              options={['7天', '30天']}
+              onChange={(val) => setTrendDays(val === '7天' ? 7 : 30)}
             />
+          </div>
+        </div>
+        <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {states.trend === 'loading' ? (
+            <LoadingBlock />
+          ) : states.trend === 'error'? (
+            <ErrorBlock onRetry={fetchData} />
+          ) : trend ? (
+            <TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={240} />
+          ) : <EmptyBlock />}
+        </div>
+      </Card>
+
+      {/* ===== 区域 3+4：热门页面 + 来源饼图 ===== */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        {/* 区域 3：热门页面 */}
+        <Col xs={24} lg={14}>
+          <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>热门页面 Top 10</h3>
+            {states.topPages === 'loading' ? (
+              <Skeleton active paragraph={{ rows: 5 }} />
+            ) : states.topPages === 'error'? (
+              <ErrorBlock onRetry={fetchData} />
+            ) : topPages.length === 0 ? (
+              <EmptyBlock />
+            ) : (
+              <Table
+                dataSource={topPages}
+                rowKey="path"
+                pagination={false}
+                scroll={{ x: 600 }}
+                size="small"
+                columns={[
+                  {
+                    title: '排名', key: 'rank', width: 60, align: 'center',
+                    render: (_: any, __: any, idx: number) =>
+                      idx < 3 ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          width: 24, height: 24, borderRadius: '50%',
+                          background: themeColor, color: '#fff', fontSize: 12, fontWeight: 'bold',
+                        }}>{idx + 1}</span>
+                      ) : <span style={{ color: '#64748b' }}>{idx + 1}</span>,
+                  },
+                  { title: '页面路径', dataIndex: 'path', ellipsis: { showTitle: true },
+                    render: (p: string) => <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{p}</span>,
+                  },
+                  { title: 'PV', dataIndex: 'pv', width: 80, align: 'right',
+                    render: (v: number) => <span style={{ fontWeight: 600 }}>{v.toLocaleString()}</span>,
+                  },
+                  { title: 'UV', dataIndex: 'uv', width: 80, align: 'right',
+                    render: (v: number) => <span style={{ fontWeight: 600 }}>{v.toLocaleString()}</span>,
+                  },
+                ]}
+              />
+            )}
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card
-            bordered={false}
-            className="shadow-sm hover:shadow-md transition-shadow"
-          >
-            <Statistic
-              title="独立访客 (UV)"
-              value={overview.uniqueVisitors}
-              prefix={<UserOutlined className="text-green-500" />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card
-            bordered={false}
-            className="shadow-sm hover:shadow-md transition-shadow"
-          >
-            <Statistic
-              title="页面浏览量 (PV)"
-              value={overview.pageViews}
-              prefix={<FileTextOutlined className="text-purple-500" />}
-              valueStyle={{ color: '#722ed1' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card
-            bordered={false}
-            className="shadow-sm hover:shadow-md transition-shadow"
-          >
-            <Statistic
-              title="今日访问"
-              value={overview.todayVisits}
-              prefix={<CalendarOutlined className="text-orange-500" />}
-              valueStyle={{ color: '#fa8c16' }}
-            />
+
+        {/* 区域 4：来源饼图 */}
+        <Col xs={24} lg={10}>
+          <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>访客来源</h3>
+            {states.referers === 'loading' ? (
+              <Skeleton active avatar paragraph={{ rows: 1 }} />
+            ) : states.referers === 'error'? (
+              <ErrorBlock onRetry={fetchData} />
+            ) : referers.length === 0 ? (
+              <EmptyBlock />
+            ) : (
+              <Pie
+                data={referers.map(r => ({ name: r.source, value: r.count }))}
+                angleField="value"
+                colorField="name"
+                innerRadius={0.6}
+                statistic={{
+                  title: { style: { fontSize: '12px', color: '#64748b' }, content: '总访问' },
+                  value: {
+                    style: { fontSize: '24px', fontWeight: 'bold', color: '#1e293b' },
+                    content: referers.reduce((s, r) => s + r.count, 0).toLocaleString(),
+                  },
+                }}
+                legend={{ position: 'bottom' as const }}
+                label={false}
+                interactions={[{ type: 'element-active' }]}
+                style={{ height: 280 }}
+              />
+            )}
           </Card>
         </Col>
       </Row>
 
-      {/* 访问趋势图表 */}
-      <Card
-        title="访问趋势（最近 7 天）"
-        bordered={false}
-        className="shadow-sm mb-6"
-      >
-        <Line {...lineConfig} />
-      </Card>
+      {/* ===== 区域 5：访问记录 ===== */}
+      <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>访问记录</h3>
 
-      {/* 热门页面列表 */}
-      <Card
-        title="热门页面 TOP 10"
-        bordered={false}
-        className="shadow-sm"
-      >
-        <Table
-          columns={columns}
-          dataSource={popularPages}
-          rowKey="path"
-          pagination={false}
-          scroll={{ x: 800 }}
-        />
+        {/* 筛选栏 */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          <Input
+            placeholder="输入页面路径筛选"
+            value={filter.path}
+            onChange={e => setFilter(prev => ({ ...prev, path: e.target.value }))}
+            style={{ width: 240 }}
+            onPressEnter={handleVisitsSearch}
+            prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+          />
+          <Input
+            type="date"
+            value={filter.startDate}
+            onChange={e => setFilter(prev => ({ ...prev, startDate: e.target.value }))}
+            style={{ width: 160 }}
+            placeholder="开始日期"
+          />
+          <span style={{ color: '#64748b', lineHeight: '32px' }}>~</span>
+          <Input
+            type="date"
+            value={filter.endDate}
+            onChange={e => setFilter(prev => ({ ...prev, endDate: e.target.value }))}
+            style={{ width: 160 }}
+            placeholder="结束日期"
+          />
+          <Button type="primary" onClick={handleVisitsSearch} style={{ background: themeColor, borderColor: themeColor }}>
+            搜索
+          </Button>
+          <Button onClick={handleResetFilter}>重置</Button>
+        </div>
+
+        {/* 表格 */}
+        {states.visits === 'loading' ? (
+          <Skeleton active paragraph={{ rows: 5 }} />
+        ) : states.visits === 'error'? (
+          <ErrorBlock onRetry={fetchData} />
+        ) : (
+          <>
+            <Table
+              dataSource={visits?.data || []}
+              rowKey="_id"
+              pagination={false}
+              scroll={{ x: 800 }}
+              size="small"
+              columns={[
+                {
+                  title: '时间', dataIndex: 'timestamp', width: 180,
+                  render: (t: string) => new Date(t).toLocaleString('zh-CN'),
+                },
+                { title: '页面路径', dataIndex: 'path', ellipsis: { showTitle: true } },
+                { title: '标题', dataIndex: 'title', width: 200, ellipsis: { showTitle: true } },
+                {
+                  title: 'IP', dataIndex: 'ip', width: 140,
+                  render: (ip: string) => {
+                    const masked = ip.replace(/(\d+\.\d+)\.\d+\.\d+/, '$1.*.*');
+                    return <span title={ip}>{masked}</span>;
+                  },
+                },
+                {
+                  title: '来源', dataIndex: 'referer', width: 160, ellipsis: { showTitle: true },
+                  render: (r: string) => {
+                    if (!r) return '直接访问';
+                    try { return new URL(r).hostname; } catch { return r; }
+                  },
+                },
+              ]}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+              <Pagination
+                current={filter.page}
+                pageSize={filter.pageSize}
+                total={visits?.total || 0}
+                showTotal={total => `共 ${total} 条`}
+                pageSizeOptions={['10', '20', '50']}
+                onChange={handlePageChange}
+                onShowSizeChange={handlePageChange}
+              />
+            </div>
+          </>
+        )}
       </Card>
     </div>
   );

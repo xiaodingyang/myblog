@@ -128,6 +128,7 @@ export default defineConfig({
         { path: '/admin/comments', component: '@/pages/admin/comments/index' },
         { path: '/admin/users', component: '@/pages/admin/users/index' },
         { path: '/admin/settings', component: '@/pages/admin/settings/index' },
+        { path: '/admin/stats', component: '@/pages/admin/stats/index' },
         { path: '/admin/series', component: '@/pages/admin/series/index' },
       ],
     },
@@ -138,14 +139,12 @@ export default defineConfig({
   // 代理配置 - 开发环境将请求转发到本地后端
   proxy: {
     '/api': {
-      target: 'https://www.xiaodingyang.art',
+      target: 'http://localhost:3000',
       changeOrigin: true,
-      secure: false,
     },
     '/uploads': {
-      target: 'https://www.xiaodingyang.art',
+      target: 'http://localhost:3000',
       changeOrigin: true,
-      secure: false,
     },
   },
   

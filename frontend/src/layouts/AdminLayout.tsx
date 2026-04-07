@@ -16,6 +16,7 @@ import {
   TeamOutlined,
   CommentOutlined,
   OrderedListOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -94,6 +95,12 @@ const AdminLayout: React.FC = () => {
       icon: <OrderedListOutlined />,
       label: '系列管理',
       onClick: () => navigate('/admin/series'),
+    },
+    {
+      key: '/admin/stats',
+      icon: <BarChartOutlined />,
+      label: '访客统计',
+      onClick: () => navigate('/admin/stats'),
     },
   ];
 
