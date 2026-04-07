@@ -28,7 +28,7 @@ function stripMarkdown(md) {
 }
 
 // RSS 2.0 Feed
-router.get('/rss', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const articles = await Article.find({ status: 'published' })
       .select('title summary content createdAt updatedAt category')
@@ -63,7 +63,7 @@ router.get('/rss', async (req, res) => {
     <description>${escapeXml(SITE_DESC)}</description>
     <language>zh-CN</language>
     <lastBuildDate>${now}</lastBuildDate>
-    <atom:link href="${SITE_URL}/api/rss/rss" rel="self" type="application/rss+xml"/>
+    <atom:link href="${SITE_URL}/api/rss/" rel="self" type="application/rss+xml"/>
     ${items}
   </channel>
 </rss>`;

@@ -66,9 +66,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // 路由
 app.use('/api', apiLimiter, routes);
 
-// RSS (accessible at /rss for RSS readers)
+// RSS (accessible at /api/rss for RSS readers)
 const rssRoutes = require('./routes/rss');
-app.use('/rss', rssRoutes);
+app.use('/api/rss', rssRoutes);
 
 // Sitemap (accessible at /sitemap.xml for search engines)
 const sitemapRoutes = require('./routes/sitemap');

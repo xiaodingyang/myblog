@@ -443,7 +443,7 @@ const FrontLayout: React.FC = () => {
 
             {/* RSS 订阅 */}
             <a
-              href="/rss"
+              href="/api/rss/"
               target="_blank"
               rel="noreferrer"
               title="RSS 订阅"
