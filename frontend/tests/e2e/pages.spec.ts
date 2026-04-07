@@ -14,9 +14,9 @@ test('TC001 - 首页', async ({ appPage }) => {
     .or(appPage.getByText('暂无文章').first());
   await expect(hero.first()).toBeVisible({ timeout: 20_000 });
 
-  // 首页 footer（CTA 底部信息区）
-  await expect(appPage.locator('.home-cta-footer')).toBeVisible({ timeout: 20_000 });
-  await expect(appPage.locator('.home-cta-footer')).toContainText(/All rights reserved|©/);
+  // 首页底部 CTA 区 + 备案信息
+  await expect(appPage.getByText(/想要了解更多/)).toBeVisible({ timeout: 20_000 });
+  await expect(appPage.getByText(/All rights reserved|©/).first()).toBeVisible({ timeout: 20_000 });
 });
 
 test('TC002 - 文章列表页', async ({ appPage }) => {

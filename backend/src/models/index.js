@@ -9,6 +9,7 @@ const Favorite = require('./Favorite');
 const Follow = require('./Follow');
 const Notification = require('./Notification');
 const Series = require('./Series');
+const Visit = require('./Visit');
 
 module.exports = {
   User,
@@ -22,4 +23,5 @@ module.exports = {
   Follow,
   Notification,
   Series,
+  Visit,
 };

@@ -18,7 +18,9 @@ interface VisitData {
 class Analytics {
   private sessionId: string;
   private isInitialized: boolean = false;
-  private apiEndpoint: string = '/api/visits';
+  private apiEndpoint: string = '/api/stats/visit';
+  private lastVisitTime: number = 0;
+  private readonly VISIT_INTERVAL: number = 5 * 60 * 1000; // 5分钟防重复提交
 
   constructor() {
     this.sessionId = this.getOrCreateSessionId();

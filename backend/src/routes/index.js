@@ -15,6 +15,8 @@ const githubAuthRoutes = require('./githubAuth');
 const followRoutes = require('./follow');
 const notificationRoutes = require('./notifications');
 const seriesRoutes = require('./series');
+const visitRoutes = require('./visits');
+const statsRoutes = require('./stats');
 
 // 公开路由
 router.use('/auth', authRoutes);
@@ -39,5 +41,9 @@ router.use('/notifications', notificationRoutes);
 
 // 系列/专栏
 router.use('/series', seriesRoutes);
+
+// 访客统计
+router.use('/visits', visitRoutes);
+router.use('/stats', statsRoutes);
 
 module.exports = router;
