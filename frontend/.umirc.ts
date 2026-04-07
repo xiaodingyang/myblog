@@ -35,11 +35,11 @@ export default defineConfig({
       if (document.head) inject();
       else document.addEventListener('DOMContentLoaded', inject, { once: true });
     })();`,
-    // Service Worker 注册（仅生产环境）
+    // 注销旧 Service Worker（仅生产环境）
     `(function(){
       if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js').catch(function(){});
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(reg) { reg.unregister(); });
         });
       }
     })();`,
