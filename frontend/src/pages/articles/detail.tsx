@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
@@ -23,7 +23,7 @@ import Empty from '@/components/shared/Empty';
 import ShareButton from '@/components/shared/ShareButton';
 import CopyPageUrlButton from '@/components/shared/CopyPageUrlButton';
 import ArticleToc from '@/components/article/ArticleToc';
-import MarkdownArticleBody from '@/components/article/MarkdownArticleBody';
+const LazyMarkdownBody = lazy(() => import('@/components/article/MarkdownArticleBody'));
 import ArticleReactions from '@/components/article/ArticleReactions';
 import RelatedArticles from '@/components/article/RelatedArticles';
 import SeriesNav from '@/components/article/SeriesNav';
@@ -455,7 +455,7 @@ const ArticleDetailPage: React.FC = () => {
             }}
           >
             <div className="markdown-body" id="main-content">
-              <MarkdownArticleBody content={article.content} toc={toc} />
+              <Suspense fallback={<div className="min-h-[200px]" />}><LazyMarkdownBody content={article.content} toc={toc} /></Suspense>
             </div>
 
             <Divider />
