@@ -5,23 +5,29 @@
  * 1. pathname 对比 — replaceState 只在路径真正变化时上报
  * 2. 5 分钟间隔 — 同一页面短时间内不重复计数
  * 3. 50ms 防抖 — 合并同一时刻的多次触发
+ *
+ * lastVisitTime 持久化到 localStorage，页面刷新后仍可去重
  */
 
 class Analytics {
   private sessionId: string;
   private lastPath: string = '';
-  private lastVisitTime: number = 0;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private originalPushState: typeof history.pushState;
   private originalReplaceState: typeof history.replaceState;
 
   private readonly VISIT_INTERVAL = 5 * 60 * 1000; // 5 分钟
   private readonly DEBOUNCE_MS = 50; // 50ms 防抖
+  private readonly LAST_VISIT_KEY = 'last_visit_time';
+  private readonly LAST_PATH_KEY = 'last_visit_path';
 
   constructor() {
     this.sessionId = this.getOrCreateSessionId();
     this.originalPushState = history.pushState.bind(history);
     this.originalReplaceState = history.replaceState.bind(history);
+
+    // 从 localStorage 恢复上次访问信息
+    this.lastPath = localStorage.getItem(this.LAST_PATH_KEY) || '';
   }
 
   /**
@@ -35,6 +41,14 @@ class Analytics {
       localStorage.setItem(key, id);
     }
     return id;
+  }
+
+  private getLastVisitTime(): number {
+    return parseInt(localStorage.getItem(this.LAST_VISIT_KEY) || '0', 10);
+  }
+
+  private setLastVisitTime(time: number): void {
+    localStorage.setItem(this.LAST_VISIT_KEY, time.toString());
   }
 
   /**
@@ -84,13 +98,16 @@ class Analytics {
   private doTrackPageView(): void {
     const currentPath = location.pathname;
     const now = Date.now();
+    const lastTime = this.getLastVisitTime();
 
-    if (currentPath === this.lastPath && now - this.lastVisitTime < this.VISIT_INTERVAL) {
+    // 同一页面 + 5 分钟内 → 不重复计数
+    if (currentPath === this.lastPath && now - lastTime < this.VISIT_INTERVAL) {
       return;
     }
 
     this.lastPath = currentPath;
-    this.lastVisitTime = now;
+    this.setLastVisitTime(now);
+    localStorage.setItem(this.LAST_PATH_KEY, currentPath);
 
     this.sendData({
       path: currentPath,

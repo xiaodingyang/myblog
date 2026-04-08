@@ -16,7 +16,6 @@
   "dependencies": {
     "@ant-design/charts": "^2.6.7",
     "@ant-design/icons": "^5.6.1",
-    "@ant-design/pro-components": "^2.8.10",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
@@ -24,6 +23,7 @@
     "antd": "^5.29.3",
     "antd-img-crop": "^4.30.0",
     "dayjs": "^1.11.20",
+    "framer-motion": "^12.38.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -32,7 +32,7 @@
     "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "three": "^0.182.0",
+    "three": "^0.183.2",
     "umi": "^4.6.34"
   },
   "devDependencies": {

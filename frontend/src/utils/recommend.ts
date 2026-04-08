@@ -1,4 +1,4 @@
-import { getReadingHistory } from '@/components/ReadingHistory';
+import { getReadingHistory } from '@/components/reading/ReadingHistory';
 
 /** 获取已读文章 ID 集合 */
 export function getReadArticleIds(): Set<string> {

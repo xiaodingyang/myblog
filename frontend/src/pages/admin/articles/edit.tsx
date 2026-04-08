@@ -26,7 +26,7 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { request } from 'umi';
 import type { UploadFile } from 'antd/es/upload/interface';
-import Loading from '@/components/Loading';
+import Loading from '@/components/layout/Loading';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;

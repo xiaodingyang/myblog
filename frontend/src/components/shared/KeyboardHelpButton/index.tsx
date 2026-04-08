@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Tooltip } from 'antd';
 import { KeyOutlined } from '@ant-design/icons';
-import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
+import KeyboardShortcutsHelpModal from '@/components/shared/KeyboardShortcutsHelpModal';
 import {
   FAB_SIZE_PX,
   FAB_RIGHT_PX,
   FAB_KEYBOARD_BOTTOM_PX,
-} from '@/components/floatingActionsConstants';
+} from '@/components/shared/floatingActionsConstants';
 
 const KeyboardHelpButton: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const [visible, setVisible] = useState(false);

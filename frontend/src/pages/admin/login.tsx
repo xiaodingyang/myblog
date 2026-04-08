@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useModel } from 'umi';
 import { Form, Input, Button, Checkbox, ConfigProvider, message } from 'antd';
 import { UserOutlined, LockOutlined, GithubOutlined } from '@ant-design/icons';
 import { request } from 'umi';
-import { ParticlesBackground } from '@xdy-npm/react-particle-backgrounds';
 import { getColorThemeById, type ColorTheme } from '@/config/colorThemes';
-import AnimatedCharacters from '@/components/AnimatedCharacters';
+
+const AnimatedCharacters = lazy(() => import('@/components/visual/AnimatedCharacters'));
+const LazyParticlesBackground = lazy(() => import('@/components/visual/ParticlesBackground'));
 
 /** 与 global.css 一致，避免登录卡内回退成生硬的系统默认字体 */
 const UI_FONT =
@@ -129,11 +130,13 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
 
         {/* 动画角色 */}
         <div className="relative z-10">
-          <AnimatedCharacters
-            isTyping={isTyping}
-            isPassword={isPassword}
-            primaryColor={currentColorTheme.primary}
-          />
+          <Suspense fallback={null}>
+            <AnimatedCharacters
+              isTyping={isTyping}
+              isPassword={isPassword}
+              primaryColor={currentColorTheme.primary}
+            />
+          </Suspense>
         </div>
 
         {/* 品牌信息 */}
@@ -194,11 +197,13 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
             <span className="font-bold text-lg text-white drop-shadow-md">若风的博客</span>
           </div>
           <div style={{ transform: 'scale(0.7)', transformOrigin: 'center' }}>
-            <AnimatedCharacters
-              isTyping={isTyping}
-              isPassword={isPassword}
-              primaryColor={currentColorTheme.primary}
-            />
+            <Suspense fallback={null}>
+              <AnimatedCharacters
+                isTyping={isTyping}
+                isPassword={isPassword}
+                primaryColor={currentColorTheme.primary}
+              />
+            </Suspense>
           </div>
         </div>
 
@@ -417,7 +422,7 @@ const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="admin-login-page fixed inset-0 z-[1] h-[100dvh] overflow-hidden">
-      <ParticlesBackground theme="tyndall" isDark themeColor={currentColorTheme.primary} />
+      <Suspense fallback={null}><LazyParticlesBackground isDark /></Suspense>
       <AdminLoginLayout currentColorTheme={currentColorTheme} />
     </div>
   );

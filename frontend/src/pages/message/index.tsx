@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Card, Input, Button, List, Avatar, Pagination, message } from 'antd';
+import { Typography, Input, Button, List, Avatar, Pagination, message } from 'antd';
 import { MessageOutlined, ClockCircleOutlined, GithubOutlined } from '@ant-design/icons';
 import { request, useModel } from 'umi';
 import dayjs from 'dayjs';
-import Empty from '@/components/Empty';
-import MessageSkeleton from '@/components/Skeleton/MessageSkeleton';
+import Empty from '@/components/shared/Empty';
+import MessageSkeleton from '@/components/layout/Skeleton/MessageSkeleton';
 import useSEO from '@/hooks/useSEO';
+import ScrollReveal from '@/components/visual/ScrollReveal';
+import { getColorThemeById } from '@/config/colorThemes';
+import { themeBg } from '@/utils/themeHelpers';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -23,6 +26,8 @@ const MessagePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [content, setContent] = useState('');
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
+  const { themeId: colorThemeId } = useModel('colorModel');
+  const currentColorTheme = getColorThemeById(colorThemeId);
   const [pageSize, setPageSize] = useState(10);
 
   const fetchMessages = async (currentPage: number) => {
@@ -82,6 +87,7 @@ const MessagePage: React.FC = () => {
     <div className="animate-fade-in py-8">
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
+        <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
@@ -91,8 +97,8 @@ const MessagePage: React.FC = () => {
           >
             <MessageOutlined className="text-3xl text-white" />
           </div>
-          <Title 
-            level={1} 
+          <Title
+            level={1}
             className="!mb-3 !text-white"
             style={{
               textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)',
@@ -100,7 +106,7 @@ const MessagePage: React.FC = () => {
           >
             留言板
           </Title>
-          <Text 
+          <Text
             className="!text-white/85 text-lg"
             style={{
               textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)',
@@ -109,23 +115,21 @@ const MessagePage: React.FC = () => {
             欢迎留下你的足迹，共 {total} 条留言
           </Text>
         </div>
+        </ScrollReveal>
 
-        {/* 内容区域 - 白色背景，覆盖粒子 */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10">
+        {/* 内容区域 - 暗色玻璃态背景 */}
+        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
         {/* 留言表单 */}
-        <Card
-          className="mb-8"
-          style={{
-            borderRadius: 16,
-            border: 'none',
-            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-          }}
+        <ScrollReveal direction="up" delay={0.06}>
+        <div
+          className="mb-8 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          <Title 
-            level={4} 
-            className="!mb-6"
+          <Title
+            level={4}
+            className="!mb-6 !text-white"
             style={{
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
             }}
           >
             ✍️ 发表留言
@@ -149,8 +153,8 @@ const MessagePage: React.FC = () => {
                   maxLength={500}
                 />
                 <div className="flex items-center justify-between mt-8">
-                  <Text type="secondary" className="text-sm">
-                    以 <Text strong>{githubUser?.nickname || githubUser?.username}</Text> 的身份留言
+                  <Text className="!text-white/60 text-sm">
+                    以 <Text strong className="!text-white">{githubUser?.nickname || githubUser?.username}</Text> 的身份留言
                   </Text>
                   <Button type="primary" onClick={handleSubmit} loading={submitting} size="large">
                     提交留言
@@ -161,28 +165,26 @@ const MessagePage: React.FC = () => {
           ) : (
             <div
               className="text-center py-8 rounded-xl cursor-pointer transition-all hover:shadow-md"
-              style={{ background: '#f8f9fa', border: '1px dashed #d9d9d9' }}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px dashed rgba(255,255,255,0.15)' }}
               onClick={() => requireAuth()}
             >
-              <GithubOutlined style={{ fontSize: 28, color: '#999', marginBottom: 8 }} />
+              <GithubOutlined style={{ fontSize: 28, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }} />
               <div>
-                <Text type="secondary">登录 GitHub 后即可发表留言</Text>
+                <Text className="!text-white/60">登录 GitHub 后即可发表留言</Text>
               </div>
               <Button type="link" style={{ marginTop: 4 }}>
                 点击登录
               </Button>
             </div>
           )}
-        </Card>
+        </div>
+        </ScrollReveal>
         {/* 留言列表 */}
-        <Card
-          style={{
-            borderRadius: 16,
-            border: 'none',
-            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-          }}
+        <div
+          className="rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          <Title level={4} className="!mb-6">
+          <Title level={4} className="!mb-6 !text-white" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
             💬 全部留言
           </Title>
 
@@ -195,8 +197,8 @@ const MessagePage: React.FC = () => {
                 dataSource={messages}
                 renderItem={(item, index) => (
                   <List.Item
-                    className="animate-slide-up !px-0"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    key={item._id || index}
+                    className="!px-0"
                   >
                     <List.Item.Meta
                       avatar={
@@ -217,18 +219,19 @@ const MessagePage: React.FC = () => {
                       }
                       title={
                         <div className="flex items-center gap-3">
-                          <Text 
+                          <Text
                             strong
+                            className="!text-white"
                             style={{
-                              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                             }}
                           >
                             {item.user?.nickname || item.user?.username || item.nickname || '匿名'}
                           </Text>
-                          <Text 
-                            className="text-gray-400 text-sm"
+                          <Text
+                            className="text-white/50 text-sm"
                             style={{
-                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                             }}
                           >
                             <ClockCircleOutlined className="mr-1" />
@@ -237,10 +240,10 @@ const MessagePage: React.FC = () => {
                         </div>
                       }
                       description={
-                        <Paragraph 
-                          className="!mb-0 mt-2 text-gray-600"
+                        <Paragraph
+                          className="!mb-0 mt-2 text-white/70"
                           style={{
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                            textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                           }}
                         >
                           {item.content}
@@ -252,7 +255,7 @@ const MessagePage: React.FC = () => {
               />
 
               {total > pageSize && (
-                <div className="flex justify-center mt-6 pt-6 border-t border-gray-100">
+                <div className="flex justify-center mt-6 pt-6 border-t border-white/10">
                   <Pagination
                     current={page}
                     total={total}
@@ -275,7 +278,7 @@ const MessagePage: React.FC = () => {
           ) : (
             <Empty description="暂无留言，快来抢沙发吧！" />
           )}
-        </Card>
+        </div>
         </div>
       </div>
     </div>

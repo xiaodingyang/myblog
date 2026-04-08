@@ -21,10 +21,10 @@ body {
   min-height: 100vh;
 }
 
-/* 自定义滚动条 - 细线风格 */
+/* 自定义滚动条 - 暗色主题 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -32,12 +32,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.6);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Firefox 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 /* Markdown 样式 */
@@ -238,7 +244,7 @@ body {
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s ease-out;
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes fadeIn {
@@ -254,7 +260,7 @@ body {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
 
   to {
@@ -459,4 +465,70 @@ body {
   background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s ease infinite;
+}
+
+/* 分页组件 - 暗色玻璃容器适配 */
+.ant-pagination .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+.ant-pagination .ant-pagination-item {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.ant-pagination .ant-pagination-item:hover a {
+  color: var(--theme-primary, #ffb3d9) !important;
+}
+.ant-pagination .ant-pagination-item:hover {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+}
+.ant-pagination .ant-pagination-item-active {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+}
+.ant-pagination .ant-pagination-item-active a {
+  color: var(--theme-primary, #ffb3d9) !important;
+}
+.ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.ant-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  color: var(--theme-primary, #ffb3d9) !important;
+}
+.ant-pagination .ant-pagination-total-text {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+.ant-pagination .ant-pagination-jump-prev .ant-pagination-item-link,
+.ant-pagination .ant-pagination-jump-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Tag 悬浮微动效 */
+.ant-tag {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ant-tag:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Link 下划线揭示动画 */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--theme-primary, #ffb3d9);
+  transition: width 0.3s ease;
+  border-radius: 1px;
+}
+.link-underline:hover::after {
+  width: 100%;
 }

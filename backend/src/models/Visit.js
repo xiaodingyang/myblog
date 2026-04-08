@@ -55,10 +55,10 @@ const visitSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// PRD 索引设计
-visitSchema.index({ createdAt: -1 });
-visitSchema.index({ path: 1 });
-visitSchema.index({ sessionId: 1 });
-visitSchema.index({ path: 1, createdAt: -1 });
+// 索引设计：升序索引适合范围查询，复合索引覆盖 trend + overview
+visitSchema.index({ createdAt: 1 }); // 升序，适合 $gte 范围查询
+visitSchema.index({ createdAt: 1, sessionId: 1 }); // 复合索引，覆盖 trend + overview 查询
+visitSchema.index({ path: 1, createdAt: -1 }); // 热门页面查询
+visitSchema.index({ sessionId: 1 }); // UV 统计
 
 module.exports = mongoose.model('Visit', visitSchema);

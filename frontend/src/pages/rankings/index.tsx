@@ -3,8 +3,10 @@ import { Avatar, Typography, List, Tag, Space } from 'antd';
 import { TrophyOutlined, CommentOutlined, CrownOutlined } from '@ant-design/icons';
 import { request, useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import Empty from '@/components/Empty';
+import { themeBg } from '@/utils/themeHelpers';
+import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
+import ScrollReveal from '@/components/visual/ScrollReveal';
 
 const { Title, Text } = Typography;
 
@@ -31,12 +33,12 @@ const RankingSkeleton: React.FC = () => (
   <div className="space-y-3">
     {[1, 2, 3, 4, 5, 6].map((i) => (
       <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
-        <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse flex-shrink-0" />
+        <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-5 w-32 rounded bg-gray-200 animate-pulse" />
-          <div className="h-4 w-48 rounded bg-gray-100 animate-pulse" />
+          <div className="h-5 w-32 rounded bg-white/10 animate-pulse" />
+          <div className="h-4 w-48 rounded bg-white/6 animate-pulse" />
         </div>
-        <div className="h-6 w-16 rounded-full bg-gray-100 animate-pulse flex-shrink-0" />
+        <div className="h-6 w-16 rounded-full bg-white/6 animate-pulse flex-shrink-0" />
       </div>
     ))}
   </div>
@@ -106,6 +108,7 @@ const Rankings: React.FC = () => {
     <div className="animate-fade-in py-8">
       <div className="max-w-3xl mx-auto px-4 md:px-6">
         {/* 页面标题 */}
+        <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
@@ -127,27 +130,37 @@ const Rankings: React.FC = () => {
             感谢每一位活跃的读者
           </Text>
         </div>
+        </ScrollReveal>
 
         {/* 内容区域 */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10" style={{ minHeight: 300 }}>
+        <div
+          className="p-5 md:p-8 rounded-2xl relative z-10"
+          style={{
+            minHeight: 300,
+            background: themeBg(currentColorTheme.primary, 0.12),
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid ' + themeBg(currentColorTheme.primary, 0.18),
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          }}
+        >
           {loading ? (
             <RankingSkeleton />
           ) : list.length === 0 ? (
             <Empty description="暂无数据，快来抢沙发吧！" />
           ) : (
             <div className="space-y-2">
-              {list.map((item) => {
+              {list.map((item, index) => {
                 const isTop3 = item.rank <= 3;
                 return (
+                  <ScrollReveal key={item.userId} direction="up" delay={index * 0.06}>
                   <div
                     key={item.userId}
-                    className={`flex items-center gap-4 p-4 rounded-xl transition-colors ${
-                      isTop3 ? 'hover:bg-yellow-50/50' : 'hover:bg-gray-50'
-                    }`}
+                    className="flex items-center gap-4 p-4 rounded-xl transition-colors hover:bg-white/8"
                     style={
                       isTop3
-                        ? { background: `${currentColorTheme.primary}06` }
-                        : undefined
+                        ? { background: `${currentColorTheme.primary}10`, border: `1px solid ${currentColorTheme.primary}18` }
+                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }
                     }
                   >
                     {/* 头像 */}
@@ -179,14 +192,14 @@ const Rankings: React.FC = () => {
                           href={item.htmlUrl || `https://github.com/${item.username}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-gray-800 hover:underline truncate"
+                          className="font-semibold text-white/90 hover:underline truncate"
                           style={isTop3 ? { color: currentColorTheme.primary } : undefined}
                         >
                           {item.nickname || item.username}
                         </a>
                         {getRankBadge(item.rank)}
                       </div>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
+                      <div className="flex items-center gap-4 mt-1 text-sm text-white/60">
                         <span>
                           <CommentOutlined className="mr-1" />
                           {item.commentCount} 条评论
@@ -199,6 +212,7 @@ const Rankings: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                  </ScrollReveal>
                 );
               })}
             </div>

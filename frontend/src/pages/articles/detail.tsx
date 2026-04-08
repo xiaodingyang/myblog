@@ -20,19 +20,19 @@ import {
 } from '@ant-design/icons';
 import { request } from 'umi';
 import dayjs from 'dayjs';
-import Empty from '@/components/Empty';
-import ShareButton from '@/components/ShareButton';
-import CopyPageUrlButton from '@/components/CopyPageUrlButton';
-import ArticleToc from '@/components/ArticleToc';
-import MarkdownArticleBody from '@/components/MarkdownArticleBody';
-import ArticleReactions from '@/components/ArticleReactions';
-import RelatedArticles from '@/components/RelatedArticles';
-import SeriesNav from '@/components/SeriesNav';
-import ArticleDetailSkeleton from '@/components/Skeleton/ArticleDetailSkeleton';
-import Breadcrumb from '@/components/Breadcrumb';
-import { addReadingHistory } from '@/components/ReadingHistory';
+import Empty from '@/components/shared/Empty';
+import ShareButton from '@/components/shared/ShareButton';
+import CopyPageUrlButton from '@/components/shared/CopyPageUrlButton';
+import ArticleToc from '@/components/article/ArticleToc';
+import MarkdownArticleBody from '@/components/article/MarkdownArticleBody';
+import ArticleReactions from '@/components/article/ArticleReactions';
+import RelatedArticles from '@/components/article/RelatedArticles';
+import SeriesNav from '@/components/article/SeriesNav';
+import ArticleDetailSkeleton from '@/components/layout/Skeleton/ArticleDetailSkeleton';
+import Breadcrumb from '@/components/layout/Breadcrumb';
+import { addReadingHistory } from '@/components/reading/ReadingHistory';
 import { checkAchievements } from '@/utils/achievements';
-import Lightbox from '@/components/Lightbox';
+import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
@@ -492,9 +492,9 @@ const ArticleDetailPage: React.FC = () => {
       </section>
 
       {/* 文章内容 */}
-      <section className="py-8 md:py-12">
+      <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 lg:items-start">
           <Card
             className="flex-1 min-w-0 w-full"
             style={{
@@ -509,7 +509,7 @@ const ArticleDetailPage: React.FC = () => {
 
             <Divider />
 
-            <div className="flex flex-wrap items-center gap-3 justify-between">
+            <div className="flex flex-wrap items-center gap-4 justify-between">
               <Space wrap size="middle">
                 <Button
                   type={article.liked ? 'primary' : 'default'}
@@ -541,7 +541,7 @@ const ArticleDetailPage: React.FC = () => {
                 />
               </Space>
             </div>
-            <div className="mt-4">
+            <div className="mt-6">
               <Text className="text-gray-500 text-sm">
                 最后更新于 {dayjs(article.updatedAt).format('YYYY-MM-DD HH:mm')}
               </Text>
@@ -583,7 +583,7 @@ const ArticleDetailPage: React.FC = () => {
           <div className="lg:pr-[calc(14rem+2rem)]">
           {/* 评论区 */}
           <Card
-            className="mt-8"
+            className="mt-10"
             ref={commentsRef as any}
             style={{
               borderRadius: 16,

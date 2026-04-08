@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const articleController = require('../controllers/articleController');
 const { optionalAuth, githubAuth } = require('../middlewares/auth');
+const { cacheMiddleware } = require('../utils/cache');
 
-// 获取文章列表（前台）
-router.get('/', articleController.getArticles);
+// 获取文章列表（前台，缓存 5 分钟）
+router.get('/', cacheMiddleware(300), articleController.getArticles);
 
-// 获取文章归档
-router.get('/archives', articleController.getArchives);
+// 获取文章归档（缓存 10 分钟）
+router.get('/archives', cacheMiddleware(600), articleController.getArchives);
 
 // 增加文章阅读量
 router.get('/:id/view', articleController.incArticleView);

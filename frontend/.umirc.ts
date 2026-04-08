@@ -192,6 +192,11 @@ export default defineConfig({
             test: /[\\/]node_modules[\\/](@xdy-npm|@tsparticles|three)[\\/]/,
             priority: 25,
           },
+          motion: {
+            name: 'motion',
+            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            priority: 25,
+          },
           vendors: {
             name: 'vendors',
             test: /[\\/]node_modules[\\/]/,

@@ -91,10 +91,14 @@ articleSchema.pre('save', function(next) {
 
 // 索引
 articleSchema.index({ title: 'text', content: 'text' });
-articleSchema.index({ category: 1 });
-articleSchema.index({ tags: 1 });
-articleSchema.index({ status: 1 });
 articleSchema.index({ createdAt: -1 });
 articleSchema.index({ views: -1 });
+// 复合索引：覆盖列表查询的高频组合
+articleSchema.index({ status: 1, createdAt: -1 });
+articleSchema.index({ status: 1, category: 1, createdAt: -1 });
+articleSchema.index({ status: 1, tags: 1, createdAt: -1 });
+articleSchema.index({ status: 1, views: -1 });
+// 系列文章查询
+articleSchema.index({ series: 1, seriesOrder: 1 });
 
 module.exports = mongoose.model('Article', articleSchema);

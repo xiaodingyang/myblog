@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { request } from 'umi';
 import dayjs from 'dayjs';
-import Loading from '@/components/Loading';
+import Loading from '@/components/layout/Loading';
 
 const { Title, Text } = Typography;
 

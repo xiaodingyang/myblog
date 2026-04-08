@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { auth, adminAuth } = require('../middlewares/auth');
 const { validate, schemas } = require('../middlewares/validate');
+const { clearCache } = require('../utils/cache');
 
 const articleController = require('../controllers/articleController');
 const categoryController = require('../controllers/categoryController');
@@ -19,22 +20,35 @@ router.use(adminAuth);
 // 统计数据
 router.get('/statistics', statisticsController.getStatistics);
 
-// 文章管理
+// 文章管理 — 写操作成功后清除文章列表和归档缓存
+const invalidateArticles = (req, res, next) => {
+  res.on('finish', () => { if (res.statusCode < 300) clearCache('/articles'); });
+  next();
+};
+const invalidateCategories = (req, res, next) => {
+  res.on('finish', () => { if (res.statusCode < 300) clearCache('/categories'); });
+  next();
+};
+const invalidateTags = (req, res, next) => {
+  res.on('finish', () => { if (res.statusCode < 300) clearCache('/tags'); });
+  next();
+};
+
 router.get('/articles', articleController.getAdminArticles);
 router.get('/articles/:id', articleController.getAdminArticle);
-router.post('/articles', validate(schemas.article), articleController.createArticle);
-router.put('/articles/:id', validate(schemas.article), articleController.updateArticle);
-router.delete('/articles/:id', articleController.deleteArticle);
+router.post('/articles', invalidateArticles, validate(schemas.article), articleController.createArticle);
+router.put('/articles/:id', invalidateArticles, validate(schemas.article), articleController.updateArticle);
+router.delete('/articles/:id', invalidateArticles, articleController.deleteArticle);
 
 // 分类管理
-router.post('/categories', validate(schemas.category), categoryController.createCategory);
-router.put('/categories/:id', validate(schemas.category), categoryController.updateCategory);
-router.delete('/categories/:id', categoryController.deleteCategory);
+router.post('/categories', invalidateCategories, validate(schemas.category), categoryController.createCategory);
+router.put('/categories/:id', invalidateCategories, validate(schemas.category), categoryController.updateCategory);
+router.delete('/categories/:id', invalidateCategories, categoryController.deleteCategory);
 
 // 标签管理
-router.post('/tags', validate(schemas.tag), tagController.createTag);
-router.put('/tags/:id', validate(schemas.tag), tagController.updateTag);
-router.delete('/tags/:id', tagController.deleteTag);
+router.post('/tags', invalidateTags, validate(schemas.tag), tagController.createTag);
+router.put('/tags/:id', invalidateTags, validate(schemas.tag), tagController.updateTag);
+router.delete('/tags/:id', invalidateTags, tagController.deleteTag);
 
 // 留言管理
 router.get('/messages', messageController.getAdminMessages);

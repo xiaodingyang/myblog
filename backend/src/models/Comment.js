@@ -37,6 +37,7 @@ const commentSchema = new mongoose.Schema({
 });
 
 commentSchema.index({ articleId: 1, createdAt: -1 });
+commentSchema.index({ articleId: 1, status: 1, createdAt: -1 });
 // 排行榜聚合查询优化：按用户分组计数
 commentSchema.index({ user: 1, status: 1, createdAt: -1 });
 

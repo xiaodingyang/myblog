@@ -4,7 +4,7 @@ import { cachedRequest } from '@/utils/apiCache';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import HomeSkeleton from '@/components/Skeleton/HomeSkeleton';
+import HomeSkeleton from '@/components/layout/Skeleton/HomeSkeleton';
 import {
   ArrowRightOutlined,
   ArrowDownOutlined,
@@ -17,9 +17,25 @@ import {
   CodeOutlined,
   BookOutlined,
 } from '@ant-design/icons';
-import DailyQuote from '@/components/DailyQuote';
+import DailyQuote from '@/components/shared/DailyQuote';
+import OptimizedImage from '@/components/shared/OptimizedImage';
 import { getReadArticleIds, sortByPopularity } from '@/utils/recommend';
 import useSEO from '@/hooks/useSEO';
+import MotionButton from '@/components/visual/MotionButton';
+import { motion } from 'framer-motion';
+
+/* 首屏内容元素列表 - 用于 stagger 动画 */
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } },
+};
 
 // 轻量日期格式化
 const formatDate = (date: string) => {
@@ -37,6 +53,17 @@ const HomePage: React.FC = () => {
     title: '首页',
     description: '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。',
     keywords: '若风,前端博客,React,TypeScript,Node.js,技术分享',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: '若风的博客',
+      url: 'https://www.xiaodingyang.art',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://www.xiaodingyang.art/articles?keyword={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
   });
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<API.Article[]>([]);
@@ -280,15 +307,23 @@ const HomePage: React.FC = () => {
           ))}
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-4 md:gap-8 lg:gap-16">
+        <motion.div
+          className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-4 md:gap-8 lg:gap-16"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={currentSection === 0 ? 'visible' : 'hidden'}
+        >
           {/* 左侧文字 */}
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-4 md:mb-8 border border-white/10">
-              <RocketOutlined className="text-yellow-400 text-base md:text-lg" />
-              <span className="text-white/90 text-xs md:text-sm font-medium">探索技术的无限可能</span>
-            </div>
+            <motion.div
+            className="flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-4 md:mb-8 border border-white/10"
+            variants={itemVariants}
+            >
+            <RocketOutlined className="text-yellow-400 text-base md:text-lg" />
+            <span className="text-white/90 text-xs md:text-sm font-medium">探索技术的无限可能</span>
+          </motion.div>
 
-            <h1
+            <motion.h1
               className="!mb-4 md:!mb-8"
               style={{
                 fontSize: 'clamp(2rem, 6vw, 5rem)',
@@ -297,6 +332,7 @@ const HomePage: React.FC = () => {
                 letterSpacing: '-0.03em',
                 margin: 0,
               }}
+              variants={itemVariants}
             >
               <span className="gradient-text-white">
                 代码改变世界
@@ -326,41 +362,31 @@ const HomePage: React.FC = () => {
               >
                 记录成长轨迹
               </span>
-            </h1>
+            </motion.h1>
 
-            <Paragraph className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <motion.div className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed" variants={itemVariants}>
               <span className="typewriter-text">
                 热爱编程 ✨ 分享技术 🚀 记录成长
               </span>
-            </Paragraph>
+            </motion.div>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5">
+            <motion.div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5" variants={itemVariants}>
               <Link to="/articles">
-                <Button
-                  size="large"
-                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-none"
+                <MotionButton
+                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-none cursor-pointer"
                   style={{
                     background: currentColorTheme.gradient,
-                    boxShadow: `0 10px 40px ${currentColorTheme.primary}66`, // 主题色阴影
+                    boxShadow: `0 10px 40px ${currentColorTheme.primary}66`,
                     color: '#fff',
                     border: 'none',
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = currentColorTheme.gradient;
-                    e.currentTarget.style.opacity = '0.9';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = currentColorTheme.gradient;
-                    e.currentTarget.style.opacity = '1';
-                  }}
                 >
                   开始探索 <ArrowRightOutlined />
-                </Button>
+                </MotionButton>
               </Link>
               <Link to="/about">
-                <Button
-                  size="large"
-                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-0"
+                <MotionButton
+                  className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-0 cursor-pointer"
                   style={{
                     background: 'rgba(0, 0, 0, 0.25)',
                     backdropFilter: 'blur(12px)',
@@ -369,12 +395,10 @@ const HomePage: React.FC = () => {
                   }}
                 >
                   <CodeOutlined /> 关于作者
-                </Button>
+                </MotionButton>
               </Link>
-            </div>
-
-            {/* 统计数据 */}
-            <div className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16">
+            </motion.div>
+            <motion.div className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16" variants={itemVariants}>
               {[
                 { label: '文章', value: articleCount || '0', icon: '📝' },
                 { label: '分类', value: categories.length || '0', icon: '📂' },
@@ -406,7 +430,7 @@ const HomePage: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* 右侧装饰 */}
@@ -453,9 +477,7 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* 向下滚动提示 */}
+        </motion.div>
         <div
           onClick={() => scrollToSection(1)}
           className="absolute bottom-3 md:bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
@@ -490,10 +512,15 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-6">
+        <motion.div
+          className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-10"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={currentSection === 1 ? 'visible' : 'hidden'}
+        >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
-          {/* 标题行：左标题+右按钮 */}
-          <div className="flex items-center justify-between mb-4 md:mb-6">
+          {/* 标题行 */}
+          <motion.div className="flex items-center justify-between mb-6 md:mb-8" variants={itemVariants}>
             <div className="flex items-center gap-3">
               <div
                 className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-sm"
@@ -513,11 +540,11 @@ const HomePage: React.FC = () => {
                 查看全部 →
               </span>
             </Link>
-          </div>
+          </motion.div>
 
-          {/* 主体：左侧主推 + 右侧文章列表 */}
+          {/* 主体 */}
           {featuredArticles.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
+            <motion.div className="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-6" variants={itemVariants}>
               {/* 左侧主推大卡 */}
               <div className="lg:col-span-7">
                 <Link to={`/article/${featuredArticles[0]?._id}`} className="block group h-full">
@@ -528,9 +555,10 @@ const HomePage: React.FC = () => {
                     }}
                   >
                     {featuredArticles[0]?.cover && (
-                      <img
+                      <OptimizedImage
                         src={featuredArticles[0].cover}
                         alt=""
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     )}
@@ -553,7 +581,7 @@ const HomePage: React.FC = () => {
                         {featuredArticles[0]?.summary}
                       </Paragraph>
                       <div className="flex items-center justify-between">
-                        <Space className="text-white/50 text-xs">
+                        <Space className="text-white/65 text-xs">
                           <EyeOutlined /> {featuredArticles[0]?.views || 0}
                           <span>·</span>
                           <ClockCircleOutlined /> {formatDate(featuredArticles[0]?.createdAt)}
@@ -582,7 +610,7 @@ const HomePage: React.FC = () => {
                   {sideArticles.map((article, index) => (
                     <Link key={article._id} to={`/article/${article._id}`} className="block group">
                       <div
-                        className={`flex items-center gap-3 p-3 md:p-4 transition-colors ${index < sideArticles.length - 1 ? 'border-b' : ''}`}
+                        className={`flex items-center gap-3.5 p-4 md:p-5 transition-colors ${index < sideArticles.length - 1 ? 'border-b' : ''}`}
                         style={{ borderColor: 'rgba(255,255,255,0.06)' }}
                         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -618,7 +646,7 @@ const HomePage: React.FC = () => {
                             <span>{formatDate(article.createdAt)}</span>
                           </div>
                         </div>
-                        <ArrowRightOutlined className="text-white/0 group-hover:text-white/40 transition-colors flex-shrink-0 text-xs" />
+                        <ArrowRightOutlined className="text-white/0 group-hover:text-white/60 transition-colors flex-shrink-0 text-xs" />
                       </div>
                     </Link>
                   ))}
@@ -627,19 +655,19 @@ const HomePage: React.FC = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ) : (
-            <div className="text-center text-gray-500 py-12">暂无文章</div>
+            <motion.div className="text-center text-gray-500 py-12" variants={itemVariants}>暂无文章</motion.div>
           )}
 
           {/* 底部引用点缀 */}
-          <div className="mt-4 md:mt-5 flex items-center justify-center gap-3 px-4">
+          <motion.div className="mt-6 md:mt-8 flex items-center justify-center gap-3 px-4" variants={itemVariants}>
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
             <DailyQuote />
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
-          </div>
+          </motion.div>
         </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ========== 第三屏：探索 + CTA ========== */}
@@ -647,13 +675,18 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <div className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-6">
+        <motion.div
+          className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-10"
+          variants={sectionVariants}
+          initial="hidden"
+          animate={currentSection === 2 ? 'visible' : 'hidden'}
+        >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
           {/* 上半部分：分类 + 标签 */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-5 mb-6 md:mb-8">
+          <motion.div className="grid grid-cols-1 lg:grid-cols-5 gap-5 md:gap-6 mb-8 md:mb-10" variants={itemVariants}>
             {/* 分类 - 占 3 列，网格卡片 */}
             <div className="lg:col-span-3">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                   <FolderOutlined style={{ color: currentColorTheme.primary, fontSize: 14 }} />
                   <span className="text-white font-semibold text-sm">文章分类</span>
@@ -662,13 +695,13 @@ const HomePage: React.FC = () => {
                   全部 →
                 </Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {categories.slice(0, 6).map((cat, index) => {
                   const hue = index * 50;
                   return (
                     <Link key={cat._id} to={`/category/${cat._id}`}>
                       <div
-                        className="group rounded-xl p-3 md:p-4 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+                        className="group rounded-xl p-4 md:p-5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
                         style={{
                           background: 'rgba(255, 255, 255, 0.04)',
                           border: '1px solid rgba(255, 255, 255, 0.06)',
@@ -708,7 +741,7 @@ const HomePage: React.FC = () => {
             {/* 标签云 - 占 2 列 */}
             <div className="lg:col-span-2">
               <div
-                className="rounded-2xl p-4 md:p-5 h-full"
+                className="rounded-2xl p-5 md:p-6 h-full"
                 style={{
                   background: 'rgba(255, 255, 255, 0.04)',
                   border: '1px solid rgba(255, 255, 255, 0.06)',
@@ -723,7 +756,7 @@ const HomePage: React.FC = () => {
                   全部 →
                 </Link>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {tags.map((tag) => (
                   <Link key={tag._id} to={`/tag/${tag._id}`}>
                     <span
@@ -753,11 +786,13 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          </div>
+          </motion.div>
 
           {/* 下半部分：CTA */}
-          <div
+          <motion.div
             className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
+            className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
+            variants={itemVariants}
             style={{
               background: 'rgba(255, 255, 255, 0.03)',
               border: '1px solid rgba(255, 255, 255, 0.06)',
@@ -777,9 +812,8 @@ const HomePage: React.FC = () => {
               </Text>
               <div className="flex flex-wrap justify-center gap-3">
                 <Link to="/message">
-                  <Button
-                    size="large"
-                    className="!h-10 md:!h-11 !px-6 md:!px-8 !rounded-full !font-semibold !text-sm !border-none"
+                  <MotionButton
+                    className="!h-10 md:!h-11 !px-6 md:!px-8 !rounded-full !font-semibold !text-sm !border-none cursor-pointer"
                     style={{
                       background: currentColorTheme.gradient,
                       color: 'white',
@@ -787,12 +821,11 @@ const HomePage: React.FC = () => {
                     }}
                   >
                     💬 留言交流
-                  </Button>
+                  </MotionButton>
                 </Link>
                 <Link to="/about">
-                  <Button
-                    size="large"
-                    className="!h-10 md:!h-11 !px-6 md:!px-8 !rounded-full !font-semibold !text-sm !border-0"
+                  <MotionButton
+                    className="!h-10 md:!h-11 !px-6 md:!px-8 !rounded-full !font-semibold !text-sm !border-0 cursor-pointer"
                     style={{
                       background: 'rgba(255, 255, 255, 0.06)',
                       color: 'rgba(255,255,255,0.8)',
@@ -800,14 +833,14 @@ const HomePage: React.FC = () => {
                     }}
                   >
                     🙋 关于我
-                  </Button>
+                  </MotionButton>
                 </Link>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* 底部备案信息 */}
-          <div className="text-center mt-4 md:mt-6">
+          <motion.div className="text-center mt-6 md:mt-8" variants={itemVariants}>
             <Text style={{ color: 'rgba(255, 255, 255, 0.35)', fontSize: 12 }}>
               © {new Date().getFullYear()} 个人博客. All rights reserved.{' '}
               <a
@@ -819,9 +852,9 @@ const HomePage: React.FC = () => {
                 蜀ICP备2026005106号
               </a>
             </Text>
-          </div>
+          </motion.div>
         </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

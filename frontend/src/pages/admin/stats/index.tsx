@@ -3,7 +3,7 @@
  * 5 区域：数据卡片 / 趋势图 / 热门页面 / 来源饼图 / 访问记录
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import {
   Card, Row, Col, Statistic, Table, Segmented, Input, DatePicker, Button,
   Spin, Empty, Skeleton, Pagination, message,
@@ -16,7 +16,7 @@ import { Pie } from '@ant-design/charts';
 import { request } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import TrendChart from '@/components/TrendChart';
+const TrendChart = lazy(() => import('@/components/visual/TrendChart'));
 
 // ========== 类型 ==========
 
@@ -67,10 +67,15 @@ const RANGE_KEYS = ['today', 'yesterday', 'week', 'month'];
 
 // ========== 子组件 ==========
 
-const ErrorBlock: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+const ErrorBlock: React.FC<{
+  onRetry: () => void;
+  message?: string;
+}> = ({ onRetry, message: errorMsg }) => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
     <ExclamationCircleOutlined style={{ fontSize: 32, color: '#f59e0b' }} />
-    <p style={{ color: '#64748b', fontSize: 14, marginTop: 12 }}>数据加载失败</p>
+    <p style={{ color: '#64748b', fontSize: 14, marginTop: 12 }}>
+      {errorMsg || '数据加载失败'}
+    </p>
     <Button type="primary" ghost onClick={onRetry} icon={<ReloadOutlined />}>重试</Button>
   </div>
 );
@@ -144,6 +149,18 @@ const StatsPage: React.FC = () => {
         handlers[i].setter(r.value.data);
         setRegion(handlers[i].region, 'success');
       } else {
+        const error = r.status === 'rejected' ? r.reason : r.value;
+
+        if (error?.response?.status === 401) {
+          message.error('登录已过期，请重新登录');
+        } else if (error?.response?.status === 403) {
+          message.error('无权限访问统计数据');
+        } else if (error?.response?.status === 500) {
+          message.error('服务器错误，请稍后重试');
+        } else if (!navigator.onLine) {
+          message.error('网络连接已断开');
+        }
+
         setRegion(handlers[i].region, 'error');
       }
     });
@@ -244,7 +261,7 @@ const StatsPage: React.FC = () => {
           ) : states.trend === 'error'? (
             <ErrorBlock onRetry={fetchData} />
           ) : trend ? (
-            <TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={240} />
+            <Suspense fallback={<LoadingBlock />}><TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={240} /></Suspense>
           ) : <EmptyBlock />}
         </div>
       </Card>
@@ -385,10 +402,7 @@ const StatsPage: React.FC = () => {
                 { title: '标题', dataIndex: 'title', width: 200, ellipsis: { showTitle: true } },
                 {
                   title: 'IP', dataIndex: 'ip', width: 140,
-                  render: (ip: string) => {
-                    const masked = ip.replace(/(\d+\.\d+)\.\d+\.\d+/, '$1.*.*');
-                    return <span title={ip}>{masked}</span>;
-                  },
+                  render: (ip: string) => <span>{ip || '--'}</span>,
                 },
                 {
                   title: '来源', dataIndex: 'referer', width: 160, ellipsis: { showTitle: true },

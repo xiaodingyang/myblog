@@ -4,10 +4,11 @@ import { Card, Tag, Space, Typography, Avatar } from 'antd';
 import { EyeOutlined, ClockCircleOutlined, FolderOutlined, UserOutlined, FireOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import ShareButton from '@/components/ShareButton';
-import OptimizedImage from '@/components/OptimizedImage';
+import ShareButton from '@/components/shared/ShareButton';
+import OptimizedImage from '@/components/shared/OptimizedImage';
 import { fetchArticleDetail } from '@/utils/prefetch';
 import dayjs from 'dayjs';
+import { themeBg, isNewArticle, isHotArticle, artId } from '@/utils/themeHelpers';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -15,18 +16,6 @@ interface ArticleCardProps {
   article: API.Article;
   style?: React.CSSProperties;
 }
-
-// 判断文章是否为"新"（7天内发布）
-const isNewArticle = (createdAt: string): boolean => {
-  const publishDate = dayjs(createdAt);
-  const now = dayjs();
-  return now.diff(publishDate, 'day') <= 7;
-};
-
-// 判断文章是否为"热门"（浏览量超过 1000）
-const isHotArticle = (views?: number): boolean => {
-  return (views || 0) >= 1000;
-};
 
 const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) => {
   const { themeId: colorThemeId } = useModel('colorModel');
@@ -41,16 +30,28 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
     <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline" onMouseEnter={() => { if (articleId) fetchArticleDetail(articleId); }}>
       <Card
         hoverable
-        className="card-hover overflow-hidden"
-        style={{ 
+        className="card-hover overflow-hidden group"
+        style={{
           borderRadius: 12,
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          background: 'rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          border: `1px solid ${themeBg(currentColorTheme.primary, 0.2)}`,
+          background: themeBg(currentColorTheme.primary, 0.15),
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           ...style,
+        }}
+        onMouseEnter={(e) => {
+          const card = e.currentTarget as HTMLElement;
+          card.style.boxShadow = `0 8px 32px rgba(0,0,0,0.3), 0 0 20px ${themeBg(currentColorTheme.primary, 0.15)}`;
+          card.style.borderColor = themeBg(currentColorTheme.primary, 0.4);
+          card.style.transform = 'translateY(-4px)';
+        }}
+        onMouseLeave={(e) => {
+          const card = e.currentTarget as HTMLElement;
+          card.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+          card.style.borderColor = themeBg(currentColorTheme.primary, 0.2);
+          card.style.transform = 'translateY(0)';
         }}
         cover={
           article.cover ? (
@@ -84,9 +85,9 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                     <Tag
                       className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
                       style={{
-                        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                        background: currentColorTheme.gradient,
                         color: '#fff',
-                        boxShadow: '0 2px 8px rgba(255, 107, 107, 0.4)',
+                        boxShadow: `0 2px 8px ${themeBg(currentColorTheme.primary, 0.4)}`,
                       }}
                     >
                       <FireOutlined className="mr-1" />
@@ -97,9 +98,9 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                     <Tag
                       className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
                       style={{
-                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        background: `linear-gradient(135deg, ${currentColorTheme.primary}88 0%, ${currentColorTheme.primary} 100%)`,
                         color: '#fff',
-                        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.4)',
+                        boxShadow: `0 2px 8px ${themeBg(currentColorTheme.primary, 0.35)}`,
                       }}
                     >
                       新
@@ -122,15 +123,14 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
           )
         }
       >
-        <div className="space-y-2 md:space-y-3">
+        <div className="space-y-3 md:space-y-4">
           {/* 标题 */}
           <Title 
             level={5} 
             ellipsis={{ rows: 1 }}
-            className="!mb-0 hover:text-primary transition-colors !text-sm md:!text-base"
+            className="!mb-1 hover:text-primary transition-colors !text-sm md:!text-base !text-white/90"
             style={{ 
-              color: '#1e293b',
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 1px 6px rgba(0, 0, 0, 0.3)',
             }}
           >
             {article.title}
@@ -139,33 +139,33 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
           {/* 摘要 */}
           <Paragraph 
             ellipsis={{ rows: 2 }}
-            className="!mb-0 text-gray-500 !text-xs md:!text-sm"
+            className="!mb-3 !text-white/50 !text-xs md:!text-sm"
             style={{
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+              textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
             }}
           >
             {article.summary || '暂无摘要'}
           </Paragraph>
 
           {/* 标签 */}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {article.tags?.slice(0, 2).map(tag => (
               <Tag 
                 key={tag._id} 
-                className="!border-gray-200 !bg-gray-50 !text-gray-600 !text-xs"
+                className="!border-white/20 !bg-white/10 !text-white/70 !text-xs"
               >
                 {tag.name}
               </Tag>
             ))}
             {article.tags?.length > 2 && (
-              <Tag className="!border-gray-200 !bg-gray-50 !text-gray-400 !text-xs">
+              <Tag className="!border-white/20 !bg-white/10 !text-white/60 !text-xs">
                 +{article.tags.length - 2}
               </Tag>
             )}
           </div>
 
           {/* 底部信息 */}
-          <div className="flex items-center justify-between pt-2 md:pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-3 md:pt-4 border-t border-white/10">
             <Space size={4}>
               <Avatar 
                 size={20} 
@@ -173,15 +173,15 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                 src={article.author?.avatar}
                 style={{ background: currentColorTheme.primary }}
               />
-              <Text className="text-gray-500 text-xs md:text-sm">
+              <Text className="!text-white/65 text-xs md:text-sm">
                 {article.author?.username || '匿名'}
               </Text>
             </Space>
             <Space 
-              className="text-gray-400 text-xs md:text-sm" 
+              className="!text-white/60 text-xs md:text-sm" 
               split={<span className="mx-0.5 md:mx-1">·</span>}
               style={{
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
               }}
             >
               <span>

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Typography, Card, Row, Col, Tag, Space, Divider, Timeline } from 'antd';
+import { Typography, Row, Col, Tag, Space, Divider, Timeline } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { themeBg } from '@/utils/themeHelpers';
 import useSEO from '@/hooks/useSEO';
 import {
   UserOutlined,
@@ -13,6 +14,7 @@ import {
   EnvironmentOutlined,
   BookOutlined,
 } from '@ant-design/icons';
+import ScrollReveal from '@/components/visual/ScrollReveal';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -21,6 +23,18 @@ const AboutPage: React.FC = () => {
     title: '关于我',
     description: '了解若风——一名热爱前端开发的工程师，专注于 React、TypeScript、Node.js 技术栈。',
     keywords: '若风,关于我,前端工程师,个人介绍',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: '若风',
+      url: 'https://www.xiaodingyang.art',
+      jobTitle: '前端开发工程师',
+      knowsAbout: ['React', 'TypeScript', 'Node.js', 'Vue', 'JavaScript'],
+      sameAs: [
+        'https://github.com/xiaodingyang',
+        'https://juejin.cn/user/712139266339694',
+      ],
+    },
   });
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
@@ -67,45 +81,53 @@ const AboutPage: React.FC = () => {
     <div className="animate-fade-in py-8">
       <div className="max-w-4xl mx-auto px-6">
         {/* 页面标题 */}
-        <div className="text-center mb-12">
-          <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: currentColorTheme.gradient }}
-          >
-            <UserOutlined className="text-3xl text-white" />
+        <ScrollReveal direction="up">
+          <div className="text-center mb-12">
+            <div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              style={{ background: currentColorTheme.gradient }}
+            >
+              <UserOutlined className="text-3xl text-white" />
+            </div>
+            <Title
+              level={1}
+              className="!mb-3 !text-white"
+              style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}
+            >
+              关于我
+            </Title>
+            <Text
+              className="!text-white/85 text-lg"
+              style={{ textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)' }}
+            >
+              前端开发工程师 · 8年经验
+            </Text>
           </div>
-          <Title
-            level={1}
-            className="!mb-3 !text-white"
-            style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}
-          >
-            关于我
-          </Title>
-          <Text
-            className="!text-white/85 text-lg"
-            style={{ textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)' }}
-          >
-            前端开发工程师 · 8年经验
-          </Text>
-        </div>
+        </ScrollReveal>
 
-        {/* 内容区域 - 白色背景，覆盖粒子 */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10">
+        {/* 内容区域 - 玻璃拟态风格 */}
+        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{
+          minHeight: 300,
+          background: themeBg(currentColorTheme.primary, 0.12),
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        }}>
           {/* 个人介绍卡片 */}
-          <Card
-            className="mb-8 overflow-hidden"
+          <ScrollReveal direction="up" delay={0.06}>
+          <div
+            className="mb-8 overflow-hidden rounded-3xl"
             style={{
-              borderRadius: 24,
-              border: 'none',
-              boxShadow: '0 10px 40px -10px rgb(0 0 0 / 0.15)',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
             }}
-            styles={{ body: { padding: 0 } }}
           >
             {/* 封面背景 */}
             <div
               className="h-40 md:h-48 relative"
               style={{
-                background: currentColorTheme.gradient, // 主题色渐变
+                background: currentColorTheme.gradient,
               }}
             >
               <div
@@ -122,7 +144,7 @@ const AboutPage: React.FC = () => {
                 <div
                   className="w-32 h-32 rounded-3xl border-4 border-white flex items-center justify-center text-white text-4xl font-bold shadow-lg"
                   style={{
-                    background: currentColorTheme.gradient, // 主题色渐变
+                    background: currentColorTheme.gradient,
                   }}
                 >
                   <UserOutlined />
@@ -141,30 +163,30 @@ const AboutPage: React.FC = () => {
                     肖定阳
                   </span>
                   <Text
-                    className="text-gray-500 text-lg"
+                    className="!text-white/60 text-lg"
                     style={{
-                      textShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+                      textShadow: '0 1px 6px rgba(0, 0, 0, 0.3)',
                     }}
                   >
                     高级前端开发工程师 / 8年经验
                   </Text>
-                  <div className="flex items-center gap-4 mt-2 text-gray-400 text-sm flex-wrap justify-center md:justify-start">
+                  <div className="flex items-center gap-4 mt-2 text-white/60 text-sm flex-wrap justify-center md:justify-start" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.3)' }}>
                     <span><EnvironmentOutlined className="mr-1" />成都</span>
                     <span><BookOutlined className="mr-1" />成都工业学院 · 软件工程</span>
                   </div>
                 </div>
                 <Space size="middle" className="mt-4 md:mt-0">
-                  <a href="mailto:346629678@qq.com" className="text-2xl text-gray-400 hover:text-primary transition-colors" title="346629678@qq.com">
+                  <a href="mailto:346629678@qq.com" className="text-2xl text-white/50 hover:text-primary transition-colors" title="346629678@qq.com">
                     <MailOutlined />
                   </a>
-                  <a href="https://github.com/xiaodingyang" target="_blank" rel="noreferrer" className="text-2xl text-gray-400 hover:text-gray-800 transition-colors" title="GitHub">
+                  <a href="https://github.com/xiaodingyang" target="_blank" rel="noreferrer" className="text-2xl text-white/50 hover:text-white transition-colors" title="GitHub">
                     <GithubOutlined />
                   </a>
                   <a
                     href="https://juejin.cn/user/712139266339694"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-2xl text-gray-400 transition-colors"
+                    className="text-2xl text-white/50 transition-colors"
                     title="掘金：风居住de街道"
                     onMouseEnter={(e) => e.currentTarget.style.color = '#1e80ff'}
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
@@ -176,12 +198,12 @@ const AboutPage: React.FC = () => {
                 </Space>
               </div>
 
-              <Divider />
+              <Divider style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
 
               <Paragraph
-                className="text-gray-600 text-base leading-relaxed"
+                className="!text-white/70 text-base leading-relaxed"
                 style={{
-                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  textShadow: '0 1px 6px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 👋 你好！我是肖定阳，一名拥有 8 年经验的前端开发工程师。
@@ -190,39 +212,36 @@ const AboutPage: React.FC = () => {
                 擅长 React、Vue、TypeScript 等前端技术栈，对前端工程化、性能优化有丰富经验。
               </Paragraph>
             </div>
-          </Card>
+          </div>
+          </ScrollReveal>
 
           <Row gutter={[24, 24]}>
             {/* 技能栈 */}
             <Col xs={24} lg={12}>
-              <Card
-                title={
+            <ScrollReveal direction="up" delay={0.12}>
+              <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
+                <div className="mb-4">
                   <Space>
                     <CodeOutlined className="text-primary" />
-                    <span>技能栈</span>
+                    <span className="text-white font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>技能栈</span>
                   </Space>
-                }
-                style={{
-                  borderRadius: 16,
-                  border: 'none',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                  height: '100%',
-                }}
-              >
+                </div>
                 <div className="space-y-4">
-                  {skills.map(skill => (
-                    <div key={skill.name}>
+                  {skills.map((skill, index) => (
+                    <ScrollReveal key={skill.name} direction="up" delay={index * 0.03}>
+                    <div>
                       <div className="flex justify-between mb-1">
                         <Text
                           strong
+                          className="!text-white"
                           style={{
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                            textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                           }}
                         >
                           {skill.name}
                         </Text>
                         <Text
-                          className="text-gray-400"
+                          className="!text-white/50"
                           style={{
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                           }}
@@ -230,7 +249,7 @@ const AboutPage: React.FC = () => {
                           {skill.level}%
                         </Text>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
                         <div
                           className="h-full rounded-full transition-all duration-1000"
                           style={{
@@ -240,93 +259,96 @@ const AboutPage: React.FC = () => {
                         />
                       </div>
                     </div>
+                    </ScrollReveal>
                   ))}
                 </div>
-              </Card>
+              </div>
+            </ScrollReveal>
             </Col>
 
             {/* 经历时间线 */}
             <Col xs={24} lg={12}>
-              <Card
-                title={
+            <ScrollReveal direction="up" delay={0.18}>
+              <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
+                <div className="mb-4">
                   <Space>
                     <RocketOutlined className="text-primary" />
-                    <span>成长历程</span>
+                    <span className="text-white font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>成长历程</span>
                   </Space>
-                }
-                style={{
-                  borderRadius: 16,
-                  border: 'none',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                  height: '100%',
-                }}
-              >
+                </div>
                 <Timeline
-                  items={experiences.map(exp => ({
-                    color: currentColorTheme.primary, // 主题色
+                  items={experiences.map((exp, expIndex) => ({
+                    color: currentColorTheme.primary,
                     children: (
+                      <ScrollReveal direction="up" delay={expIndex * 0.06}>
                       <div className="pb-2">
                         <div className="flex items-center gap-2 mb-1">
                           <Tag color="pink">{exp.year}</Tag>
                           <Text
                             strong
+                            className="!text-white"
                             style={{
-                              textShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                              textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                             }}
                           >
                             {exp.title}
                           </Text>
                         </div>
                         <Text
-                          className="text-gray-500 text-sm"
+                          className="!text-white/60 text-sm"
                           style={{
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.2)',
                           }}
                         >
                           {exp.company}
                         </Text>
                         <Paragraph
-                          className="!mb-0 mt-2 text-gray-600 text-sm"
+                          className="!mb-0 mt-2 !text-white/70 text-sm"
                           style={{
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.2)',
                           }}
                         >
                           {exp.description}
                         </Paragraph>
                       </div>
+                      </ScrollReveal>
                     ),
                   }))}
                 />
-              </Card>
+              </div>
+            </ScrollReveal>
             </Col>
           </Row>
 
           {/* 兴趣爱好 */}
-          <Card
-            className="mt-6"
-            title={
-              <Space>
-                <HeartOutlined className="text-red-500" />
-                <span>兴趣爱好</span>
-              </Space>
-            }
+          <ScrollReveal direction="up" delay={0.24}>
+          <div
+            className="mt-6 rounded-2xl p-6"
             style={{
-              borderRadius: 16,
-              border: 'none',
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
+            <div className="mb-4">
+              <Space>
+                <HeartOutlined className="text-red-500" />
+                <span className="text-white font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>兴趣爱好</span>
+              </Space>
+            </div>
             <Space wrap size={[16, 16]}>
-              {['💻 编程', '📚 技术博客', '🎮 游戏', '🎵 音乐', '📖 阅读', '🏃 跑步', '☕ 咖啡', '🎬 电影'].map(hobby => (
+              {['💻 编程', '📚 技术博客', '🎮 游戏', '🎵 音乐', '📖 阅读', '🏃 跑步', '☕ 咖啡', '🎬 电影'].map((hobby, index) => (
+                <ScrollReveal key={hobby} direction="up" delay={index * 0.03}>
                 <Tag
-                  key={hobby}
-                  className="!px-4 !py-2 !text-base !rounded-full !border-gray-200"
+                  className="!px-4 !py-2 !text-base !rounded-full !border-white/15 !text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}
                 >
                   {hobby}
                 </Tag>
+                </ScrollReveal>
               ))}
             </Space>
-          </Card>
+          </div>
+          </ScrollReveal>
         </div>
       </div>
     </div>

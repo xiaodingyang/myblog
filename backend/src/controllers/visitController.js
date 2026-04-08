@@ -1,64 +1,6 @@
 const { Visit } = require('../models');
-
-// ==================== 工具函数 ====================
-
-/**
- * 根据北京时间计算日期范围，返回 UTC 日期用于 MongoDB 查询
- */
-function getDateRange(range) {
-  const now = new Date();
-  const BJ_MS = 8 * 3600000;
-  // 当前北京时间
-  const bjMs = now.getTime() + now.getTimezoneOffset() * 60000 + BJ_MS;
-  const bjNow = new Date(bjMs);
-  const bjTodayStart = new Date(bjNow.getFullYear(), bjNow.getMonth(), bjNow.getDate());
-
-  let startBj, endBj;
-  switch (range) {
-    case 'yesterday':
-      startBj = new Date(bjTodayStart.getTime() - 86400000);
-      endBj = new Date(bjTodayStart.getTime());
-      break;
-    case 'week': {
-      const dow = bjNow.getDay() || 7; // 周一=1
-      startBj = new Date(bjTodayStart.getTime() - (dow - 1) * 86400000);
-      endBj = new Date(bjTodayStart.getTime() + 86400000);
-      break;
-    }
-    case 'month':
-      startBj = new Date(bjNow.getFullYear(), bjNow.getMonth(), 1);
-      endBj = new Date(bjTodayStart.getTime() + 86400000);
-      break;
-    default: // today
-      startBj = new Date(bjTodayStart.getTime());
-      endBj = new Date(bjTodayStart.getTime() + 86400000);
-      break;
-  }
-
-  // 北京时间 → UTC
-  return {
-    startDate: new Date(startBj.getTime() - BJ_MS),
-    endDate: new Date(endBj.getTime() - BJ_MS),
-  };
-}
-
-/**
- * 获取最近 N 天的北京时间日期字符串数组 ['2026-04-01', ...]
- */
-function getRecentDates(days) {
-  const now = new Date();
-  const BJ_MS = 8 * 3600000;
-  const bjMs = now.getTime() + now.getTimezoneOffset() * 60000 + BJ_MS;
-  const bjNow = new Date(bjMs);
-  const bjTodayStart = new Date(bjNow.getFullYear(), bjNow.getMonth(), bjNow.getDate());
-
-  const dates = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(bjTodayStart.getTime() - i * 86400000);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  return dates;
-}
+const { getDateRange, getRecentDates, bjDateToUTC } = require('../utils/dateHelper');
+const { maskIP } = require('../utils/ipHelper');
 
 /**
  * 从 referer URL 提取域名
@@ -89,7 +31,7 @@ exports.recordVisit = async (req, res) => {
       return res.json({ code: 0, message: '记录成功' });
     }
 
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    const rawIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
       || req.headers['x-real-ip']
       || req.connection?.remoteAddress
       || '';
@@ -99,7 +41,7 @@ exports.recordVisit = async (req, res) => {
       title: req.body.title || '',
       referer: req.body.referer || req.body.referrer || '',
       userAgent: req.headers['user-agent'] || '',
-      ip,
+      ip: maskIP(rawIP),
       sessionId,
       duration: req.body.duration || null,
     });
@@ -189,8 +131,7 @@ exports.getTrend = async (req, res, next) => {
     const dates = getRecentDates(days);
 
     // dates[0] 的北京时间 00:00 对应的 UTC 时间
-    const BJ_MS = 8 * 3600000;
-    const startUTC = new Date(new Date(dates[0]).getTime() + BJ_MS);
+    const startUTC = bjDateToUTC(dates[0]);
 
     const rows = await Visit.aggregate([
       { $match: { createdAt: { $gte: startUTC } } },

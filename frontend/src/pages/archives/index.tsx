@@ -4,8 +4,10 @@ import { ClockCircleOutlined, FileTextOutlined, CalendarOutlined } from '@ant-de
 import { Link } from 'umi';
 import { request, useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import Empty from '@/components/Empty';
+import { themeBg } from '@/utils/themeHelpers';
+import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
+import ScrollReveal from '@/components/visual/ScrollReveal';
 
 const { Title, Text } = Typography;
 
@@ -31,16 +33,16 @@ const ArchivesSkeleton: React.FC = () => (
   <div className="space-y-8">
     {[1, 2].map((y) => (
       <div key={y}>
-        <div className="h-8 w-24 rounded-lg bg-gray-200 animate-pulse mb-4" />
-        <div className="space-y-3 pl-6 border-l-2 border-gray-100">
+        <div className="h-8 w-24 rounded-lg bg-white/10 animate-pulse mb-4" />
+        <div className="space-y-3 pl-6 border-l-2 border-white/10">
           {[1, 2, 3].map((m) => (
             <div key={m} className="space-y-2">
-              <div className="h-5 w-16 rounded bg-gray-200 animate-pulse" />
+              <div className="h-5 w-16 rounded bg-white/10 animate-pulse" />
               {[1, 2].map((a) => (
                 <div key={a} className="flex items-center gap-3 py-1">
-                  <div className="h-4 w-12 rounded bg-gray-100 animate-pulse" />
-                  <div className="h-4 flex-1 rounded bg-gray-100 animate-pulse" style={{ maxWidth: 280 }} />
-                  <div className="h-5 w-14 rounded-full bg-gray-100 animate-pulse" />
+                  <div className="h-4 w-12 rounded bg-white/6 animate-pulse" />
+                  <div className="h-4 flex-1 rounded bg-white/6 animate-pulse" style={{ maxWidth: 280 }} />
+                  <div className="h-5 w-14 rounded-full bg-white/6 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -61,6 +63,13 @@ const Archives: React.FC = () => {
     title: '文章归档',
     description: '按时间线浏览若风技术博客的所有文章归档。',
     keywords: '文章归档,技术博客,时间线',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: '文章归档 - 若风的博客',
+      url: 'https://www.xiaodingyang.art/archives',
+      description: '按时间线浏览若风技术博客的所有文章归档',
+    },
   });
 
   useEffect(() => {
@@ -99,6 +108,7 @@ const Archives: React.FC = () => {
     <div className="animate-fade-in py-8">
       <div className="max-w-4xl mx-auto px-4 md:px-6">
         {/* 页面标题 */}
+        <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
@@ -120,27 +130,36 @@ const Archives: React.FC = () => {
             共 {totalArticles} 篇文章，记录成长轨迹
           </Text>
         </div>
+        </ScrollReveal>
 
-        {/* 内容区域 */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg relative z-10" style={{ minHeight: 300 }}>
+        {/* 内容区域 - 玻璃拟态风格 */}
+        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{
+          minHeight: 300,
+          background: themeBg(currentColorTheme.primary, 0.12),
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        }}>
           {loading ? (
             <ArchivesSkeleton />
           ) : data.length === 0 ? (
             <Empty description="暂无文章" />
           ) : (
-            sortedYears.map((year) => {
+            sortedYears.map((year, yearIndex) => {
               const months = yearMap.get(year)!.sort((a, b) => b.month - a.month);
               return (
-                <div key={year} className="mb-10 last:mb-0">
+                <ScrollReveal key={year} direction="up" delay={yearIndex * 0.06}>
+                <div className="mb-10 last:mb-0">
                   {/* 年份标题 */}
                   <div className="flex items-center gap-3 mb-6">
                     <div
                       className="text-3xl font-bold"
-                      style={{ color: currentColorTheme.primary }}
+                      style={{ color: currentColorTheme.primary, textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}
                     >
                       {year}
                     </div>
-                    <div className="flex-1 h-px bg-gray-200" />
+                    <div className="flex-1 h-px bg-white/15" />
                     <Tag
                       className="!rounded-full !px-3 !py-0.5 !border-none !text-sm"
                       style={{
@@ -173,7 +192,7 @@ const Archives: React.FC = () => {
                             style={{ color: currentColorTheme.primary }}
                           >
                             {monthNames[group.month - 1]}
-                            <span className="text-gray-400 text-sm font-normal ml-2">
+                            <span className="!text-white/60 text-sm font-normal ml-2">
                               ({group.articles.length} 篇)
                             </span>
                           </div>
@@ -185,17 +204,19 @@ const Archives: React.FC = () => {
                                 <Link
                                 key={articleId}
                                 to={`/article/${articleId}`}
-                                className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                                className="flex items-center gap-3 py-2 px-3 rounded-lg transition-colors group"
+                                style={{ background: 'transparent' }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <Text className="text-gray-400 text-xs flex-shrink-0" style={{ minWidth: 48 }}>
+                                <Text className="!text-white/50 text-xs flex-shrink-0" style={{ minWidth: 48 }}>
                                   {new Date(article.createdAt).toLocaleDateString('zh-CN', {
                                     month: '2-digit',
                                     day: '2-digit',
                                   })}
                                 </Text>
                                 <span
-                                  className="flex-1 text-gray-700 group-hover:text-current transition-colors truncate"
-                                  style={{ '--hover-color': currentColorTheme.primary } as React.CSSProperties}
+                                  className="flex-1 text-white/80 group-hover:text-white transition-colors truncate"
                                   onMouseEnter={(e) => (e.currentTarget.style.color = currentColorTheme.primary)}
                                   onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                                 >
@@ -219,6 +240,7 @@ const Archives: React.FC = () => {
                     }))}
                   />
                 </div>
+                </ScrollReveal>
               );
             })
           )}

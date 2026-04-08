@@ -3,7 +3,7 @@ import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import { history } from 'umi';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import { getRouterPathname } from '@/utils/runtimePath';
 import analytics from '@/utils/analytics';
 

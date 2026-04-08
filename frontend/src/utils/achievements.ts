@@ -1,4 +1,4 @@
-import { getReadingHistory } from '@/components/ReadingHistory';
+import { getReadingHistory } from '@/components/reading/ReadingHistory';
 
 const ACHIEVEMENT_KEY = 'blog_achievements';
 

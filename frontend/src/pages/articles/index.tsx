@@ -15,21 +15,19 @@ import {
 import { request, useModel } from 'umi';
 import { cachedRequest } from '@/utils/apiCache';
 import { getColorThemeById } from '@/config/colorThemes';
-import OptimizedImage from '@/components/OptimizedImage';
-import ShareButton from '@/components/ShareButton';
-import Empty from '@/components/Empty';
-import ArticlesListSkeleton from '@/components/Skeleton/ArticlesListSkeleton';
+import OptimizedImage from '@/components/shared/OptimizedImage';
+import ShareButton from '@/components/shared/ShareButton';
+import Empty from '@/components/shared/Empty';
+import ArticlesListSkeleton from '@/components/layout/Skeleton/ArticlesListSkeleton';
 import { fetchArticleDetail } from '@/utils/prefetch';
 import useSEO from '@/hooks/useSEO';
 import dayjs from 'dayjs';
+import { themeBg, isNewArticle, isHotArticle, artId } from '@/utils/themeHelpers';
+import ScrollReveal from '@/components/visual/ScrollReveal';
+import { useTilt } from '@/hooks/useTilt';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
-
-/* ─── helpers ─── */
-const isNewArticle = (d: string) => dayjs().diff(dayjs(d), 'day') <= 7;
-const isHotArticle = (v?: number) => (v || 0) >= 1000;
-const artId = (a: API.Article) => a._id || (a as any).id;
 
 /* ================================================================
    Hero — 杂志风精选大图
@@ -74,7 +72,7 @@ const HeroArticle: React.FC<{ article: API.Article; colorTheme: ReturnType<typeo
           {isHotArticle(article.views) && (
             <span
               className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium text-white"
-              style={{ background: 'linear-gradient(135deg,#ff6b6b,#ee5a6f)', boxShadow: '0 2px 8px rgba(255,107,107,.4)' }}
+              style={{ background: colorTheme.gradient, boxShadow: `0 2px 8px ${themeBg(colorTheme.primary, 0.4)}` }}
             >
               <FireOutlined className="mr-1" />
               热门
@@ -83,7 +81,7 @@ const HeroArticle: React.FC<{ article: API.Article; colorTheme: ReturnType<typeo
           {isNewArticle(article.createdAt) && (
             <span
               className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium text-white"
-              style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 2px 8px rgba(16,185,129,.4)' }}
+              style={{ background: `linear-gradient(135deg,${colorTheme.primary}88,${colorTheme.primary})`, boxShadow: `0 2px 8px ${themeBg(colorTheme.primary, 0.35)}` }}
             >
               新
             </span>
@@ -151,6 +149,7 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCo
   const id = artId(article);
   const isNew = isNewArticle(article.createdAt);
   const isHot = isHotArticle(article.views);
+  const { ref: tiltRef, handlers: tiltHandlers, style: tiltStyle } = useTilt();
 
   return (
     <Link
@@ -158,7 +157,18 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCo
       className="block no-underline group"
       onMouseEnter={() => id && fetchArticleDetail(id)}
     >
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div
+        ref={tiltRef}
+        {...tiltHandlers}
+        className="rounded-xl overflow-hidden"
+        style={{
+          ...tiltStyle,
+          background: themeBg(colorTheme.primary, 0.15),
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: `1px solid ${themeBg(colorTheme.primary, 0.2)}`,
+          boxShadow: `0 4px 16px rgba(0, 0, 0, 0.2)`,
+        }}>
         {/* cover — 部分卡片显示，部分不显示，制造瀑布流高度差 */}
         {showCover && article.cover && (
           <div className="h-36 sm:h-44 overflow-hidden">
@@ -171,56 +181,56 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCo
           </div>
         )}
 
-        <div className="p-4">
+        <div className="p-4 md:p-5">
           {/* date */}
-          <div className="text-[11px] text-gray-400 mb-1.5 font-mono">
+          <div className="text-[11px] text-white/65 mb-2 font-mono">
             {dayjs(article.createdAt).format('YYYY / MM / DD')}
           </div>
 
           {/* category + badges */}
-          <div className="flex items-center flex-wrap gap-1.5 mb-2">
-            <Tag className="!text-[11px] !rounded-md !border-gray-200 !bg-gray-50 !text-gray-500 !m-0 !px-1.5 !leading-5">
+          <div className="flex items-center flex-wrap gap-1.5 mb-2.5">
+            <Tag className="!text-[11px] !rounded-md !m-0 !px-1.5 !leading-5 !border-white/15" style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}>
               <FolderOutlined className="mr-0.5" />
               {article.category?.name || '未分类'}
             </Tag>
             {isHot && (
-              <Tag color="red" className="!text-[11px] !rounded-md !m-0 !px-1.5 !leading-5">
+              <Tag color="red" className="!text-[11px] !rounded-md !m-0 !px-1.5 !leading-5" style={{ background: themeBg(colorTheme.primary, 0.25), color: colorTheme.primary, border: 'none' }}>
                 <FireOutlined /> 热门
               </Tag>
             )}
             {isNew && (
-              <Tag color="green" className="!text-[11px] !rounded-md !m-0 !px-1.5 !leading-5">
+              <Tag color="green" className="!text-[11px] !rounded-md !m-0 !px-1.5 !leading-5" style={{ background: themeBg(colorTheme.primary, 0.15), color: colorTheme.primary, border: 'none' }}>
                 新
               </Tag>
             )}
           </div>
 
           {/* title */}
-          <h3 className="text-sm md:text-[15px] font-semibold text-gray-800 mb-1.5 line-clamp-2 leading-snug group-hover:text-[var(--theme-primary)] transition-colors">
+          <h3 className="text-sm md:text-[15px] font-semibold text-white/90 mb-2 line-clamp-2 leading-snug group-hover:text-[var(--theme-primary)] transition-colors" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
             {article.title}
           </h3>
 
           {/* summary — 仅无封面的卡片展示更多摘要行 */}
-          <p className={`text-xs text-gray-500 mb-2.5 leading-relaxed ${showCover && article.cover ? 'line-clamp-2' : 'line-clamp-3'}`}>
+          <p className={`text-xs text-white/65 mb-3 leading-relaxed ${showCover && article.cover ? 'line-clamp-2' : 'line-clamp-3'}`}>
             {article.summary || '暂无摘要'}
           </p>
 
           {/* tags */}
           {article.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2.5">
+            <div className="flex flex-wrap gap-1.5 mb-3">
               {article.tags.slice(0, 3).map((tag) => (
-                <span key={tag._id} className="text-[11px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">
+                <span key={tag._id} className="text-[11px] text-white/65 bg-white/10 px-1.5 py-0.5 rounded">
                   #{tag.name}
                 </span>
               ))}
               {article.tags.length > 3 && (
-                <span className="text-[11px] text-gray-300">+{article.tags.length - 3}</span>
+                <span className="text-[11px] text-white/60">+{article.tags.length - 3}</span>
               )}
             </div>
           )}
 
           {/* footer */}
-          <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
+          <div className="flex items-center justify-between text-[11px] text-white/60 pt-3 border-t border-white/10">
             <span className="flex items-center gap-1">
               <Avatar size={16} src={article.author?.avatar} icon={<UserOutlined />} style={{ background: colorTheme.primary }} />
               {article.author?.username || '匿名'}
@@ -265,18 +275,18 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
   };
 
   return (
-    <div className="relative mt-10 md:mt-14">
+    <div className="relative mt-12 md:mt-16">
       {/* ── 时间线标题 ── */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-10">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
           style={{ background: colorTheme.gradient }}
         >
           ✎
         </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" />
-        <span className="text-xs text-gray-400 flex-shrink-0">更多文章</span>
-        <div className="h-px flex-1 bg-gradient-to-l from-gray-200 to-transparent" />
+        <div className="h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" />
+        <span className="text-xs text-white/65 flex-shrink-0">更多文章</span>
+        <div className="h-px flex-1 bg-gradient-to-l from-white/15 to-transparent" />
       </div>
 
       {/* ── 移动端：单列 + 左侧时间线 ── */}
@@ -286,16 +296,18 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
           className="absolute left-[11px] top-0 bottom-0 w-[2px] rounded-full"
           style={{ background: `linear-gradient(180deg, ${colorTheme.primary}, ${colorTheme.primary}33, transparent)` }}
         />
-        <div className="space-y-5">
+        <div className="space-y-6">
           {articles.map((article, i) => (
-            <div key={artId(article) || i} className="relative animate-slide-up" style={{ animationDelay: `${i * 0.06}s` }}>
+            <ScrollReveal key={artId(article) || i} direction="up" delay={i * 0.06}>
+              <div className="relative">
               {/* dot */}
               <div
                 className="absolute -left-8 top-4 w-[10px] h-[10px] rounded-full ring-[3px] ring-white z-10"
                 style={{ background: colorTheme.primary, left: 4 }}
               />
               <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(i)} />
-            </div>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -309,14 +321,13 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
         />
 
         {/* left column */}
-        <div className="w-1/2 space-y-6 relative z-10">
+        <div className="w-1/2 space-y-7 relative z-10">
           {leftCol.map((article, i) => {
             const globalIdx = i * 2;
             return (
+              <ScrollReveal key={artId(article) || globalIdx} direction="up" delay={globalIdx * 0.06}>
               <div
-                key={artId(article) || globalIdx}
-                className="relative animate-slide-up"
-                style={{ animationDelay: `${globalIdx * 0.06}s` }}
+                className="relative"
               >
                 {/* dot on the right edge → timeline center */}
                 <div
@@ -330,19 +341,19 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
                 />
                 <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(globalIdx)} />
               </div>
+              </ScrollReveal>
             );
           })}
         </div>
 
         {/* right column — offset top for masonry stagger */}
-        <div className="w-1/2 space-y-6 pt-20 relative z-10">
+        <div className="w-1/2 space-y-7 pt-20 relative z-10">
           {rightCol.map((article, i) => {
             const globalIdx = i * 2 + 1;
             return (
+              <ScrollReveal key={artId(article) || globalIdx} direction="up" delay={globalIdx * 0.06}>
               <div
-                key={artId(article) || globalIdx}
-                className="relative animate-slide-up"
-                style={{ animationDelay: `${globalIdx * 0.06}s` }}
+                className="relative"
               >
                 {/* dot on the left edge → timeline center */}
                 <div
@@ -356,6 +367,7 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
                 />
                 <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(globalIdx)} />
               </div>
+              </ScrollReveal>
             );
           })}
         </div>
@@ -372,6 +384,13 @@ const ArticlesPage: React.FC = () => {
     title: '文章列表',
     description: '若风的技术博客文章列表，涵盖前端开发、后端技术、开源项目等内容。',
     keywords: '技术文章,前端开发,React,TypeScript,Node.js',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: '文章列表 - 若风的博客',
+      url: 'https://www.xiaodingyang.art/articles',
+      description: '若风的技术博客文章列表',
+    },
   });
 
   const { themeId: colorThemeId } = useModel('colorModel');
@@ -447,6 +466,7 @@ const ArticlesPage: React.FC = () => {
     <div className="animate-fade-in py-6 md:py-8">
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* ── 页面标题 ── */}
+        <ScrollReveal direction="up">
         <div className="text-center mb-8 md:mb-12">
           <Title
             level={1}
@@ -459,19 +479,32 @@ const ArticlesPage: React.FC = () => {
             共 {total} 篇文章，记录技术成长的点滴
           </Text>
         </div>
+        </ScrollReveal>
 
         {/* ── 内容容器 ── */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-8 shadow-lg relative z-10" style={{ minHeight: 400 }}>
+        <div className="rounded-2xl p-4 md:p-8 relative z-10" style={{
+          minHeight: 400,
+          background: themeBg(colorTheme.primary, 0.12),
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: `1px solid ${themeBg(colorTheme.primary, 0.18)}`,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+        }}>
           {/* ── 搜索筛选栏 ── */}
-          <div className="flex flex-wrap items-center gap-3 mb-6 md:mb-8 p-3 md:p-4 rounded-xl bg-gray-50/80 border border-gray-100">
+          <div className="flex flex-wrap items-center gap-3 mb-6 md:mb-8 p-4 md:p-5 rounded-xl" style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}>
             <Input
               placeholder="搜索文章…"
-              prefix={<SearchOutlined className="text-gray-400" />}
+              prefix={<SearchOutlined className="text-white/60" />}
               value={keyword}
               onChange={(e) => updateParams('keyword', e.target.value)}
               onPressEnter={(e) => updateParams('keyword', (e.target as HTMLInputElement).value)}
               allowClear
-              className="!rounded-lg !flex-1 !min-w-[160px]"
+              className="!rounded-lg !flex-1 !min-w-[160px] [&_.ant-input]:!bg-white/10 [&_.ant-input]:!text-white/80 [&_.ant-input]:!border-white/20 [&_.ant-input]:placeholder:!text-white/45 [&_.ant-input-clear-icon]:!text-white/60"
               style={{ maxWidth: 280 }}
             />
             <Select
@@ -479,8 +512,8 @@ const ArticlesPage: React.FC = () => {
               value={categoryId || undefined}
               onChange={(v) => updateParams('category', v || '')}
               allowClear
-              className="!min-w-[120px]"
-              suffixIcon={<FolderOutlined />}
+              className="!min-w-[120px] [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white/80 [&_.ant-select-selector]:!border-white/15 [&_.ant-select-selection-placeholder]:!text-white/50"
+              suffixIcon={<FolderOutlined className="text-white/60" />}
               popupMatchSelectWidth={false}
             >
               {categories.map((c) => (
@@ -494,8 +527,8 @@ const ArticlesPage: React.FC = () => {
               value={tagId || undefined}
               onChange={(v) => updateParams('tag', v || '')}
               allowClear
-              className="!min-w-[120px]"
-              suffixIcon={<TagsOutlined />}
+              className="!min-w-[120px] [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white/80 [&_.ant-select-selector]:!border-white/15 [&_.ant-select-selection-placeholder]:!text-white/50"
+              suffixIcon={<TagsOutlined className="text-white/60" />}
               popupMatchSelectWidth={false}
             >
               {tags.map((t) => (
@@ -507,8 +540,8 @@ const ArticlesPage: React.FC = () => {
             <Select
               value={sort}
               onChange={(v) => updateParams('sort', v)}
-              className="!min-w-[110px]"
-              suffixIcon={<SortAscendingOutlined />}
+              className="!min-w-[110px] [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white/80 [&_.ant-select-selector]:!border-white/15 [&_.ant-select-selection-placeholder]:!text-white/50"
+              suffixIcon={<SortAscendingOutlined className="text-white/60" />}
               popupMatchSelectWidth={false}
             >
               <Option value="latest">最新优先</Option>
@@ -526,19 +559,19 @@ const ArticlesPage: React.FC = () => {
           {/* 当前筛选标签 */}
           {hasFilters && (
             <div className="flex flex-wrap items-center gap-2 mb-6">
-              <Text className="text-gray-400 text-xs">当前筛选：</Text>
+              <Text className="text-white/60 text-xs">当前筛选：</Text>
               {keyword && (
-                <Tag closable onClose={() => updateParams('keyword', '')} color="pink">
+                <Tag closable onClose={() => updateParams('keyword', '')} style={{ background: themeBg(colorTheme.primary, 0.2), color: colorTheme.primary, border: 'none' }}>
                   关键词：{keyword}
                 </Tag>
               )}
               {categoryId && (
-                <Tag closable onClose={() => updateParams('category', '')} color="green">
+                <Tag closable onClose={() => updateParams('category', '')} style={{ background: themeBg(colorTheme.primary, 0.15), color: colorTheme.primary, border: 'none' }}>
                   分类：{categories.find((c) => c._id === categoryId)?.name}
                 </Tag>
               )}
               {tagId && (
-                <Tag closable onClose={() => updateParams('tag', '')} color="pink">
+                <Tag closable onClose={() => updateParams('tag', '')} style={{ background: themeBg(colorTheme.primary, 0.2), color: colorTheme.primary, border: 'none' }}>
                   标签：{tags.find((t) => t._id === tagId)?.name}
                 </Tag>
               )}
@@ -551,24 +584,26 @@ const ArticlesPage: React.FC = () => {
           ) : articles.length > 0 ? (
             <>
               {/* Hero — 杂志风首篇 */}
-              {heroArticle && <HeroArticle article={heroArticle} colorTheme={colorTheme} />}
+              {heroArticle && <ScrollReveal direction="up" delay={0.1}><HeroArticle article={heroArticle} colorTheme={colorTheme} /></ScrollReveal>}
 
               {/* 瀑布流 + 时间线 */}
               {restArticles.length > 0 && <MasonryTimeline articles={restArticles} colorTheme={colorTheme} />}
 
               {/* 分页 */}
               {total > pageSize && (
+                <ScrollReveal direction="up">
                 <div className="flex justify-center mt-10 md:mt-14">
                   <Pagination
                     current={page}
                     total={total}
                     pageSize={pageSize}
                     showSizeChanger={false}
-                    showTotal={(t) => <span className="text-gray-500 text-sm">共 {t} 篇文章</span>}
+                    showTotal={(t) => <span className="text-white/65 text-sm">共 {t} 篇文章</span>}
                     responsive
                     onChange={handlePageChange}
                   />
                 </div>
+                </ScrollReveal>
               )}
             </>
           ) : (

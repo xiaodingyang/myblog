@@ -8,7 +8,7 @@ import {
   FAB_SIZE_PX,
   FAB_RIGHT_PX,
   FAB_THEME_BOTTOM_PX,
-} from '@/components/floatingActionsConstants';
+} from '@/components/shared/floatingActionsConstants';
 
 interface ParticleThemeSelectorProps {
   isDark?: boolean;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Outlet, Link, useLocation, history } from 'umi';
+import PageTransition from '@/components/visual/PageTransition';
 import {
   FAB_RIGHT_PX,
   FAB_KEYBOARD_BOTTOM_PX,
   FAB_GAP_PX,
-} from '@/components/floatingActionsConstants';
+} from '@/components/shared/floatingActionsConstants';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
@@ -24,23 +25,22 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
-import GlassBackground from '@/components/GlassBackground';
-import GradientText from '@/components/GradientText';
-import GithubLoginModal from '@/components/GithubLoginModal';
-import GuestLoginPrompt from '@/components/GuestLoginPrompt';
-import ReadingProgressBar from '@/components/ReadingProgressBar';
-import BackToTop from '@/components/BackToTop';
-import KeyboardHelpButton from '@/components/KeyboardHelpButton';
-import KeyboardShortcutsHelpModal from '@/components/KeyboardShortcutsHelpModal';
-import GlobalSearch from '@/components/GlobalSearch';
-import NotificationBell from '@/components/NotificationBell';
-import ReadingStatsModal from '@/components/ReadingStats';
-import MobileTabBar from '@/components/MobileTabBar';
+import GradientText from '@/components/visual/GradientText';
+import GithubLoginModal from '@/components/shared/GithubLoginModal';
+import GuestLoginPrompt from '@/components/shared/GuestLoginPrompt';
+import ReadingProgressBar from '@/components/reading/ReadingProgressBar';
+import BackToTop from '@/components/layout/BackToTop';
+import KeyboardHelpButton from '@/components/shared/KeyboardHelpButton';
+import KeyboardShortcutsHelpModal from '@/components/shared/KeyboardShortcutsHelpModal';
+import GlobalSearch from '@/components/shared/GlobalSearch';
+import NotificationBell from '@/components/shared/NotificationBell';
+import ReadingStatsModal from '@/components/reading/ReadingStats';
+import MobileTabBar from '@/components/layout/MobileTabBar';
 import { getColorThemeById } from '@/config/colorThemes';
 import analytics from '@/utils/analytics';
 
-const LazyParticlesBackground = lazy(() => import('@/components/ParticlesBackground'));
-const LazyParticleThemeSelector = lazy(() => import('@/components/ParticleThemeSelector'));
+const LazyParticlesBackground = lazy(() => import('@/components/visual/ParticlesBackground'));
+const LazyParticleThemeSelector = lazy(() => import('@/components/visual/ParticleThemeSelector'));
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -305,7 +305,11 @@ const FrontLayout: React.FC = () => {
           ...getBackgroundStyle(),
           '--theme-primary': currentColorTheme.primary,
           '--theme-gradient': currentColorTheme.gradient,
-        } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string }}
+          '--theme-primary-rgb': (() => {
+            const hex = currentColorTheme.primary.replace('#', '');
+            return `${parseInt(hex.substring(0,2),16)}, ${parseInt(hex.substring(2,4),16)}, ${parseInt(hex.substring(4,6),16)}`;
+          })(),
+        } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string; '--theme-primary-rgb': string }}
       >
         {/* 毛玻璃背景层 - 先渲染，作为底层背景 */}
         {/* <GlassBackground isDark={isDarkTheme} /> */}
@@ -640,9 +644,11 @@ const FrontLayout: React.FC = () => {
             zIndex: isHomePage ? 10 : 2, // 确保内容在毛玻璃背景之上
           }}
         >
-          <div className={isHomePage ? 'h-full min-h-0' : ''}>
-            <Outlet />
-          </div>
+          <PageTransition locationKey={location.pathname}>
+            <div className={isHomePage ? 'h-full min-h-0' : ''}>
+              <Outlet />
+            </div>
+          </PageTransition>
         </Content>
 
         {/* 页脚 - 首页不显示 */}

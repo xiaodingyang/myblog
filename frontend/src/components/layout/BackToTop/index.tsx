@@ -5,7 +5,7 @@ import {
   FAB_SIZE_PX,
   FAB_RIGHT_PX,
   FAB_BACKTOP_BOTTOM_PX,
-} from '@/components/floatingActionsConstants';
+} from '@/components/shared/floatingActionsConstants';
 
 const FAB_RADIUS_PX = 12;
 

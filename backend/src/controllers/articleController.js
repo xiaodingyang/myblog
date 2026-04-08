@@ -252,7 +252,7 @@ exports.incArticleView = async (req, res, next) => {
       await Article.findByIdAndUpdate(id, { $inc: { views: 1, viewCount: 1 } });
     }
 
-    res.json({ success: true });
+    res.json({ code: 0, message: 'success', data: null });
   } catch (error) {
     next(error);
   }
