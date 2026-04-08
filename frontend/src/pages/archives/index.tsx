@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Timeline, Typography, Tag } from 'antd';
 import { ClockCircleOutlined, FileTextOutlined, CalendarOutlined } from '@ant-design/icons';
-import { Link } from 'umi';
-import { request, useModel } from 'umi';
+import { Link, useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import { themeBg } from '@/utils/themeHelpers';
 import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
+import { useArchives } from '@/hooks/useQueries';
 import ScrollReveal from '@/components/visual/ScrollReveal';
 
 const { Title, Text } = Typography;
@@ -54,10 +54,10 @@ const ArchivesSkeleton: React.FC = () => (
 );
 
 const Archives: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<MonthGroup[]>([]);
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
+
+  const { data: data = [], isLoading: loading } = useArchives();
 
   useSEO({
     title: '文章归档',
@@ -71,25 +71,6 @@ const Archives: React.FC = () => {
       description: '按时间线浏览若风技术博客的所有文章归档',
     },
   });
-
-  useEffect(() => {
-    const fetchArchives = async () => {
-      setLoading(true);
-      try {
-        const res = await request<API.Response<MonthGroup[]>>('/api/articles/archives', {
-          params: { limit: 200 },
-        });
-        if (res.code === 0) {
-          setData(res.data || []);
-        }
-      } catch (error) {
-        // handled
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchArchives();
-  }, []);
 
   // 按年分组
   const yearMap = new Map<number, MonthGroup[]>();

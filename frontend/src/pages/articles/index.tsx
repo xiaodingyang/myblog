@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSearchParams, Link } from 'umi';
 import { Typography, Input, Select, Space, Pagination, Tag, Avatar } from 'antd';
 import {
@@ -12,8 +12,7 @@ import {
   FireOutlined,
   FilterOutlined,
 } from '@ant-design/icons';
-import { request, useModel } from 'umi';
-import { cachedRequest } from '@/utils/apiCache';
+import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import OptimizedImage from '@/components/shared/OptimizedImage';
 import ShareButton from '@/components/shared/ShareButton';
@@ -21,6 +20,7 @@ import Empty from '@/components/shared/Empty';
 import ArticlesListSkeleton from '@/components/layout/Skeleton/ArticlesListSkeleton';
 import { fetchArticleDetail } from '@/utils/prefetch';
 import useSEO from '@/hooks/useSEO';
+import { useArticles, useCategories, useTags } from '@/hooks/useQueries';
 import dayjs from 'dayjs';
 import { themeBg, isNewArticle, isHotArticle, artId } from '@/utils/themeHelpers';
 import ScrollReveal from '@/components/visual/ScrollReveal';
@@ -397,11 +397,6 @@ const ArticlesPage: React.FC = () => {
   const colorTheme = getColorThemeById(colorThemeId);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [loading, setLoading] = useState(true);
-  const [articles, setArticles] = useState<API.Article[]>([]);
-  const [total, setTotal] = useState(0);
-  const [categories, setCategories] = useState<API.Category[]>([]);
-  const [tags, setTags] = useState<API.Tag[]>([]);
 
   const page = Number(searchParams.get('page')) || 1;
   const pageSize = 9;
@@ -410,31 +405,18 @@ const ArticlesPage: React.FC = () => {
   const tagId = searchParams.get('tag') || '';
   const sort = searchParams.get('sort') || 'latest';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
-          request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
-            params: { page, pageSize, keyword: keyword || undefined, category: categoryId || undefined, tag: tagId || undefined, sort },
-          }),
-          cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000),
-          cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000),
-        ]);
-        if (articlesRes.code === 0) {
-          setArticles(articlesRes.data.list);
-          setTotal(articlesRes.data.total);
-        }
-        if (categoriesRes.code === 0) setCategories(categoriesRes.data);
-        if (tagsRes.code === 0) setTags(tagsRes.data);
-      } catch {
-        /* ignore */
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [page, keyword, categoryId, tagId, sort]);
+  const { data: articlesData, isLoading: articlesLoading } = useArticles({
+    page, pageSize,
+    keyword: keyword || undefined,
+    category: categoryId || undefined,
+    tag: tagId || undefined,
+    sort,
+  });
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: tags = [], isLoading: tagsLoading } = useTags();
+  const loading = articlesLoading || categoriesLoading || tagsLoading;
+  const articles = articlesData?.list ?? [];
+  const total = articlesData?.total ?? 0;
 
   const updateParams = useCallback(
     (key: string, value: string) => {

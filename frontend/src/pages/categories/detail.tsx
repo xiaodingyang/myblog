@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, history, Link } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -11,13 +11,13 @@ import {
   UserOutlined,
   FireOutlined,
 } from '@ant-design/icons';
-import { request } from 'umi';
 import OptimizedImage from '@/components/shared/OptimizedImage';
 import ShareButton from '@/components/shared/ShareButton';
 import Loading from '@/components/layout/Loading';
 import Empty from '@/components/shared/Empty';
 import { fetchArticleDetail } from '@/utils/prefetch';
 import useSEO from '@/hooks/useSEO';
+import { useCategory, useArticles } from '@/hooks/useQueries';
 import dayjs from 'dayjs';
 import { themeBg, isNewArticle, isHotArticle, artId } from '@/utils/themeHelpers';
 
@@ -138,45 +138,27 @@ const ArticleRow: React.FC<{
    ================================================================ */
 const CategoryDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState(true);
   const { themeId: colorThemeId } = useModel('colorModel');
   const colorTheme = getColorThemeById(colorThemeId);
-  const [category, setCategory] = useState<API.Category | null>(null);
-  const [articles, setArticles] = useState<API.Article[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const pageSize = 9;
+
+  const { data: category, isLoading: categoryLoading } = useCategory(id!);
+  const { data: articlesData, isLoading: articlesLoading } = useArticles({
+    page,
+    pageSize,
+    category: id,
+  });
+
+  const loading = categoryLoading || articlesLoading;
+  const articles = articlesData?.list ?? [];
+  const total = articlesData?.total ?? 0;
 
   useSEO({
     title: category ? `${category.name} - 分类` : '分类详情',
     description: category ? `浏览分类「${category.name}」下的所有技术文章。` : '分类详情',
     keywords: category ? `${category.name},文章分类,技术博客` : '文章分类',
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [categoryRes, articlesRes] = await Promise.all([
-          request<API.Response<API.Category>>(`/api/categories/${id}`),
-          request<API.Response<API.PageResult<API.Article>>>('/api/articles', {
-            params: { page, pageSize, category: id },
-          }),
-        ]);
-
-        if (categoryRes.code === 0) setCategory(categoryRes.data);
-        if (articlesRes.code === 0) {
-          setArticles(articlesRes.data.list);
-          setTotal(articlesRes.data.total);
-        }
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchData();
-  }, [id, page]);
 
   if (loading) {
     return <Loading />;

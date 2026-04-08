@@ -3,7 +3,6 @@ import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import { getPrefetchedArticle } from '@/utils/prefetch';
 import {
   ClockCircleOutlined,
   EyeOutlined,
@@ -35,6 +34,7 @@ import { checkAchievements } from '@/utils/achievements';
 import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
+import { useArticle, useComments, useCreateComment, useToggleArticleLike } from '@/hooks/useQueries';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
 
@@ -49,24 +49,25 @@ function formatViews(views: number): string {
 
 const ArticleDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState(true);
-  const [article, setArticle] = useState<API.Article | null>(null);
+  const { data: article, isLoading: loading } = useArticle(id!);
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
-  const [submitting, setSubmitting] = useState(false);
-  const [commentContent, setCommentContent] = useState('');
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentTotal, setCommentTotal] = useState(0);
   const [commentPage, setCommentPage] = useState(1);
+  const { data: commentsData, isLoading: commentLoading } = useComments(id!, commentPage);
+  const comments = commentsData?.list ?? [];
+  const commentTotal = commentsData?.total ?? 0;
+  const createCommentMutation = useCreateComment();
+  const toggleLikeMutation = useToggleArticleLike();
 
   // Lightbox for article images
   const lightbox = useLightbox('.markdown-body', [article]);
-  const [commentLoading, setCommentLoading] = useState(false);
   const { githubUser, githubToken, isLoggedIn, requireAuth } = useModel('githubUserModel');
   const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
   const [articleLikeLoading, setArticleLikeLoading] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [showCommentButton, setShowCommentButton] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [commentContent, setCommentContent] = useState('');
   const commentPageSize = 10;
   const commentsRef = useRef<HTMLDivElement>(null);
 
@@ -118,70 +119,20 @@ const ArticleDetailPage: React.FC = () => {
     jsonLd,
   });
 
-  const fetchComments = useCallback(async (page: number) => {
-    if (!id) return;
-    setCommentLoading(true);
-    try {
-      const res = await request(`/api/comments/article/${id}`, {
-        params: { page, pageSize: commentPageSize },
-      });
-      if (res.code === 0) {
-        setComments(res.data.list);
-        setCommentTotal(res.data.total);
-      }
-    } catch {
-      // ignore
-    } finally {
-      setCommentLoading(false);
-    }
-  }, [id]);
-
+  // 记录阅读历史 + 检查成就（文章加载成功后触发）
   useEffect(() => {
-    const fetchArticle = async () => {
-      const cached = getPrefetchedArticle(id!);
-      if (cached && cached.code === 0) {
-        setArticle(cached.data);
-        addReadingHistory({
-          articleId: id!,
-          title: cached.data.title,
-          cover: cached.data.cover,
-          summary: cached.data.summary,
-          readAt: new Date().toISOString(),
-        });
-        const ach1 = checkAchievements();
-        if (ach1) message.success(`🏆 成就解锁：${ach1.title} — ${ach1.desc}`, 3);
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await request<API.Response<API.Article>>(`/api/articles/${id}`);
-        if (res.code === 0) {
-          setArticle(res.data);
-          addReadingHistory({
-            articleId: id!,
-            title: res.data.title,
-            cover: res.data.cover,
-            summary: res.data.summary,
-            readAt: new Date().toISOString(),
-          });
-          const ach2 = checkAchievements();
-          if (ach2) message.success(`🏆 成就解锁：${ach2.title} — ${ach2.desc}`, 3);
-        } else {
-          message.error(res.message || '文章不存在');
-        }
-      } catch (error) {
-        message.error('获取文章失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchArticle();
-      fetchComments(1);
+    if (article && id) {
+      addReadingHistory({
+        articleId: id,
+        title: article.title,
+        cover: article.cover,
+        summary: article.summary,
+        readAt: new Date().toISOString(),
+      });
+      const ach = checkAchievements();
+      if (ach) message.success(`🏆 成就解锁：${ach.title} — ${ach.desc}`, 3);
     }
-  }, [id, fetchComments]);
+  }, [article, id]);
 
   // Call view count API (separate effect to avoid re-calling on fetchComments changes)
   useEffect(() => {
