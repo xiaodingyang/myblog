@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Row, Col, Tag } from 'antd';
 import { FolderOutlined, FileTextOutlined } from '@ant-design/icons';
-import { request } from 'umi';
-import { cachedRequest } from '@/utils/apiCache';
 import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
+import { useCategories } from '@/hooks/useQueries';
 import { themeBg } from '@/utils/themeHelpers';
 import ScrollReveal from '@/components/visual/ScrollReveal';
 
@@ -26,27 +25,9 @@ const CategoriesPage: React.FC = () => {
       description: '按分类浏览若风技术博客的所有文章',
     },
   });
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<API.Category[]>([]);
+  const { data: categories = [], isLoading: loading } = useCategories();
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setLoading(true);
-      try {
-        const res = await cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000);
-        if (res.code === 0) {
-          setCategories(res.data);
-        }
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   // 骨架屏
   const CategoriesSkeleton = () => (

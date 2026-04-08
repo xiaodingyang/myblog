@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Card, Tag } from 'antd';
 import { TagsOutlined } from '@ant-design/icons';
-import { request } from 'umi';
-import { cachedRequest } from '@/utils/apiCache';
 import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
+import { useTags } from '@/hooks/useQueries';
 import { themeBg } from '@/utils/themeHelpers';
 import ScrollReveal from '@/components/visual/ScrollReveal';
 
@@ -26,25 +25,7 @@ const TagsPage: React.FC = () => {
       description: '按标签浏览若风技术博客的所有文章',
     },
   });
-  const [loading, setLoading] = useState(true);
-  const [tags, setTags] = useState<API.Tag[]>([]);
-
-  useEffect(() => {
-    const fetchTags = async () => {
-      setLoading(true);
-      try {
-        const res = await cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000);
-        if (res.code === 0) {
-          setTags(res.data);
-        }
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTags();
-  }, []);
+  const { data: tags = [], isLoading: loading } = useTags();
 
   // 根据文章数量计算标签大小
   const getTagSize = (count: number) => {

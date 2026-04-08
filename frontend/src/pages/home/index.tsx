@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { Link, request } from 'umi';
-import { cachedRequest } from '@/utils/apiCache';
+import { Link } from 'umi';
 import { Typography, Tag, Space, Button } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -21,6 +20,7 @@ import DailyQuote from '@/components/shared/DailyQuote';
 import OptimizedImage from '@/components/shared/OptimizedImage';
 import { getReadArticleIds, sortByPopularity } from '@/utils/recommend';
 import useSEO from '@/hooks/useSEO';
+import { useArticles, useCategories, useTags } from '@/hooks/useQueries';
 import MotionButton from '@/components/visual/MotionButton';
 import { motion } from 'framer-motion';
 
@@ -65,11 +65,12 @@ const HomePage: React.FC = () => {
       },
     },
   });
-  const [loading, setLoading] = useState(true);
-  const [articles, setArticles] = useState<API.Article[]>([]);
-  const [articleCount, setArticleCount] = useState(0);
-  const [categories, setCategories] = useState<API.Category[]>([]);
-  const [tags, setTags] = useState<API.Tag[]>([]);
+  const { data: articlesData, isLoading: articlesLoading } = useArticles({ page: 1, pageSize: 6 });
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: tags, isLoading: tagsLoading } = useTags();
+  const loading = articlesLoading || categoriesLoading || tagsLoading;
+  const articles = articlesData?.list ?? [];
+  const articleCount = articlesData?.total ?? 0;
   const [currentSection, setCurrentSection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { themeId: colorThemeId } = useModel('colorModel');
@@ -117,39 +118,6 @@ const HomePage: React.FC = () => {
     }
     return result;
   }, [featuredArticles, latestArticles, recommendArticles]);
-
-  // Bug Fix #4: 将 fetchData 提取到 useCallback 中，确保 cleanup 函数引用最新版本
-  // 避免组件重渲染或依赖变化时 cleanup 引用旧版 fetchData 导致数据不更新或内存泄漏
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [articlesRes, categoriesRes, tagsRes] = await Promise.all([
-        cachedRequest<API.Response<API.PageResult<API.Article>>>('/api/articles', { page: '1', pageSize: '6' }, 5 * 60 * 1000),
-        cachedRequest<API.Response<API.Category[]>>('/api/categories', {}, 30 * 60 * 1000),
-        cachedRequest<API.Response<API.Tag[]>>('/api/tags', {}, 30 * 60 * 1000),
-      ]);
-
-      if (articlesRes.code === 0) {
-        setArticles(articlesRes.data.list);
-        setArticleCount(articlesRes.data.total);
-      }
-      if (categoriesRes.code === 0) setCategories(categoriesRes.data);
-      if (tagsRes.code === 0) setTags(tagsRes.data);
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if ('requestIdleCallback' in window) {
-      const id = requestIdleCallback(() => fetchData());
-      return () => cancelIdleCallback(id);
-    } else {
-      const timer = setTimeout(() => fetchData(), 200);
-      return () => clearTimeout(timer);
-    }
-  }, [fetchData]);
 
   /** 与 CSS `.home-fullscreen-section` 实际高度一致（含 100dvh），避免 innerHeight 与 dvh 不一致导致圆点错位 */
   const getSectionHeight = useCallback(() => {
