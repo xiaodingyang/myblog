@@ -19,7 +19,7 @@ import ScrollReveal from '@/components/visual/ScrollReveal';
 const { Title, Text, Paragraph } = Typography;
 
 const AboutPage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '关于我',
     description: '了解若风——一名热爱前端开发的工程师，专注于 React、TypeScript、Node.js 技术栈。',
     keywords: '若风,关于我,前端工程师,个人介绍',
@@ -79,6 +79,7 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-4xl mx-auto px-6">
         {/* 页面标题 */}
         <ScrollReveal direction="up">

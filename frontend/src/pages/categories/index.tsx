@@ -13,7 +13,7 @@ import ScrollReveal from '@/components/visual/ScrollReveal';
 const { Title, Text, Paragraph } = Typography;
 
 const CategoriesPage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '分类',
     description: '按分类浏览若风技术博客的所有文章，快速找到感兴趣的内容。',
     keywords: '文章分类,技术博客,前端,后端',
@@ -23,6 +23,13 @@ const CategoriesPage: React.FC = () => {
       name: '文章分类 - 若风的博客',
       url: 'https://www.xiaodingyang.art/categories',
       description: '按分类浏览若风技术博客的所有文章',
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: '首页', item: 'https://www.xiaodingyang.art/' },
+          { '@type': 'ListItem', position: 2, name: '分类', item: 'https://www.xiaodingyang.art/categories' },
+        ],
+      },
     },
   });
   const { data: categories = [], isLoading: loading } = useCategories();
@@ -51,6 +58,7 @@ const CategoriesPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
         <ScrollReveal direction="up">

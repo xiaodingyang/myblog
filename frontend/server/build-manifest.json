@@ -1,0 +1,9 @@
+{
+  "assets": {
+    "public/baidu_verify_codeva-T2MxTzyMwa.html": "/baidu_verify_codeva-T2MxTzyMwa.html",
+    "public/favicon.png": "/favicon.png",
+    "public/robots.txt": "/robots.txt",
+    "umi.css": "/umi.css",
+    "umi.js": "/umi.server.js"
+  }
+}

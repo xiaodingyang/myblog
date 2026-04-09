@@ -50,7 +50,7 @@ const Rankings: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
 
-  useSEO({
+  const seo = useSEO({
     title: '评论活跃榜',
     description: '若风博客评论活跃排行榜，看看谁是最活跃的读者！',
     keywords: '排行榜,评论,活跃用户',
@@ -106,6 +106,7 @@ const Rankings: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-3xl mx-auto px-4 md:px-6">
         {/* 页面标题 */}
         <ScrollReveal direction="up">

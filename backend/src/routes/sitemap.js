@@ -11,41 +11,33 @@ router.get('/', async (req, res) => {
       .sort({ updatedAt: -1 })
       .lean();
 
-    const categories = await Category.find().select('_id').lean();
-    const tags = await Tag.find().select('_id').lean();
+    const categories = await Category.find().select('_id updatedAt').lean();
+    const tags = await Tag.find().select('_id updatedAt').lean();
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const staticPages = [
+      { loc: `${SITE_URL}/`, changefreq: 'daily', priority: '1.0' },
+      { loc: `${SITE_URL}/articles`, changefreq: 'daily', priority: '0.9' },
+      { loc: `${SITE_URL}/categories`, changefreq: 'weekly', priority: '0.7' },
+      { loc: `${SITE_URL}/tags`, changefreq: 'weekly', priority: '0.7' },
+      { loc: `${SITE_URL}/about`, changefreq: 'monthly', priority: '0.6' },
+      { loc: `${SITE_URL}/message`, changefreq: 'weekly', priority: '0.5' },
+      { loc: `${SITE_URL}/archives`, changefreq: 'weekly', priority: '0.7' },
+    ];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    for (const page of staticPages) {
+      xml += `
   <url>
-    <loc>${SITE_URL}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/categories</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/tags</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/message</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>${page.loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
   </url>`;
+    }
 
     for (const article of articles) {
       const lastmod = article.updatedAt
@@ -61,18 +53,22 @@ router.get('/', async (req, res) => {
     }
 
     for (const cat of categories) {
+      const lastmod = cat.updatedAt ? new Date(cat.updatedAt).toISOString().split('T')[0] : today;
       xml += `
   <url>
     <loc>${SITE_URL}/category/${cat._id}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`;
     }
 
     for (const tag of tags) {
+      const lastmod = tag.updatedAt ? new Date(tag.updatedAt).toISOString().split('T')[0] : today;
       xml += `
   <url>
     <loc>${SITE_URL}/tag/${tag._id}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`;

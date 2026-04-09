@@ -4,9 +4,25 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import { history } from 'umi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
+import * as Sentry from '@sentry/react';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import { getRouterPathname } from '@/utils/runtimePath';
 import analytics from '@/utils/analytics';
+
+// Sentry 初始化（仅生产环境）
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+  Sentry.init({
+    dsn: 'https://your-sentry-dsn@sentry.io/your-project-id', // TODO: 替换为实际的 Sentry DSN
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
+    ],
+    tracesSampleRate: 0.1, // 采样 10% 的页面加载
+    replaysSessionSampleRate: 0.05, // 采样 5% 的 session 录制
+    replaysOnErrorSampleRate: 1.0, // 有错误时 100% 录制 replay
+  });
+}
 
 dayjs.locale('zh-cn');
 
@@ -30,6 +46,9 @@ export async function getInitialState(): Promise<{
     currentUser?: API.User;
     token?: string;
 }> {
+    // SSR 保护：Node.js 环境没有 localStorage
+    if (typeof window === 'undefined') return {};
+
     const token = localStorage.getItem('token');
 
     if (token) {
@@ -106,10 +125,17 @@ export const request = {
     },
     requestInterceptors: [
         (config: any) => {
+            // SSR 保护：构建时将相对路径转为绝对 URL
+            if (typeof window === 'undefined') {
+                const apiBase = process.env.SSR_API_BASE || 'http://localhost:3000';
+                if (config.url && !config.url.startsWith('http')) {
+                    config.url = `${apiBase}${config.url}`;
+                }
+                return config;
+            }
             const adminToken = localStorage.getItem('token');
             const ghToken = localStorage.getItem('github_token');
-            const isAdmin =
-                typeof window !== 'undefined' && getRouterPathname().startsWith('/admin');
+            const isAdmin = getRouterPathname().startsWith('/admin');
             const bearer = isAdmin ? adminToken : ghToken || adminToken;
             if (bearer) {
                 config.headers = {
@@ -152,6 +178,7 @@ export function rootContainer(container: React.ReactNode) {
 
     return (
         <ErrorBoundary>
+            <HelmetProvider>
             <QueryClientProvider client={queryClient}>
                 <ConfigProvider
                     locale={zhCN}
@@ -177,6 +204,7 @@ export function rootContainer(container: React.ReactNode) {
                     {container}
                 </ConfigProvider>
             </QueryClientProvider>
+            </HelmetProvider>
         </ErrorBoundary>
     );
 }

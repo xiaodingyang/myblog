@@ -38,7 +38,7 @@ const FavoritesPage: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
 
-  useSEO({
+  const seo = useSEO({
     title: '我的收藏',
     description: '你在若风博客中收藏的文章列表。',
     keywords: '收藏,博客,文章',
@@ -78,6 +78,7 @@ const FavoritesPage: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <div className="animate-fade-in py-8">
+        {seo}
         <div className="max-w-lg mx-auto px-4 md:px-6">
           <ScrollReveal direction="up">
           <div className="text-center mb-12">
@@ -123,6 +124,7 @@ const FavoritesPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* 页面标题 */}
         <ScrollReveal direction="up">

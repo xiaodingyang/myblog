@@ -59,7 +59,7 @@ const Archives: React.FC = () => {
 
   const { data: data = [], isLoading: loading } = useArchives();
 
-  useSEO({
+  const seo = useSEO({
     title: '文章归档',
     description: '按时间线浏览若风技术博客的所有文章归档。',
     keywords: '文章归档,技术博客,时间线',
@@ -87,6 +87,7 @@ const Archives: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-4xl mx-auto px-4 md:px-6">
         {/* 页面标题 */}
         <ScrollReveal direction="up">

@@ -1,6 +1,11 @@
 /**
  * 全局错误处理中间件
+ *
+ * 统一错误码：
+ * - 错误响应格式：{ code: <ErrorCode>, message: <string>, data: null }
  */
+const ErrorCode = require('../config/errorCode');
+
 const errorHandler = (err, req, res, next) => {
   console.error('Error:', err);
 
@@ -8,7 +13,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map(e => e.message);
     return res.status(400).json({
-      code: 400,
+      code: ErrorCode.PARAM_ERROR,
       message: messages[0] || '数据验证失败',
       data: null,
     });
@@ -23,7 +28,7 @@ const errorHandler = (err, req, res, next) => {
       name: '名称',
     };
     return res.status(400).json({
-      code: 400,
+      code: ErrorCode.PARAM_ERROR,
       message: `${fieldNames[field] || field} 已存在`,
       data: null,
     });
@@ -32,7 +37,7 @@ const errorHandler = (err, req, res, next) => {
   // Mongoose CastError（无效的 ObjectId）
   if (err.name === 'CastError') {
     return res.status(400).json({
-      code: 400,
+      code: ErrorCode.PARAM_ERROR,
       message: '无效的 ID 格式',
       data: null,
     });
@@ -41,7 +46,7 @@ const errorHandler = (err, req, res, next) => {
   // JWT 错误
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
-      code: 401,
+      code: ErrorCode.TOKEN_INVALID,
       message: '无效的 token',
       data: null,
     });
@@ -49,8 +54,17 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({
-      code: 401,
+      code: ErrorCode.TOKEN_EXPIRED,
       message: '登录已过期',
+      data: null,
+    });
+  }
+
+  // 自定义 ApiError
+  if (err.statusCode) {
+    return res.status(err.statusCode).json({
+      code: err.code || ErrorCode.SERVER_ERROR,
+      message: err.message,
       data: null,
     });
   }
@@ -58,24 +72,15 @@ const errorHandler = (err, req, res, next) => {
   // Multer 错误
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
-      code: 400,
+      code: ErrorCode.FILE_TOO_LARGE,
       message: '文件大小超过限制',
-      data: null,
-    });
-  }
-
-  // 自定义错误
-  if (err.statusCode) {
-    return res.status(err.statusCode).json({
-      code: err.statusCode,
-      message: err.message,
       data: null,
     });
   }
 
   // 默认服务器错误
   res.status(500).json({
-    code: 500,
+    code: ErrorCode.SERVER_ERROR,
     message: process.env.NODE_ENV === 'production' ? '服务器内部错误' : err.message,
     data: null,
   });

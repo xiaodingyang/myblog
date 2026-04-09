@@ -380,7 +380,7 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
    ArticlesPage — 主页面
    ================================================================ */
 const ArticlesPage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '文章列表',
     description: '若风的技术博客文章列表，涵盖前端开发、后端技术、开源项目等内容。',
     keywords: '技术文章,前端开发,React,TypeScript,Node.js',
@@ -446,6 +446,7 @@ const ArticlesPage: React.FC = () => {
   /* ── render ── */
   return (
     <div className="animate-fade-in py-6 md:py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* ── 页面标题 ── */}
         <ScrollReveal direction="up">

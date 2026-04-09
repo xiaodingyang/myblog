@@ -14,7 +14,7 @@ const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const MessagePage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '留言板',
     description: '欢迎在若风的博客留言板留下你的想法、建议或问题。',
     keywords: '留言板,评论,交流,技术讨论',
@@ -85,6 +85,7 @@ const MessagePage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
         <ScrollReveal direction="up">

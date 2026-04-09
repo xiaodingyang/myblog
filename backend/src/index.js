@@ -55,7 +55,7 @@ const max = Number.isFinite(envMax) && envMax > 0
 const apiLimiter = rateLimit({
   windowMs,
   max,
-  message: { code: 429, message: '请求过于频繁，请稍后再试', data: null },
+  message: { code: 10008, message: '请求过于频繁，请稍后再试', data: null },
   standardHeaders: true,
   legacyHeaders: false,
 });

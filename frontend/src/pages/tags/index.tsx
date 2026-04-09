@@ -13,7 +13,7 @@ import ScrollReveal from '@/components/visual/ScrollReveal';
 const { Title, Text } = Typography;
 
 const TagsPage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '标签',
     description: '按标签浏览若风技术博客的所有文章，精确定位感兴趣的技术话题。',
     keywords: '文章标签,技术标签,前端开发,React,TypeScript',
@@ -23,6 +23,13 @@ const TagsPage: React.FC = () => {
       name: '文章标签 - 若风的博客',
       url: 'https://www.xiaodingyang.art/tags',
       description: '按标签浏览若风技术博客的所有文章',
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: '首页', item: 'https://www.xiaodingyang.art/' },
+          { '@type': 'ListItem', position: 2, name: '标签', item: 'https://www.xiaodingyang.art/tags' },
+        ],
+      },
     },
   });
   const { data: tags = [], isLoading: loading } = useTags();
@@ -67,6 +74,7 @@ const TagsPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-8">
+      {seo}
       <div className="max-w-4xl mx-auto px-6">
         {/* 页面标题 - 透明背景，显示粒子 */}
         <ScrollReveal direction="up">

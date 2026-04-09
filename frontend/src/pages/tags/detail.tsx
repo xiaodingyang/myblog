@@ -148,19 +148,20 @@ const TagDetailPage: React.FC = () => {
   const articles = articlesData?.list ?? [];
   const total = articlesData?.total ?? 0;
 
-  useSEO({
+  const seo = useSEO({
     title: tag ? `${tag.name} - 标签` : '标签详情',
     description: tag ? `浏览标签「${tag.name}」下的所有技术文章。` : '标签详情',
     keywords: tag ? `${tag.name},文章标签,技术博客` : '文章标签',
   });
 
   if (loading) {
-    return <Loading />;
+    return <>{seo}<Loading /></>;
   }
 
   if (!tag) {
     return (
       <div className="py-16">
+        {seo}
         <Empty
           description="标签不存在"
           showAction
@@ -173,6 +174,7 @@ const TagDetailPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-6 md:py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* ── 沉浸式 Hero 头部 ── */}
         <div className="text-center mb-10 md:mb-14 relative">

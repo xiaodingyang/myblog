@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
+import React, { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
 import { useParams, Link, history } from 'umi';
 import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
 import { useModel } from 'umi';
@@ -34,7 +34,8 @@ import { checkAchievements } from '@/utils/achievements';
 import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
-import { useArticle, useComments, useCreateComment, useToggleArticleLike } from '@/hooks/useQueries';
+import { useArticle, useComments } from '@/hooks/useQueries';
+import { useQueryClient } from 'umi';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
 
@@ -56,8 +57,6 @@ const ArticleDetailPage: React.FC = () => {
   const { data: commentsData, isLoading: commentLoading } = useComments(id!, commentPage);
   const comments = commentsData?.list ?? [];
   const commentTotal = commentsData?.total ?? 0;
-  const createCommentMutation = useCreateComment();
-  const toggleLikeMutation = useToggleArticleLike();
 
   // Lightbox for article images
   const lightbox = useLightbox('.markdown-body', [article]);
@@ -70,6 +69,7 @@ const ArticleDetailPage: React.FC = () => {
   const [commentContent, setCommentContent] = useState('');
   const commentPageSize = 10;
   const commentsRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   const toc = useMemo(
     () => (article ? extractTocFromMarkdown(article.content) : []),
@@ -106,7 +106,7 @@ const ArticleDetailPage: React.FC = () => {
     };
   }, [article]);
 
-  useSEO({
+  const seo = useSEO({
     title: article?.title,
     shareTitle: article?.title,
     description:
@@ -183,8 +183,8 @@ const ArticleDetailPage: React.FC = () => {
         if (res.code === 0) {
           message.success('评论发表成功');
           setCommentContent('');
-          fetchComments(1);
           setCommentPage(1);
+          queryClient.invalidateQueries({ queryKey: ['comments', id!, 1] });
         } else {
           message.error(res.message || '评论失败');
         }
@@ -207,22 +207,25 @@ const ArticleDetailPage: React.FC = () => {
 
       setLikingComments(prev => new Set(prev).add(commentId));
 
-      // 乐观更新：先在本地更新状态
-      const prevComments = [...comments];
-      setComments(prev =>
-        prev.map(c => {
-          if (c._id === commentId) {
-            const userLikes = c.likes?.map((l: any) => l.toString()) || [];
-            const isLiked = userLikes.includes(githubUser?.id?.toString());
-            return {
-              ...c,
-              likeCount: isLiked ? Math.max(0, (c.likeCount || 0) - 1) : (c.likeCount || 0) + 1,
-              liked: !isLiked,
-            };
-          }
-          return c;
-        })
-      );
+      // 乐观更新：先缓存中更新
+      queryClient.setQueryData(['comments', id!, commentPage], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          list: old.list.map((c: any) => {
+            if (c._id === commentId) {
+              const userLikes = c.likes?.map((l: any) => l.toString()) || [];
+              const isLiked = userLikes.includes(githubUser?.id?.toString());
+              return {
+                ...c,
+                likeCount: isLiked ? Math.max(0, (c.likeCount || 0) - 1) : (c.likeCount || 0) + 1,
+                liked: !isLiked,
+              };
+            }
+            return c;
+          }),
+        };
+      });
 
       try {
         const res = await request(`/api/comments/${commentId}/like`, {
@@ -230,22 +233,25 @@ const ArticleDetailPage: React.FC = () => {
           headers: { Authorization: `Bearer ${githubToken}` },
         });
         if (res.code === 0) {
-          // 更新本地状态，使用服务器返回的值
-          setComments(prev =>
-            prev.map(c => {
-              if (c._id === commentId) {
-                return { ...c, likeCount: res.data.likeCount, liked: res.data.liked };
-              }
-              return c;
-            })
-          );
+          // 使用服务器返回值更新缓存
+          queryClient.setQueryData(['comments', id!, commentPage], (old: any) => {
+            if (!old) return old;
+            return {
+              ...old,
+              list: old.list.map((c: any) =>
+                c._id === commentId
+                  ? { ...c, likeCount: res.data.likeCount, liked: res.data.liked }
+                  : c
+              ),
+            };
+          });
         } else {
-          // 失败则恢复原状态
-          setComments(prevComments);
+          // 失败则使缓存失效，重新获取
+          queryClient.invalidateQueries({ queryKey: ['comments', id!, commentPage] });
           message.error(res.message || '点赞失败');
         }
       } catch {
-        setComments(prevComments);
+        queryClient.invalidateQueries({ queryKey: ['comments', id!, commentPage] });
         message.error('点赞失败');
       } finally {
         setLikingComments(prev => {
@@ -270,14 +276,8 @@ const ArticleDetailPage: React.FC = () => {
           headers: { Authorization: `Bearer ${githubToken}` },
         });
         if (res.code === 0 && res.data) {
-          setArticle((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  liked: res.data.liked,
-                  likeCount: res.data.likeCount,
-                }
-              : null
+          queryClient.setQueryData(['article', id], (old: any) =>
+            old ? { ...old, liked: res.data.liked, likeCount: res.data.likeCount } : old
           );
         } else {
           message.error(res.message || '操作失败');
@@ -305,7 +305,9 @@ const ArticleDetailPage: React.FC = () => {
             headers: { Authorization: `Bearer ${githubToken}` },
           });
           if (res.code === 0) {
-            setArticle((prev) => (prev ? { ...prev, favorited: false } : null));
+            queryClient.setQueryData(['article', id], (old: any) =>
+              old ? { ...old, favorited: false } : old
+            );
             message.success('已取消收藏');
           } else {
             message.error(res.message || '取消收藏失败');
@@ -317,7 +319,9 @@ const ArticleDetailPage: React.FC = () => {
             data: { articleId: id },
           });
           if (res.code === 0) {
-            setArticle((prev) => (prev ? { ...prev, favorited: true } : null));
+            queryClient.setQueryData(['article', id], (old: any) =>
+              old ? { ...old, favorited: true } : old
+            );
             message.success('已加入收藏');
           } else {
             message.error(res.message || '收藏失败');
@@ -350,6 +354,7 @@ const ArticleDetailPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
+      {seo}
       {/* Skip to content */}
       <a
         href="#main-content"
@@ -683,7 +688,6 @@ const ArticleDetailPage: React.FC = () => {
                       showSizeChanger={false}
                       onChange={(p) => {
                         setCommentPage(p);
-                        fetchComments(p);
                       }}
                     />
                   </div>

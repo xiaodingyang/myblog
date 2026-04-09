@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link, useLocation } from 'umi';
 import { HomeOutlined } from '@ant-design/icons';
+import { Helmet } from 'react-helmet-async';
 import { SITE_ORIGIN } from '@/hooks/useSEO';
 
 interface BreadcrumbNavProps {
@@ -10,32 +11,6 @@ interface BreadcrumbNavProps {
   categorySlug?: string;
   tagName?: string;
   tagSlug?: string;
-}
-
-/** 输出 BreadcrumbList JSON-LD 到 <head> */
-function setBreadcrumbJsonLd(breadcrumbItems: { name: string; url: string }[]) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: breadcrumbItems.map((item, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: item.name,
-      ...(i < breadcrumbItems.length - 1 ? { item: item.url } : {}),
-    })),
-  };
-  let el = document.querySelector('script[data-seo-breadcrumb]') as HTMLScriptElement | null;
-  if (!el) {
-    el = document.createElement('script');
-    el.type = 'application/ld+json';
-    el.setAttribute('data-seo-breadcrumb', 'true');
-    document.head.appendChild(el);
-  }
-  el.textContent = JSON.stringify(jsonLd);
-}
-
-function removeBreadcrumbJsonLd() {
-  document.querySelectorAll('script[data-seo-breadcrumb]').forEach((n) => n.remove());
 }
 
 const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
@@ -92,15 +67,28 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
     jsonLdItems.push({ name: '标签', url: `${SITE_ORIGIN}/tags` });
   }
 
-  useEffect(() => {
-    if (jsonLdItems.length > 1) {
-      setBreadcrumbJsonLd(jsonLdItems);
-    }
-    return () => removeBreadcrumbJsonLd();
+  const jsonLdString = useMemo(() => {
+    if (jsonLdItems.length <= 1) return undefined;
+    return JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: jsonLdItems.map((item, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: item.name,
+        ...(i < jsonLdItems.length - 1 ? { item: item.url } : {}),
+      })),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, articleTitle, categoryName, tagName]);
 
   return (
     <div className="mb-4">
+      {jsonLdString && (
+        <Helmet>
+          <script type="application/ld+json">{jsonLdString}</script>
+        </Helmet>
+      )}
       <Breadcrumb items={items} />
     </div>
   );

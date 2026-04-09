@@ -1,0 +1,53 @@
+/**
+ * 统一错误码常量
+ *
+ * 格式：{ HTTP状态码: 业务错误码 }
+ * - 业务错误码用于客户端逻辑判断
+ * - HTTP状态码用于 HTTP 响应
+ */
+const ErrorCode = {
+  // 成功
+  SUCCESS: 0,
+
+  // 通用错误（1xxxx）
+  PARAM_ERROR: 10001,       // 参数错误
+  AUTH_FAILED: 10002,       // 认证失败
+  TOKEN_INVALID: 10003,     // Token 无效
+  TOKEN_EXPIRED: 10004,    // Token 已过期
+  PERMISSION_DENIED: 10005, // 权限不足
+  NOT_FOUND: 10006,        // 资源不存在
+  SERVER_ERROR: 10007,     // 服务器错误
+  RATE_LIMITED: 10008,     // 请求过于频繁
+
+  // 业务错误（2xxxx）
+  ARTICLE_NOT_FOUND: 20001,
+  CATEGORY_NOT_FOUND: 20002,
+  TAG_NOT_FOUND: 20003,
+  COMMENT_NOT_FOUND: 20004,
+  USER_NOT_FOUND: 20005,
+
+  ARTICLE_ALREADY_LIKED: 21001,
+  ARTICLE_NOT_LIKED: 21002,
+
+  CATEGORY_NAME_EXISTS: 22001,
+  CATEGORY_HAS_ARTICLES: 22002,
+
+  TAG_NAME_EXISTS: 23001,
+
+  COMMENT_ALREADY_LIKED: 24001,
+  COMMENT_NOT_LIKED: 24002,
+  COMMENT_RATE_LIMITED: 24003,
+
+  FAVORITE_EXISTS: 25001,
+  FAVORITE_NOT_EXISTS: 25002,
+
+  FOLLOW_EXISTS: 26001,
+  FOLLOW_NOT_EXISTS: 26002,
+
+  // 文件上传错误（3xxxx）
+  FILE_TOO_LARGE: 30001,
+  FILE_TYPE_NOT_ALLOWED: 30002,
+  FILE_UPLOAD_FAILED: 30003,
+};
+
+module.exports = ErrorCode;

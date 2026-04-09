@@ -49,7 +49,7 @@ const { Title, Paragraph, Text } = Typography;
 // 注意：此组件内部通过 request from 'umi' 调用 API
 
 const HomePage: React.FC = () => {
-  useSEO({
+  const seo = useSEO({
     title: '首页',
     description: '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。',
     keywords: '若风,前端博客,React,TypeScript,Node.js,技术分享',
@@ -194,6 +194,7 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
+      {seo}
       {/* 导航点指示器 - 移动端隐藏 */}
       <div className="hidden md:flex fixed right-4 lg:right-6 top-1/2 transform -translate-y-1/2 z-50 flex-col gap-3">
         {sections.map((_, index) => {

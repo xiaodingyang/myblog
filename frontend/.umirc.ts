@@ -156,6 +156,12 @@ export default defineConfig({
     strategy: 'normal',
   },
 
+  // ── SSG 静态站点生成 ──
+  ssr: false,
+  exportStatic: {
+    ignorePreRenderError: true,
+  },
+
   // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
   chainWebpack(config: any, { env }: any) {
     if (env === 'production') {

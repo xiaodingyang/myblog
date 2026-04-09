@@ -154,19 +154,20 @@ const CategoryDetailPage: React.FC = () => {
   const articles = articlesData?.list ?? [];
   const total = articlesData?.total ?? 0;
 
-  useSEO({
+  const seo = useSEO({
     title: category ? `${category.name} - 分类` : '分类详情',
     description: category ? `浏览分类「${category.name}」下的所有技术文章。` : '分类详情',
     keywords: category ? `${category.name},文章分类,技术博客` : '文章分类',
   });
 
   if (loading) {
-    return <Loading />;
+    return <>{seo}<Loading /></>;
   }
 
   if (!category) {
     return (
       <div className="py-16">
+        {seo}
         <Empty
           description="分类不存在"
           showAction
@@ -179,6 +180,7 @@ const CategoryDetailPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in py-6 md:py-8">
+      {seo}
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         {/* ── 沉浸式 Hero 头部（白色文字 + 粒子背景） ── */}
         <div className="text-center mb-10 md:mb-14 relative">
