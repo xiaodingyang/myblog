@@ -43,6 +43,25 @@ export default defineConfig({
         });
       }
     })();`,
+    // 版本检测 - 自动更新到最新版本（无感知刷新）
+    `(function(){
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
+      var BUILD_VERSION = '${Date.now()}';
+      var STORAGE_KEY = 'app_build_version';
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
+      } else if (stored !== BUILD_VERSION) {
+        // 检测到新版本，清除缓存并刷新
+        localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) { caches.delete(name); });
+          });
+        }
+        window.location.reload();
+      }
+    })();`,
     // 异步 chunk 加载失败时自动刷新页面（仅重试一次，防止死循环）
     `(function(){
       window.addEventListener('error', function(e) {
@@ -157,8 +176,10 @@ export default defineConfig({
   },
 
   // ── SSG 静态站点生成 ──
-  ssr: false,
+  // 启用静态导出，为每个路由生成独立 HTML 文件
+  // 动态路由页面（如 /article/:id）保持 CSR，不预渲染
   exportStatic: {
+    // 忽略预渲染错误，确保构建不中断
     ignorePreRenderError: true,
   },
 

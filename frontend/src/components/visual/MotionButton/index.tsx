@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionButton, LazyMotionSpan, LazyAnimatePresence } from '@/utils/lazyMotion';
 import { prefersReducedMotion } from '@/utils/motionPrefs';
 
 interface Ripple {
@@ -62,7 +62,7 @@ const MotionButton: React.FC<MotionButtonProps> = ({
   }
 
   return (
-    <motion.button
+    <LazyMotionButton
       className={className}
       style={{ ...style, position: 'relative', overflow: 'hidden' }}
       whileHover={{ scale: hoverScale }}
@@ -72,9 +72,9 @@ const MotionButton: React.FC<MotionButtonProps> = ({
       {...(rest as any)}
     >
       <span style={{ position: 'relative', zIndex: 1 }}>{children}</span>
-      <AnimatePresence>
+      <LazyAnimatePresence>
         {ripples.map((r) => (
-          <motion.span
+          <LazyMotionSpan
             key={r.id}
             initial={{ opacity: 0.35, scale: 0 }}
             animate={{ opacity: 0, scale: 1 }}
@@ -92,8 +92,8 @@ const MotionButton: React.FC<MotionButtonProps> = ({
             }}
           />
         ))}
-      </AnimatePresence>
-    </motion.button>
+      </LazyAnimatePresence>
+    </LazyMotionButton>
   );
 };
 

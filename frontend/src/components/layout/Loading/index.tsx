@@ -1,7 +1,7 @@
 import React from 'react';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
+import { LazyMotionDiv } from '@/utils/lazyMotion';
 import { prefersReducedMotion } from '@/utils/motionPrefs';
 
 interface LoadingProps {
@@ -19,14 +19,14 @@ const Loading: React.FC<LoadingProps> = ({
   const reducedMotion = prefersReducedMotion();
 
   const spinner = (
-    <motion.div
+    <LazyMotionDiv
       animate={reducedMotion ? undefined : { scale: [1, 1.05, 1] }}
       transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
       className="flex flex-col items-center"
     >
       <Spin indicator={antIcon} size={size} />
       {tip && <p className="mt-4 text-gray-500">{tip}</p>}
-    </motion.div>
+    </LazyMotionDiv>
   );
 
   if (fullScreen) {

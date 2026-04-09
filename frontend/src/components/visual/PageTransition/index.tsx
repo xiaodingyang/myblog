@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionDiv, LazyAnimatePresence } from '@/utils/lazyMotion';
 import { prefersReducedMotion } from '@/utils/motionPrefs';
 
 interface PageTransitionProps {
@@ -15,8 +15,8 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children, locationKey }
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
+    <LazyAnimatePresence mode="wait">
+      <LazyMotionDiv
         key={locationKey}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -27,8 +27,8 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children, locationKey }
         }}
       >
         {children}
-      </motion.div>
-    </AnimatePresence>
+      </LazyMotionDiv>
+    </LazyAnimatePresence>
   );
 };
 

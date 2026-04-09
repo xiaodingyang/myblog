@@ -73,6 +73,7 @@ const FrontLayout: React.FC = () => {
     return () => { analytics.destroy(); };
   }, []);
   const [showParticles, setShowParticles] = useState(false);
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
   const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');
 
   useEffect(() => {
@@ -80,6 +81,12 @@ const FrontLayout: React.FC = () => {
       setTimeout(() => setShowParticles(true), 100);
     });
     return () => cancelAnimationFrame(id);
+  }, []);
+
+  // 延迟加载主题选择器组件，进一步减少首屏负担
+  useEffect(() => {
+    const timer = setTimeout(() => setShowThemeSelector(true), 500);
+    return () => clearTimeout(timer);
   }, []);
 
   // 关键路由预加载：首屏渲染后，浏览器空闲时预加载高频页面 JS chunk
@@ -311,10 +318,7 @@ const FrontLayout: React.FC = () => {
           })(),
         } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string; '--theme-primary-rgb': string }}
       >
-        {/* 毛玻璃背景层 - 先渲染，作为底层背景 */}
-        {/* <GlassBackground isDark={isDarkTheme} /> */}
-
-        {/* 粒子背景 - 延迟加载，首屏渲染完成后再加载 Three.js (~973KB) */}
+        {/* 粒子背景（内含玻璃背景层） - 延迟加载 */}
         {showParticles && (
           <Suspense fallback={null}>
             <LazyParticlesBackground isDark={isDarkTheme} />
@@ -327,9 +331,11 @@ const FrontLayout: React.FC = () => {
           style={{ right: FAB_RIGHT_PX, bottom: FAB_KEYBOARD_BOTTOM_PX, gap: FAB_GAP_PX }}
         >
           <BackToTop embedded />
-          <Suspense fallback={null}>
-            <LazyParticleThemeSelector isDark={isDarkTheme} embedded />
-          </Suspense>
+          {showThemeSelector && (
+            <Suspense fallback={null}>
+              <LazyParticleThemeSelector isDark={isDarkTheme} embedded />
+            </Suspense>
+          )}
           <KeyboardHelpButton embedded />
         </div>
 
@@ -657,6 +663,8 @@ const FrontLayout: React.FC = () => {
             className="p-0"
             style={{
               background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
+              position: 'relative',
+              zIndex: 10,
             }}
           >
             <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -683,44 +691,45 @@ const FrontLayout: React.FC = () => {
                       className="font-bold text-2xl"
                     />
                   </div>
-                  <Paragraph className="text-gray-400 text-sm">
+                  <Paragraph style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="text-sm">
                     8年前端开发经验，专注 React/Vue/TypeScript。记录技术成长，分享学习心得。
                   </Paragraph>
                 </Col>
                 <Col xs={24} md={8}>
-                  <Title level={5} className="!text-white !mb-4">快速链接</Title>
+                  <Title level={5} style={{ color: '#fff' }} className="!mb-4">快速链接</Title>
                   <Space direction="vertical" size={8}>
-                    <Link to="/" className="text-gray-400 hover:text-white transition-colors">首页</Link>
-                    <Link to="/articles" className="text-gray-400 hover:text-white transition-colors">文章</Link>
-                    <Link to="/categories" className="text-gray-400 hover:text-white transition-colors">分类</Link>
-                    <Link to="/rankings" className="text-gray-400 hover:text-white transition-colors">排行榜</Link>
-                    <Link to="/about" className="text-gray-400 hover:text-white transition-colors">关于我</Link>
+                    <Link to="/" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">首页</Link>
+                    <Link to="/articles" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">文章</Link>
+                    <Link to="/categories" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">分类</Link>
+                    <Link to="/rankings" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">排行榜</Link>
+                    <Link to="/about" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">关于我</Link>
                   </Space>
                 </Col>
                 <Col xs={24} md={8}>
-                  <Title level={5} className="!text-white !mb-4">联系方式</Title>
+                  <Title level={5} style={{ color: '#fff' }} className="!mb-4">联系方式</Title>
                   <Space direction="vertical" size={8}>
-                    <a href="mailto:346629678@qq.com" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                    <a href="mailto:346629678@qq.com" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors flex items-center gap-2">
                       <MailOutlined /> 346629678@qq.com
                     </a>
-                    <a href="https://github.com/xiaodingyang" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                    <a href="https://github.com/xiaodingyang" target="_blank" rel="noreferrer" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors flex items-center gap-2">
                       <GithubOutlined /> GitHub
                     </a>
-                    <a href="https://juejin.cn/user/712139266339694" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                    <a href="https://juejin.cn/user/712139266339694" target="_blank" rel="noreferrer" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors flex items-center gap-2">
                       📘 掘金：风居住de街道
                     </a>
                   </Space>
                 </Col>
               </Row>
-              <Divider className="!border-gray-700 !my-8" />
-              <div className="text-center text-gray-500 text-sm">
+              <Divider style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} className="!my-8" />
+              <div className="text-center text-sm" style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
                 © {new Date().getFullYear()} 肖定阳的博客. All rights reserved.
                 <span className="mx-2">|</span>
                 <a
                   href="https://beian.miit.gov.cn/"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-gray-500 hover:text-gray-300 transition-colors"
+                  style={{ color: 'rgba(255, 255, 255, 0.65)' }}
+                  className="hover:text-white transition-colors"
                 >
                   蜀ICP备2026005106号
                 </a>

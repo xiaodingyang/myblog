@@ -13,7 +13,7 @@ import analytics from '@/utils/analytics';
 // Sentry 初始化（仅生产环境）
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
   Sentry.init({
-    dsn: 'https://your-sentry-dsn@sentry.io/your-project-id', // TODO: 替换为实际的 Sentry DSN
+    dsn: 'https://3631eb07f246364cf03168135dfd8500@o4511185490149376.ingest.us.sentry.io/4511185491918848',
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
@@ -36,12 +36,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// 初始化访客统计埋点 SDK
-if (typeof window !== 'undefined') {
-    analytics.init();
-}
+// analytics.init() 移到 FrontLayout 中统一初始化，避免重复调用
 
 // 全局初始化状态
+// 优化：不阻塞首屏渲染，直接返回本地缓存，认证检查在后台进行
 export async function getInitialState(): Promise<{
     currentUser?: API.User;
     token?: string;
@@ -50,32 +48,33 @@ export async function getInitialState(): Promise<{
     if (typeof window === 'undefined') return {};
 
     const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
 
-    if (token) {
+    // 快速返回本地缓存，不阻塞渲染
+    if (token && userStr) {
         try {
-            const res = await fetch('/api/auth/profile', {
+            const user = JSON.parse(userStr);
+            // 后台异步验证 token（不等待结果）
+            fetch('/api/auth/profile', {
                 headers: { Authorization: `Bearer ${token}` },
-            });
-            const json = await res.json();
-            if (json.code === 0 && json.data) {
-                localStorage.setItem('user', JSON.stringify(json.data));
-                return { currentUser: json.data, token };
-            }
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    if (json.code === 0 && json.data) {
+                        localStorage.setItem('user', JSON.stringify(json.data));
+                    } else if (json.code === 401) {
+                        // token 无效，清除本地存储
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                })
+                .catch(() => {
+                    // 网络失败，忽略
+                });
+            return { currentUser: user, token };
         } catch {
-            // 网络失败时回退到本地缓存
+            // JSON 解析失败
         }
-
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-            try {
-                return { currentUser: JSON.parse(userStr), token };
-            } catch {
-                // ignore
-            }
-        }
-
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
     }
 
     return {};
@@ -95,7 +94,12 @@ export const request = {
                 const { status, data } = error.response;
 
                 if (status === 401) {
+                    // 401 表示 token 无效或过期，清除本地存储的凭证
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+
                     const p = getRouterPathname();
+                    // 仅管理后台页面需要重定向到登录页
                     if (
                         p.startsWith('/admin') &&
                         !p.includes('/admin/login') &&
@@ -103,8 +107,6 @@ export const request = {
                     ) {
                         _isRedirectingToLogin = true;
                         message.warning('请先登录');
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
                         setTimeout(() => {
                             history.push('/admin/login');
                             _isRedirectingToLogin = false;

@@ -44,8 +44,23 @@ export function useArticles(params: {
 export function useArticle(id: string) {
   return useQuery({
     queryKey: queryKeys.article(id),
-    queryFn: () =>
-      request<ApiResponse<API.Article>>(`/api/articles/${id}`).then(r => r.data),
+    queryFn: async () => {
+      try {
+        const res = await request<ApiResponse<API.Article>>(`/api/articles/${id}`);
+        // 接口返回成功但数据为空，视为文章不存在
+        if (res.code === 404 || !res.data) {
+          return null;
+        }
+        return res.data;
+      } catch (error: any) {
+        // 404/400 错误返回 null（文章不存在或 ID 无效）
+        const status = error?.response?.status || error?.response?.data?.code;
+        if (status === 404 || status === 400) {
+          return null;
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
   });
@@ -77,8 +92,20 @@ export function useCategories() {
 export function useCategory(id: string) {
   return useQuery({
     queryKey: queryKeys.category(id),
-    queryFn: () =>
-      request<ApiResponse<API.Category>>(`/api/categories/${id}`).then(r => r.data),
+    queryFn: async () => {
+      try {
+        const res = await request<ApiResponse<API.Category>>(`/api/categories/${id}`);
+        if (!res.data) return null;
+        return res.data;
+      } catch (error: any) {
+        // 404/400 错误返回 null（分类不存在或 ID 无效）
+        const status = error?.response?.status || error?.response?.data?.code;
+        if (status === 404 || status === 400) {
+          return null;
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
     staleTime: 30 * 60 * 1000,
   });
@@ -100,8 +127,20 @@ export function useTags() {
 export function useTag(id: string) {
   return useQuery({
     queryKey: queryKeys.tag(id),
-    queryFn: () =>
-      request<ApiResponse<API.Tag>>(`/api/tags/${id}`).then(r => r.data),
+    queryFn: async () => {
+      try {
+        const res = await request<ApiResponse<API.Tag>>(`/api/tags/${id}`);
+        if (!res.data) return null;
+        return res.data;
+      } catch (error: any) {
+        // 404/400 错误返回 null（标签不存在或 ID 无效）
+        const status = error?.response?.status || error?.response?.data?.code;
+        if (status === 404 || status === 400) {
+          return null;
+        }
+        throw error;
+      }
+    },
     enabled: !!id,
     staleTime: 30 * 60 * 1000,
   });

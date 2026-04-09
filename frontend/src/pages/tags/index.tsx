@@ -107,8 +107,18 @@ const TagsPage: React.FC = () => {
         </div>
         </ScrollReveal>
 
-        {/* 内容区域 - 深色毛玻璃 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+        {/* 内容区域 - 玻璃态卡片 */}
+        <div
+          className="rounded-2xl p-5 md:p-8 relative z-10"
+          style={{
+            minHeight: 300,
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+          }}
+        >
         {/* 标签云 */}
         {loading ? (
           <TagsSkeleton />

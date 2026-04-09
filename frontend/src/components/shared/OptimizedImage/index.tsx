@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionDiv } from '@/utils/lazyMotion';
 import { prefersReducedMotion, isMobileViewport } from '@/utils/motionPrefs';
 
 interface OptimizedImageProps {
@@ -35,7 +35,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   }
 
   return (
-    <motion.div
+    <LazyMotionDiv
       className={className}
       style={{ ...style, overflow: 'hidden' }}
       initial={animType === 'blur' ? { opacity: 0, filter: 'blur(20px)' } : { opacity: 0 }}
@@ -52,7 +52,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           style={{ width: '100%', height: '100%', objectFit: (style?.objectFit as any) || 'cover' }}
         />
       </picture>
-    </motion.div>
+    </LazyMotionDiv>
   );
 };
 

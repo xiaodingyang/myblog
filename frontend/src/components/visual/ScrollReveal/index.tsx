@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, type Variants, type Transition } from 'framer-motion';
+import { LazyMotionDiv } from '@/utils/lazyMotion';
 import { prefersReducedMotion, isMobileViewport } from '@/utils/motionPrefs';
 
 interface ScrollRevealProps {
@@ -45,29 +45,21 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   const actualDistance = isMobile ? Math.min(distance, 16) : distance;
   const offset = getInitialOffset(direction, actualDistance);
 
-  const variants: Variants = {
-    hidden: { opacity: 0, x: offset.x, y: offset.y },
-    visible: { opacity: 1, x: 0, y: 0 },
-  };
-
-  const transition: Transition = {
-    duration: actualDuration,
-    delay,
-    ease: [0.25, 0.1, 0.25, 1],
-  };
-
   return (
-    <motion.div
+    <LazyMotionDiv
       className={className}
       style={style}
-      variants={variants}
-      initial="hidden"
-      whileInView="visible"
+      initial={{ opacity: 0, x: offset.x, y: offset.y }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, amount: 0.15, margin: '-60px' }}
-      transition={transition}
+      transition={{
+        duration: actualDuration,
+        delay,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
     >
       {children}
-    </motion.div>
+    </LazyMotionDiv>
   );
 };
 

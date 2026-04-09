@@ -35,7 +35,7 @@ import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
 import { useArticle, useComments } from '@/hooks/useQueries';
-import { useQueryClient } from 'umi';
+import { useQueryClient } from '@tanstack/react-query';
 import { extractTocFromMarkdown } from '@/utils/markdownToc';
 import { estimateReadingMinutes } from '@/utils/readingTime';
 

@@ -22,7 +22,7 @@ import { getReadArticleIds, sortByPopularity } from '@/utils/recommend';
 import useSEO from '@/hooks/useSEO';
 import { useArticles, useCategories, useTags } from '@/hooks/useQueries';
 import MotionButton from '@/components/visual/MotionButton';
-import { motion } from 'framer-motion';
+import { LazyMotionDiv, LazyMotionH1 } from '@/utils/lazyMotion';
 
 /* 首屏内容元素列表 - 用于 stagger 动画 */
 const sectionVariants = {
@@ -66,11 +66,15 @@ const HomePage: React.FC = () => {
     },
   });
   const { data: articlesData, isLoading: articlesLoading } = useArticles({ page: 1, pageSize: 6 });
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: tags, isLoading: tagsLoading } = useTags();
-  const loading = articlesLoading || categoriesLoading || tagsLoading;
+  const { data: categories } = useCategories();
+  const { data: tags } = useTags();
+  // 只等待文章数据加载完成，分类和标签可以后显示
+  const loading = articlesLoading;
   const articles = articlesData?.list ?? [];
   const articleCount = articlesData?.total ?? 0;
+  // 分类和标签可能还未加载，提供默认值
+  const categoriesList = categories ?? [];
+  const tagsList = tags ?? [];
   const [currentSection, setCurrentSection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { themeId: colorThemeId } = useModel('colorModel');
@@ -276,7 +280,7 @@ const HomePage: React.FC = () => {
           ))}
         </div>
 
-        <motion.div
+        <LazyMotionDiv
           className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center gap-4 md:gap-8 lg:gap-16"
           variants={sectionVariants}
           initial="hidden"
@@ -284,15 +288,15 @@ const HomePage: React.FC = () => {
         >
           {/* 左侧文字 */}
           <div className="flex-1 text-center lg:text-left">
-            <motion.div
+            <LazyMotionDiv
             className="flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-4 md:mb-8 border border-white/10"
             variants={itemVariants}
             >
             <RocketOutlined className="text-yellow-400 text-base md:text-lg" />
             <span className="text-white/90 text-xs md:text-sm font-medium">探索技术的无限可能</span>
-          </motion.div>
+          </LazyMotionDiv>
 
-            <motion.h1
+            <LazyMotionH1
               className="!mb-4 md:!mb-8"
               style={{
                 fontSize: 'clamp(2rem, 6vw, 5rem)',
@@ -331,15 +335,15 @@ const HomePage: React.FC = () => {
               >
                 记录成长轨迹
               </span>
-            </motion.h1>
+            </LazyMotionH1>
 
-            <motion.div className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed" variants={itemVariants}>
+            <LazyMotionDiv className="!text-gray-400 !text-base md:!text-xl !mb-4 md:!mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed" variants={itemVariants}>
               <span className="typewriter-text">
                 热爱编程 ✨ 分享技术 🚀 记录成长
               </span>
-            </motion.div>
+            </LazyMotionDiv>
 
-            <motion.div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5" variants={itemVariants}>
+            <LazyMotionDiv className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-5" variants={itemVariants}>
               <Link to="/articles">
                 <MotionButton
                   className="!h-11 md:!h-14 !px-6 md:!px-10 !rounded-full !font-bold !text-sm md:!text-base !border-none cursor-pointer"
@@ -366,12 +370,12 @@ const HomePage: React.FC = () => {
                   <CodeOutlined /> 关于作者
                 </MotionButton>
               </Link>
-            </motion.div>
-            <motion.div className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16" variants={itemVariants}>
+            </LazyMotionDiv>
+            <LazyMotionDiv className="flex justify-center lg:justify-start gap-4 md:gap-6 lg:gap-12 mt-4 md:mt-10 lg:mt-16" variants={itemVariants}>
               {[
                 { label: '文章', value: articleCount || '0', icon: '📝' },
-                { label: '分类', value: categories.length || '0', icon: '📂' },
-                { label: '标签', value: tags.length || '0', icon: '🏷️' },
+                { label: '分类', value: categoriesList.length || '0', icon: '📂' },
+                { label: '标签', value: tagsList.length || '0', icon: '🏷️' },
               ].map((item, i) => (
                 <div
                   key={i}
@@ -399,7 +403,7 @@ const HomePage: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </motion.div>
+            </LazyMotionDiv>
           </div>
 
           {/* 右侧装饰 */}
@@ -446,7 +450,7 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </LazyMotionDiv>
         <div
           onClick={() => scrollToSection(1)}
           className="absolute bottom-3 md:bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
@@ -481,7 +485,7 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <motion.div
+        <LazyMotionDiv
           className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-10"
           variants={sectionVariants}
           initial="hidden"
@@ -489,7 +493,7 @@ const HomePage: React.FC = () => {
         >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
           {/* 标题行 */}
-          <motion.div className="flex items-center justify-between mb-6 md:mb-8" variants={itemVariants}>
+          <LazyMotionDiv className="flex items-center justify-between mb-6 md:mb-8" variants={itemVariants}>
             <div className="flex items-center gap-3">
               <div
                 className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-sm"
@@ -509,11 +513,11 @@ const HomePage: React.FC = () => {
                 查看全部 →
               </span>
             </Link>
-          </motion.div>
+          </LazyMotionDiv>
 
           {/* 主体 */}
           {featuredArticles.length > 0 ? (
-            <motion.div className="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-6" variants={itemVariants}>
+            <LazyMotionDiv className="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-6" variants={itemVariants}>
               {/* 左侧主推大卡 */}
               <div className="lg:col-span-7">
                 <Link to={`/article/${featuredArticles[0]?._id}`} className="block group h-full">
@@ -624,19 +628,19 @@ const HomePage: React.FC = () => {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </LazyMotionDiv>
           ) : (
-            <motion.div className="text-center text-gray-500 py-12" variants={itemVariants}>暂无文章</motion.div>
+            <LazyMotionDiv className="text-center text-gray-500 py-12" variants={itemVariants}>暂无文章</LazyMotionDiv>
           )}
 
           {/* 底部引用点缀 */}
-          <motion.div className="mt-6 md:mt-8 flex items-center justify-center gap-3 px-4" variants={itemVariants}>
+          <LazyMotionDiv className="mt-6 md:mt-8 flex items-center justify-center gap-3 px-4" variants={itemVariants}>
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
             <DailyQuote />
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
-          </motion.div>
+          </LazyMotionDiv>
         </div>
-        </motion.div>
+        </LazyMotionDiv>
       </section>
 
       {/* ========== 第三屏：探索 + CTA ========== */}
@@ -644,7 +648,7 @@ const HomePage: React.FC = () => {
         className="home-fullscreen-section w-full relative flex flex-col"
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
-        <motion.div
+        <LazyMotionDiv
           className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-10"
           variants={sectionVariants}
           initial="hidden"
@@ -652,7 +656,7 @@ const HomePage: React.FC = () => {
         >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
           {/* 上半部分：分类 + 标签 */}
-          <motion.div className="grid grid-cols-1 lg:grid-cols-5 gap-5 md:gap-6 mb-8 md:mb-10" variants={itemVariants}>
+          <LazyMotionDiv className="grid grid-cols-1 lg:grid-cols-5 gap-5 md:gap-6 mb-8 md:mb-10" variants={itemVariants}>
             {/* 分类 - 占 3 列，网格卡片 */}
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-5">
@@ -665,7 +669,7 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                {categories.slice(0, 6).map((cat, index) => {
+                {categoriesList.slice(0, 6).map((cat, index) => {
                   const hue = index * 50;
                   return (
                     <Link key={cat._id} to={`/category/${cat._id}`}>
@@ -704,7 +708,7 @@ const HomePage: React.FC = () => {
                   );
                 })}
               </div>
-              {categories.length === 0 && <div className="text-center py-6 text-gray-500 text-sm">暂无分类</div>}
+              {categoriesList.length === 0 && <div className="text-center py-6 text-gray-500 text-sm">暂无分类</div>}
             </div>
 
             {/* 标签云 - 占 2 列 */}
@@ -726,7 +730,7 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-2.5">
-                {tags.map((tag) => (
+                {tagsList.map((tag) => (
                   <Link key={tag._id} to={`/tag/${tag._id}`}>
                     <span
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer"
@@ -751,14 +755,14 @@ const HomePage: React.FC = () => {
                     </span>
                   </Link>
                 ))}
-                {tags.length === 0 && <div className="text-center py-4 text-gray-500 text-sm w-full">暂无标签</div>}
+                {tagsList.length === 0 && <div className="text-center py-4 text-gray-500 text-sm w-full">暂无标签</div>}
               </div>
             </div>
           </div>
-          </motion.div>
+          </LazyMotionDiv>
 
           {/* 下半部分：CTA */}
-          <motion.div
+          <LazyMotionDiv
             className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
             className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
             variants={itemVariants}
@@ -806,10 +810,10 @@ const HomePage: React.FC = () => {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </LazyMotionDiv>
 
           {/* 底部备案信息 */}
-          <motion.div className="text-center mt-6 md:mt-8" variants={itemVariants}>
+          <LazyMotionDiv className="text-center mt-6 md:mt-8" variants={itemVariants}>
             <Text style={{ color: 'rgba(255, 255, 255, 0.35)', fontSize: 12 }}>
               © {new Date().getFullYear()} 个人博客. All rights reserved.{' '}
               <a
@@ -821,9 +825,9 @@ const HomePage: React.FC = () => {
                 蜀ICP备2026005106号
               </a>
             </Text>
-          </motion.div>
+          </LazyMotionDiv>
         </div>
-        </motion.div>
+        </LazyMotionDiv>
       </section>
     </div>
   );

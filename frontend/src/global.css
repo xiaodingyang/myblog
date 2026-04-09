@@ -532,3 +532,19 @@ body {
 .link-underline:hover::after {
   width: 100%;
 }
+
+/* Footer 样式 - 强制白色 */
+.ant-layout-footer,
+.ant-layout-footer * {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ant-layout-footer a:hover,
+.ant-layout-footer *:hover {
+  color: #ffffff !important;
+}
+
+.ant-layout-footer h5,
+.ant-layout-footer .ant-typography h5 {
+  color: #ffffff !important;
+}
