@@ -30,28 +30,11 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
     <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline" onMouseEnter={() => { if (articleId) fetchArticleDetail(articleId); }}>
       <Card
         hoverable
-        className="card-hover overflow-hidden group"
+        className="card-hover glass-card overflow-hidden group"
         style={{
-          borderRadius: 12,
-          border: `1px solid ${themeBg(currentColorTheme.primary, 0.2)}`,
-          background: themeBg(currentColorTheme.primary, 0.15),
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
           transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           ...style,
-        }}
-        onMouseEnter={(e) => {
-          const card = e.currentTarget as HTMLElement;
-          card.style.boxShadow = `0 8px 32px rgba(0,0,0,0.3), 0 0 20px ${themeBg(currentColorTheme.primary, 0.15)}`;
-          card.style.borderColor = themeBg(currentColorTheme.primary, 0.4);
-          card.style.transform = 'translateY(-4px)';
-        }}
-        onMouseLeave={(e) => {
-          const card = e.currentTarget as HTMLElement;
-          card.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-          card.style.borderColor = themeBg(currentColorTheme.primary, 0.2);
-          card.style.transform = 'translateY(0)';
         }}
         cover={
           article.cover ? (

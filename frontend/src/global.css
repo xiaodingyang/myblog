@@ -275,9 +275,38 @@ body {
 }
 
 .card-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
   border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* 毛玻璃卡片样式 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+}
+
+/* 毛玻璃卡片 - 移动端优化 */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px !important;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* 不支持 backdrop-filter 的浏览器降级 */
+@supports not (backdrop-filter: blur(12px)) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
 }
 
 /* 渐变文字 */
@@ -547,4 +576,34 @@ body {
 .ant-layout-footer h5,
 .ant-layout-footer .ant-typography h5 {
   color: #ffffff !important;
+}
+
+/* Modal 毛玻璃效果 */
+.ant-modal-content {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .ant-modal-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* 统一圆角 */
+.ant-btn {
+  border-radius: 8px !important;
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-textarea textarea {
+  border-radius: 8px !important;
+}
+
+.ant-tag {
+  border-radius: 6px !important;
 }

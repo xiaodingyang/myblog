@@ -452,10 +452,8 @@ const ArticleDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 lg:items-start">
           <Card
-            className="flex-1 min-w-0 w-full"
+            className="flex-1 min-w-0 w-full glass-card"
             style={{
-              borderRadius: 16,
-              border: 'none',
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           >
@@ -539,11 +537,9 @@ const ArticleDetailPage: React.FC = () => {
           <div className="lg:pr-[calc(14rem+2rem)]">
           {/* 评论区 */}
           <Card
-            className="mt-10"
+            className="mt-10 glass-card"
             ref={commentsRef as any}
             style={{
-              borderRadius: 16,
-              border: 'none',
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           >
