@@ -592,7 +592,7 @@ const ArticleDetailPage: React.FC = () => {
                   style={{ background: '#f8f9fa', border: '1px dashed #d9d9d9' }}
                   onClick={() => requireAuth()}
                 >
-                  <GithubOutlined style={{ fontSize: 24, color: '#999', marginBottom: 8 }} />
+                  <GithubOutlined style={{ fontSize: 24, color: '#525252', marginBottom: 8 }} />
                   <div>
                     <Text type="secondary">登录 GitHub 后即可发表评论</Text>
                   </div>
@@ -626,7 +626,7 @@ const ArticleDetailPage: React.FC = () => {
                               key="like"
                               type="text"
                               size="small"
-                              icon={isLiked ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined style={{ color: '#999' }} />}
+                              icon={isLiked ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined style={{ color: '#525252' }} />}
                               onClick={() => handleLikeComment(item._id)}
                               loading={isLiking}
                               className="flex items-center gap-1 hover:!text-red-500 transition-colors"
@@ -638,7 +638,7 @@ const ArticleDetailPage: React.FC = () => {
                               key="like"
                               type="text"
                               size="small"
-                              icon={<HeartOutlined style={{ color: '#999' }} />}
+                              icon={<HeartOutlined style={{ color: '#525252' }} />}
                               onClick={() => requireAuth()}
                               className="flex items-center gap-1 hover:!text-red-500 transition-colors"
                             >

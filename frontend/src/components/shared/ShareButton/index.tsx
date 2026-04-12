@@ -109,7 +109,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     <div style={{ width: 220 }}>
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <QRCodeSVG value={shareUrl} size={140} level="M" />
-        <div style={{ color: '#999', fontSize: 12, marginTop: 6 }}>
+        <div style={{ color: '#525252', fontSize: 12, marginTop: 6 }}>
           微信扫码分享
         </div>
       </div>

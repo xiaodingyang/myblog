@@ -162,7 +162,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose }) => {
       <Input
         ref={inputRef}
         size="large"
-        prefix={<SearchOutlined style={{ color: '#999' }} />}
+        prefix={<SearchOutlined style={{ color: '#525252' }} />}
         placeholder="搜索文章标题、内容..."
         value={keyword}
         onChange={e => handleInputChange(e.target.value)}
@@ -185,7 +185,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose }) => {
               </Text>
               <a
                 onClick={() => { clearHistory(); setHistoryList([]); }}
-                style={{ fontSize: 12, color: '#999' }}
+                style={{ fontSize: 12, color: '#525252' }}
               >
                 清除
               </a>

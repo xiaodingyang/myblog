@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Typography, Space, Divider } from 'antd';
+import { Modal, Button, Typography, Space, Divider, message } from 'antd';
 import {
   GithubOutlined,
   CommentOutlined,
@@ -22,8 +22,11 @@ const GithubLoginModal: React.FC = () => {
   const theme = getColorThemeById(themeId);
 
   const handleGithubLogin = () => {
+    message.info('正在跳转到 GitHub 授权...', 2);
     const returnUrl = encodeURIComponent(getOAuthReturnPath());
-    window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
+    setTimeout(() => {
+      window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
+    }, 300);
   };
 
   return (
