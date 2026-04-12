@@ -662,7 +662,10 @@ const FrontLayout: React.FC = () => {
           <Footer
             className="p-0"
             style={{
-              background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
+              background: `linear-gradient(180deg, rgba(15, 23, 42, 0.78) 0%, rgba(${hexToRgb(currentColorTheme.primary).r}, ${hexToRgb(currentColorTheme.primary).g}, ${hexToRgb(currentColorTheme.primary).b}, 0.22) 50%, rgba(15, 23, 42, 0.78) 100%)`,
+              backdropFilter: 'blur(20px) saturate(180%)',
+              boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.28)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.12)',
               position: 'relative',
               zIndex: 10,
             }}
