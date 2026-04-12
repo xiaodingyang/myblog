@@ -487,7 +487,7 @@ const ArticlesPage: React.FC = () => {
               onChange={(e) => updateParams('keyword', e.target.value)}
               onPressEnter={(e) => updateParams('keyword', (e.target as HTMLInputElement).value)}
               allowClear
-              className="!rounded-lg !flex-1 !min-w-[160px] [&_.ant-input]:!bg-white/10 [&_.ant-input]:!text-white/80 [&_.ant-input]:!border-white/20 [&_.ant-input]:placeholder:!text-white/45 [&_.ant-input-clear-icon]:!text-white/60"
+              className="!rounded-lg !flex-1 !min-w-[160px] [&_.ant-input]:!bg-white/10 [&_.ant-input]:!text-white/80 [&_.ant-input]:!border-white/20 [&_.ant-input]:placeholder:!text-white/45 [&_.ant-input-clear-icon]:!text-white/60 [&_.ant-input]:!backdrop-blur-[10px] [&_.ant-input]:!backdrop-saturate-[180%]"
               style={{ maxWidth: 280 }}
             />
             <Select

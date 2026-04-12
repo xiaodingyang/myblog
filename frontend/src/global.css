@@ -410,10 +410,12 @@ body {
 /* 头部搜索框样式修复（勿对全站 .ant-input-affix-wrapper 写 focus，会与 Ant Design 叠层并在毛玻璃登录卡上闪屏） */
 .header-search.ant-input-affix-wrapper {
   width: 100% !important;
-  border: 1px solid #d9d9d9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 20px !important;
-  background: #fff !important;
-  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   padding: 4px 11px !important;
 }
 
