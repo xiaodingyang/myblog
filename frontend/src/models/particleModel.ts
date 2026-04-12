@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
 const STORAGE_KEY = 'particle-theme-id';
-const DEFAULT_PARTICLE_THEME_ID = 'tyndall';
+const DEFAULT_PARTICLE_THEME_ID = 'dark-mint';
 
 function normalizeParticleThemeId(id: string | null | undefined): string {
   if (!id) return DEFAULT_PARTICLE_THEME_ID;

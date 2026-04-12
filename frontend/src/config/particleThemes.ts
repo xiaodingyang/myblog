@@ -13,6 +13,61 @@ const mergedLibThemes = (() => {
   return [...rest, tyndallTheme];
 })();
 
+// 博客特有主题：深色薄荷混合
+const darkMintTheme: ParticleTheme = {
+  id: 'dark-mint',
+  name: '深色薄荷',
+  icon: '🌿',
+  description: '深色背景与薄荷绿粒子的混合',
+  backgroundColor: '#18212c',
+  options: () => ({
+    ...baseConfig,
+    particles: {
+      number: { value: 80, density: { enable: true, value_area: 800 } },
+      color: { value: '#10b981' },
+      shape: { type: 'circle' },
+      opacity: {
+        value: 0.5,
+        random: true,
+        anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false },
+      },
+      size: {
+        value: 3,
+        random: true,
+        anim: { enable: true, speed: 2, size_min: 0.1, sync: false },
+      },
+      line_linked: {
+        enable: true,
+        distance: 150,
+        color: '#10b981',
+        opacity: 0.4,
+        width: 1,
+      },
+      move: {
+        enable: true,
+        speed: 2,
+        direction: 'none',
+        random: false,
+        straight: false,
+        out_mode: 'out',
+        bounce: false,
+      },
+    },
+    interactivity: {
+      detect_on: 'canvas',
+      events: {
+        onhover: { enable: true, mode: 'grab' },
+        onclick: { enable: true, mode: 'push' },
+        resize: true,
+      },
+      modes: {
+        grab: { distance: 140, line_linked: { opacity: 1 } },
+        push: { particles_nb: 4 },
+      },
+    },
+  }),
+};
+
 // 博客特有的「关闭特效」主题
 const noneTheme: ParticleTheme = {
   id: 'none',
@@ -26,10 +81,11 @@ const noneTheme: ParticleTheme = {
   }),
 };
 
-export const particleThemes: ParticleTheme[] = [...mergedLibThemes, noneTheme];
+export const particleThemes: ParticleTheme[] = [...mergedLibThemes, darkMintTheme, noneTheme];
 
 export const getThemeById = (id: string): ParticleTheme => {
   if (id === 'none') return noneTheme;
+  if (id === 'dark-mint') return darkMintTheme;
   return libGetThemeById(id);
 };
 

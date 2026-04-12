@@ -9,13 +9,6 @@ export interface ColorTheme {
 // 时尚漂亮的主题色配置
 export const colorThemes: ColorTheme[] = [
   {
-    id: 'indigo',
-    name: '靛蓝紫',
-    primary: '#6366f1',
-    gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    description: '现代的蓝紫色系',
-  },
-  {
     id: 'pink',
     name: '淡粉樱花',
     primary: '#ffb3d9',
@@ -93,4 +86,4 @@ export const getColorThemeById = (id: string): ColorTheme => {
 };
 
 // 默认主题 ID
-export const DEFAULT_COLOR_THEME_ID = 'indigo';
+export const DEFAULT_COLOR_THEME_ID = 'mint';
