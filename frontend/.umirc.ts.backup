@@ -175,27 +175,13 @@ export default defineConfig({
     strategy: 'normal',
   },
 
-  // ── 代码分割配置 ──
-  // 只拆分 vendors 和 umi，避免文件数量过多
-  chunks: ['vendors', 'umi'],
-
-  // ── JSMinifier 配置 ──
-  // 使用 esbuild 压缩，移除 console 和 debugger
-  jsMinifier: 'esbuild',
-  jsMinifierOptions: {
-    minifyWhitespace: true,
-    minifyIdentifiers: true,
-    minifySyntax: true,
-    target: 'es2015',
-  },
-
   // ── SSG 静态站点生成 ──
   // 启用静态导出，为每个路由生成独立 HTML 文件
   // 动态路由页面（如 /article/:id）保持 CSR，不预渲染
-  exportStatic: {
-    // 忽略预渲染错误，确保构建不中断
-    ignorePreRenderError: true,
-  },
+  // exportStatic: {
+  //   // 忽略预渲染错误，确保构建不中断
+  //   ignorePreRenderError: true,
+  // },
 
   // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
   chainWebpack(config: any, { env }: any) {
@@ -205,67 +191,46 @@ export default defineConfig({
 
       config.optimization.splitChunks({
         chunks: 'all',
-        maxInitialRequests: 30,
+        maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 200000, // 限制单个 chunk 最大 200KB
         cacheGroups: {
-          // React 核心库（最高优先级）
-          react: {
-            name: 'react',
-            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
-            priority: 40,
-            reuseExistingChunk: true,
-          },
-          // Ant Design 组件库
           antd: {
             name: 'antd',
             test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
-            priority: 30,
-            reuseExistingChunk: true,
+            priority: 20,
           },
-          // Markdown 渲染相关（按需加载）
+          react: {
+            name: 'react',
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
+            priority: 30,
+          },
           markdown: {
             name: 'markdown',
             test: /[\\/]node_modules[\\/](react-markdown|remark-gfm|rehype-raw|rehype-highlight)[\\/]/,
             priority: 25,
-            reuseExistingChunk: true,
           },
-          // 代码高亮库（按需加载）
           syntax: {
             name: 'syntax',
             test: /[\\/]node_modules[\\/]react-syntax-highlighter[\\/]/,
             priority: 25,
-            reuseExistingChunk: true,
           },
-          // 粒子动画库（按需加载）
           particles: {
             name: 'particles',
             test: /[\\/]node_modules[\\/](@xdy-npm|@tsparticles|three)[\\/]/,
             priority: 25,
-            reuseExistingChunk: true,
           },
-          // 动画库（按需加载）
           motion: {
             name: 'motion',
             test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
             priority: 25,
-            reuseExistingChunk: true,
           },
-          // 其他第三方库
           vendors: {
             name: 'vendors',
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
-            minChunks: 1,
-            reuseExistingChunk: true,
-            maxSize: 200000, // 控制在 200KB 以内
           },
         },
       });
-
-      // Tree Shaking 优化
-      config.optimization.usedExports(true);
-      config.optimization.sideEffects(true);
     }
   },
 });

@@ -8,7 +8,6 @@ const tabs = [
   { key: '/', icon: HomeOutlined, label: '首页' },
   { key: '/articles', icon: ReadOutlined, label: '文章' },
   { key: '/categories', icon: AppstoreOutlined, label: '分类' },
-  { key: '/tags', icon: UserOutlined, label: '标签' },
 ];
 
 const MobileTabBar: React.FC = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Outlet, Link, useLocation, history } from 'umi';
 import PageTransition from '@/components/visual/PageTransition';
 import {
@@ -38,9 +38,8 @@ import ReadingStatsModal from '@/components/reading/ReadingStats';
 import MobileTabBar from '@/components/layout/MobileTabBar';
 import { getColorThemeById } from '@/config/colorThemes';
 import analytics from '@/utils/analytics';
-
-const LazyParticlesBackground = lazy(() => import('@/components/visual/ParticlesBackground'));
-const LazyParticleThemeSelector = lazy(() => import('@/components/visual/ParticleThemeSelector'));
+import ParticlesBackground from '@/components/visual/ParticlesBackground';
+import ParticleThemeSelector from '@/components/visual/ParticleThemeSelector';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -72,22 +71,7 @@ const FrontLayout: React.FC = () => {
     analytics.init();
     return () => { analytics.destroy(); };
   }, []);
-  const [showParticles, setShowParticles] = useState(false);
-  const [showThemeSelector, setShowThemeSelector] = useState(false);
   const { githubUser, isLoggedIn, logout, setLoginModalVisible } = useModel('githubUserModel');
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      setTimeout(() => setShowParticles(true), 100);
-    });
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  // 延迟加载主题选择器组件，进一步减少首屏负担
-  useEffect(() => {
-    const timer = setTimeout(() => setShowThemeSelector(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   // 关键路由预加载：首屏渲染后，浏览器空闲时预加载高频页面 JS chunk
  useEffect(() => {
@@ -265,7 +249,6 @@ const FrontLayout: React.FC = () => {
       { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
       { key: '/articles', icon: <ReadOutlined />, label: <Link to="/articles">文章</Link> },
       { key: '/categories', icon: <FolderOutlined />, label: <Link to="/categories">分类</Link> },
-      { key: '/tags', icon: <TagsOutlined />, label: <Link to="/tags">标签</Link> },
       { key: '/rankings', icon: <TrophyOutlined />, label: <Link to="/rankings">排行榜</Link> },
       ...(isLoggedIn
         ? [{ key: '/favorites', icon: <StarOutlined />, label: <Link to="/favorites">我的收藏</Link> }]
@@ -318,12 +301,8 @@ const FrontLayout: React.FC = () => {
           })(),
         } as React.CSSProperties & { '--theme-primary': string; '--theme-gradient': string; '--theme-primary-rgb': string }}
       >
-        {/* 粒子背景（内含玻璃背景层） - 延迟加载 */}
-        {showParticles && (
-          <Suspense fallback={null}>
-            <LazyParticlesBackground isDark={isDarkTheme} />
-          </Suspense>
-        )}
+        {/* 粒子背景（内含玻璃背景层） */}
+        <ParticlesBackground isDark={isDarkTheme} />
 
         {/* 右侧悬浮按钮：单容器竖向排列，保证同一条垂直线与间距一致 */}
         <div
@@ -331,11 +310,7 @@ const FrontLayout: React.FC = () => {
           style={{ right: FAB_RIGHT_PX, bottom: FAB_KEYBOARD_BOTTOM_PX, gap: FAB_GAP_PX }}
         >
           <BackToTop embedded />
-          {showThemeSelector && (
-            <Suspense fallback={null}>
-              <LazyParticleThemeSelector isDark={isDarkTheme} embedded />
-            </Suspense>
-          )}
+          <ParticleThemeSelector isDark={isDarkTheme} embedded />
           <KeyboardHelpButton embedded />
         </div>
 
@@ -478,11 +453,27 @@ const FrontLayout: React.FC = () => {
             </a>
 
             {/* 搜索框 - PC端显示 */}
-            <div className="hidden sm:block" style={{ width: 160 }}>
+            <div className="hidden sm:block" style={{ width: 200 }}>
               <Input
                 placeholder="搜索..."
-                prefix={<SearchOutlined className="text-gray-400" />}
-                className="header-search"
+                prefix={<SearchOutlined style={{ color: 'rgba(255, 255, 255, 0.5)' }} />}
+                className="header-search-glass"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  borderRadius: 20,
+                  transition: 'all 0.3s ease',
+                }}
+                styles={{
+                  input: {
+                    color: '#fff',
+                    '::placeholder': {
+                      color: 'rgba(255, 255, 255, 0.5)',
+                    },
+                  },
+                }}
                 onPressEnter={(e) => {
                   const value = (e.target as HTMLInputElement).value;
                   if (value) {

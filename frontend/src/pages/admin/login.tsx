@@ -156,31 +156,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
           </p>
         </div>
 
-        {/* 底部 */}
-        <div className="absolute bottom-0 left-0 w-full z-10 p-8 lg:p-10">
-          <div className="flex items-center gap-4 text-white/30 text-xs flex-wrap">
-            <span>© {new Date().getFullYear()} 若风的博客</span>
-            <span>·</span>
-            <a
-              href="https://github.com/xiaodingyang"
-              target="_blank"
-              rel="noreferrer"
-              className="text-white/30 hover:text-white/60 transition-colors"
-            >
-              <GithubOutlined className="mr-1" />
-              GitHub
-            </a>
-            <span>·</span>
-            <a
-              href="https://beian.miit.gov.cn/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-white/30 hover:text-white/60 transition-colors"
-            >
-              蜀ICP备2026005106号
-            </a>
-          </div>
-        </div>
+
       </div>
 
       {/* 右侧 */}
@@ -376,17 +352,15 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         </div>
 
         {/* 底部 */}
-        <div className="shrink-0 px-6 sm:px-12 lg:px-16 xl:px-24 py-3 sm:py-4 text-center lg:text-left">
-          <p className="text-xs text-white/55 drop-shadow-sm">
-            访问
+        <div className="shrink-0 px-6 sm:px-12 lg:px-16 xl:px-24 py-4 sm:py-5 text-center lg:text-left">
+          <p className="text-xs text-white/50 drop-shadow-sm">
             <a
               href="/"
-              className="mx-1 hover:underline font-medium"
+              className="hover:underline font-medium transition-colors"
               style={{ color: currentColorTheme.primary }}
             >
-              博客首页
+              返回博客首页
             </a>
-            浏览更多内容
           </p>
         </div>
       </div>

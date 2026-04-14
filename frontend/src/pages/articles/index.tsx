@@ -487,8 +487,22 @@ const ArticlesPage: React.FC = () => {
               onChange={(e) => updateParams('keyword', e.target.value)}
               onPressEnter={(e) => updateParams('keyword', (e.target as HTMLInputElement).value)}
               allowClear
-              className="!rounded-lg !flex-1 !min-w-[160px] [&_.ant-input]:!bg-white/10 [&_.ant-input]:!text-white/80 [&_.ant-input]:!border-white/20 [&_.ant-input]:placeholder:!text-white/45 [&_.ant-input-clear-icon]:!text-white/60 [&_.ant-input]:!backdrop-blur-[10px] [&_.ant-input]:!backdrop-saturate-[180%]"
-              style={{ maxWidth: 280 }}
+              className="!rounded-lg !flex-1 !min-w-[160px]"
+              style={{
+                maxWidth: 280,
+              }}
+              styles={{
+                affixWrapper: {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                },
+                input: {
+                  backgroundColor: 'transparent',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                },
+              }}
             />
             <Select
               placeholder="分类"
@@ -538,6 +552,46 @@ const ArticlesPage: React.FC = () => {
               </a>
             )}
           </div>
+
+          {/* 标签云快速筛选 */}
+          {!loading && tags.length > 0 && (
+            <div className="mb-6 p-4 md:p-5 rounded-xl" style={{
+              background: 'rgba(255, 255, 255, 0.06)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+            }}>
+              <div className="flex items-center gap-2 mb-3">
+                <TagsOutlined className="text-white/70" />
+                <Text className="text-white/70 text-xs font-medium">快速筛选标签</Text>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {tags.slice(0, 12).map((tag) => {
+                  const isActive = tagId === tag._id;
+                  return (
+                    <Tag
+                      key={tag._id}
+                      className="!m-0 !px-3 !py-1 cursor-pointer transition-all hover:scale-105"
+                      style={{
+                        fontSize: 12,
+                        color: isActive ? '#fff' : 'rgba(255, 255, 255, 0.75)',
+                        background: isActive ? colorTheme.gradient : 'rgba(255, 255, 255, 0.1)',
+                        border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: 12,
+                        boxShadow: isActive ? `0 2px 8px ${themeBg(colorTheme.primary, 0.4)}` : 'none',
+                      }}
+                      onClick={() => updateParams('tag', isActive ? '' : tag._id)}
+                    >
+                      {tag.name}
+                      <span className="ml-1.5 opacity-75" style={{ fontSize: 11 }}>
+                        {tag.articleCount || 0}
+                      </span>
+                    </Tag>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* 当前筛选标签 */}
           {hasFilters && (

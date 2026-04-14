@@ -1,0 +1,25 @@
+{
+  "name": "myblog-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "个人博客 - 前后端一体化启动",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:mongodb\" \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:mongodb": "node scripts/start-mongodb.js",
+    "dev:backend": "pnpm --filter blog-backend dev",
+    "dev:frontend": "pnpm --filter blog-frontend dev",
+    "build": "pnpm --filter blog-backend build && pnpm --filter blog-frontend build",
+    "start": "concurrently \"npm:start:backend\" \"npm:start:frontend\"",
+    "start:backend": "pnpm --filter blog-backend start",
+    "start:frontend": "pnpm --filter blog-frontend start"
+  },
+  "devDependencies": {
+    "bson": "^7.2.0",
+    "concurrently": "^9.1.2",
+    "mongodb": "^7.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}

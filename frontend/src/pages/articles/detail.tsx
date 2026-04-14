@@ -31,6 +31,7 @@ import ArticleDetailSkeleton from '@/components/layout/Skeleton/ArticleDetailSke
 import Breadcrumb from '@/components/layout/Breadcrumb';
 import { addReadingHistory } from '@/components/reading/ReadingHistory';
 import { checkAchievements } from '@/utils/achievements';
+import { FAB_COMMENT_BOTTOM_PX, FAB_RIGHT_PX, FAB_SIZE_PX } from '@/components/shared/floatingActionsConstants';
 import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
@@ -452,8 +453,10 @@ const ArticleDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 lg:items-start">
           <Card
-            className="flex-1 min-w-0 w-full glass-card"
+            className="flex-1 min-w-0 w-full"
             style={{
+              background: '#ffffff',
+              borderRadius: 16,
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           >
@@ -510,16 +513,22 @@ const ArticleDetailPage: React.FC = () => {
           </div>
 
           {/* 跳到评论浮动按钮 */}
-          <Button
-            shape="circle"
-            size="large"
-            icon={<CommentOutlined />}
+          <button
+            type="button"
             onClick={scrollToComments}
-            className="!flex items-center justify-center"
+            className="rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
             style={{
               position: 'fixed',
-              bottom: 100,
-              right: 24,
+              bottom: FAB_COMMENT_BOTTOM_PX,
+              right: FAB_RIGHT_PX,
+              width: FAB_SIZE_PX,
+              height: FAB_SIZE_PX,
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 0,
+              flexShrink: 0,
               zIndex: 100,
               opacity: showCommentButton ? 1 : 0,
               transform: showCommentButton ? 'scale(1)' : 'scale(0.8)',
@@ -529,17 +538,24 @@ const ArticleDetailPage: React.FC = () => {
               color: '#fff',
               border: 'none',
               boxShadow: `0 4px 14px ${currentColorTheme.primary}55`,
+              cursor: 'pointer',
             }}
             aria-label="跳到评论区"
-          />
+          >
+            <span className="inline-flex items-center justify-center" style={{ width: 22, height: 22 }}>
+              <CommentOutlined style={{ fontSize: 20, lineHeight: 1 }} />
+            </span>
+          </button>
 
           {/* 评论区 + 相关推荐：lg 下为 fixed 目录预留与上方 flex（w-56 + gap-8）同宽的右侧空间，避免白底卡片盖住目录 */}
           <div className="lg:pr-[calc(14rem+2rem)]">
           {/* 评论区 */}
           <Card
-            className="mt-10 glass-card"
+            className="mt-10"
             ref={commentsRef as any}
             style={{
+              background: '#ffffff',
+              borderRadius: 16,
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           >

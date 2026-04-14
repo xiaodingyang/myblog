@@ -2,6 +2,9 @@
 
 一个基于 **React 18 + Umi 4 + Ant Design 5 + Express + MongoDB** 的全栈个人博客系统，支持 Markdown 写作、GitHub 登录、评论互动、游戏化排行榜等功能。
 
+> 📖 **项目结构说明**: 查看 [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)  
+> 📚 **技术文档**: 查看 [docs/README.md](./docs/README.md)
+
 ## 预览
 
 > 如果你有在线演示地址，可以在这里添加截图或链接。

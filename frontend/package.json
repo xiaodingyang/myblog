@@ -4,7 +4,7 @@
   "private": true,
   "description": "个人博客前端 - Umi 4 + Ant Design 5 + Tailwind CSS",
   "scripts": {
-    "dev": "cross-env PORT=8001 umi dev",
+    "dev": "cross-env PORT=8080 umi dev",
     "dev:strict": "node scripts/dev-strict.mjs",
     "e2e": "node scripts/run-e2e.mjs",
     "lhci": "node scripts/run-lhci.mjs",

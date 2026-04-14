@@ -20,7 +20,7 @@ export default function useCategoryModel() {
         return res.data;
       }
     } catch (error) {
-      message.error('获取分类列表失败');
+      // 全局 errorHandler 已处理，不重复弹窗
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export default function useCategoryModel() {
         message.error(res.message || '创建失败');
       }
     } catch (error) {
-      message.error('创建失败');
+      // 全局 errorHandler 已处理，不重复弹窗
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function useCategoryModel() {
         message.error(res.message || '更新失败');
       }
     } catch (error) {
-      message.error('更新失败');
+      // 全局 errorHandler 已处理，不重复弹窗
     } finally {
       setLoading(false);
     }
@@ -85,7 +85,7 @@ export default function useCategoryModel() {
         message.error(res.message || '删除失败');
       }
     } catch (error) {
-      message.error('删除失败');
+      // 全局 errorHandler 已处理，不重复弹窗
     } finally {
       setLoading(false);
     }

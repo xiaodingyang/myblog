@@ -289,7 +289,7 @@ const HomePage: React.FC = () => {
           {/* 左侧文字 */}
           <div className="flex-1 text-center lg:text-left">
             <LazyMotionDiv
-            className="flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-white/10 backdrop-blur-sm mb-4 md:mb-8 border border-white/10"
+            className="flex items-center gap-2 mb-4 md:mb-8 justify-center lg:justify-start"
             variants={itemVariants}
             >
             <RocketOutlined className="text-yellow-400 text-base md:text-lg" />
@@ -716,8 +716,10 @@ const HomePage: React.FC = () => {
               <div
                 className="rounded-2xl p-5 md:p-6 h-full"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                 }}
               >
               <div className="flex items-center justify-between mb-4">

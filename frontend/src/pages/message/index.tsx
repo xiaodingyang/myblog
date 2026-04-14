@@ -123,7 +123,7 @@ const MessagePage: React.FC = () => {
         {/* 留言表单 */}
         <ScrollReveal direction="up" delay={0.06}>
         <div
-          className="mb-8 rounded-2xl"
+          className="mb-8 rounded-2xl p-6"
           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           <Title
@@ -182,7 +182,7 @@ const MessagePage: React.FC = () => {
         </ScrollReveal>
         {/* 留言列表 */}
         <div
-          className="rounded-2xl"
+          className="rounded-2xl p-6"
           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           <Title level={4} className="!mb-6 !text-white" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
@@ -256,13 +256,14 @@ const MessagePage: React.FC = () => {
               />
 
               {total > pageSize && (
-                <div className="flex justify-center mt-6 pt-6 border-t border-white/10">
+                <div className="flex justify-center mt-6 pt-6 border-t border-white/10" style={{ position: 'relative', paddingBottom: '60px' }}>
                   <Pagination
                     current={page}
                     total={total}
                     pageSize={pageSize}
                     showSizeChanger
                     pageSizeOptions={['10', '20', '50']}
+                    getPopupContainer={(trigger) => trigger.parentElement || document.body}
                     onChange={(p, size) => {
                       if (size !== pageSize) {
                         setPageSize(size);

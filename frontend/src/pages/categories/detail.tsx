@@ -189,8 +189,10 @@ const CategoryDetailPage: React.FC = () => {
             onClick={() => history.back()}
             className="absolute left-0 top-0 group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs text-white transition-all duration-300 hover:scale-105"
             style={{
-              background: colorTheme.gradient,
-              boxShadow: `0 4px 12px ${colorTheme.primary}55`,
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: `0 2px 8px rgba(0, 0, 0, 0.1)`,
             }}
           >
             <ArrowLeftOutlined className="transition-transform duration-300 group-hover:-translate-x-0.5" />

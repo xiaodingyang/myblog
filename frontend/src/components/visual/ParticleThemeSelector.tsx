@@ -33,7 +33,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={`rounded-xl transition-transform duration-300 hover:scale-105 group ${
+          className={`rounded-xl shadow-lg transition-transform duration-300 hover:scale-105 group ${
             embedded ? '' : 'fixed z-50'
           }`}
           style={{
@@ -48,11 +48,8 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
             justifyContent: 'center',
             lineHeight: 0,
             flexShrink: 0,
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: `1px solid rgba(255, 255, 255, 0.5)`,
-            boxShadow: `0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px ${currentColorTheme.primary}20`,
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid #e0e0e0',
             cursor: 'pointer',
           }}
         >
@@ -63,7 +60,6 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
               height: 22,
               fontSize: 20,
               lineHeight: 1,
-              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
             }}
           >
             {currentTheme.icon}

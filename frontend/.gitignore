@@ -48,3 +48,4 @@ pnpm-debug.log*
 
 # old e2e dir (replaced by tests/e2e)
 /e2e
+.vercel

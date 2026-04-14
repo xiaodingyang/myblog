@@ -25,12 +25,39 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// 中间件
+// CORS 配置 - 支持开发环境和 Vercel 部署
+const allowedOrigins = [
+  'http://localhost:8001',
+  'http://127.0.0.1:8001',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+  'http://localhost:8080',  // Umi 默认端口
+  'http://127.0.0.1:8080',
+];
+
+// 生产环境添加 Vercel 域名
+if (process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL
-    : ['http://localhost:8001', 'http://127.0.0.1:8001', 'http://localhost:8000', 'http://127.0.0.1:8000'],
+  origin: function (origin, callback) {
+    // 允许无 origin 的请求（如 Postman、服务器端请求）
+    if (!origin) return callback(null, true);
+
+    // 检查是否在白名单中，或匹配 Vercel 预览环境
+    const isAllowed = allowedOrigins.includes(origin) ||
+                      /^https:\/\/.*\.vercel\.app$/.test(origin);
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(morgan('dev'));
@@ -47,7 +74,7 @@ const envWindowMs = Number(process.env.API_RATE_LIMIT_WINDOW_MS);
 const envMax = Number(process.env.API_RATE_LIMIT_MAX);
 const windowMs = Number.isFinite(envWindowMs) && envWindowMs > 0
   ? envWindowMs
-  : (isProd ? 15 * 60 * 1000 : 60 * 1000);
+  : (isProd ? 15 * 60 * 1000 : 5 * 60 * 1000);
 const max = Number.isFinite(envMax) && envMax > 0
   ? envMax
   : (isProd ? 100 : 2000);
@@ -58,6 +85,21 @@ const apiLimiter = rateLimit({
   message: { code: 10008, message: '请求过于频繁，请稍后再试', data: null },
   standardHeaders: true,
   legacyHeaders: false,
+  // 管理员用户豁免频率限制
+  skip: (req) => {
+    // 从 Authorization header 中提取 token
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return false;
+    
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      // 管理员用户 ruofeng 不受限制
+      return decoded.username === 'ruofeng';
+    } catch (err) {
+      return false;
+    }
+  },
 });
 
 // 静态文件服务

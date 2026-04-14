@@ -196,10 +196,10 @@ const StatsPage: React.FC = () => {
   // ===== 渲染 =====
 
   return (
-    <div style={{ padding: 24, minHeight: '100vh' }}>
+    <div style={{ padding: 16, minHeight: '100vh' }}>
       {/* 页面标题 + 时间范围切换 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#1e293b', margin: 0 }}>访客统计</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>访客统计</h1>
         <Segmented
           options={['今日', '昨日', '本周', '本月']}
           onChange={(val) => setTimeRange(RANGE_MAP[val as string] || 'today')}
@@ -207,7 +207,7 @@ const StatsPage: React.FC = () => {
       </div>
 
       {/* ===== 区域 1：数据卡片 ===== */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
         {([
           { icon: <EyeOutlined />, label: 'PV（页面浏览）', value: overview?.pv ?? 0, isNum: true },
           { icon: <UserOutlined />, label: 'UV（独立访客）', value: overview?.uv ?? 0, isNum: true },
@@ -215,20 +215,20 @@ const StatsPage: React.FC = () => {
           { icon: <BarChartOutlined />, label: '昨日 UV', value: '--', isNum: false },
         ] as const).map((card, i) => (
           <Col xs={24} sm={12} lg={6} key={i}>
-            <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
+            <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
               {states.overview === 'loading' ? (
                 <Skeleton active paragraph={{ rows: 2 }} />
               ) : states.overview === 'error' ? (
                 <ErrorBlock onRetry={fetchData} />
               ) : (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span style={{ color: themeColor, fontSize: 20 }}>{card.icon}</span>
-                    <span style={{ fontSize: 14, color: '#64748b' }}>{card.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <span style={{ color: themeColor, fontSize: 18 }}>{card.icon}</span>
+                    <span style={{ fontSize: 13, color: '#64748b' }}>{card.label}</span>
                   </div>
                   <Statistic
                     value={card.value}
-                    valueStyle={{ fontSize: 32, fontWeight: 600, color: '#1e293b' }}
+                    valueStyle={{ fontSize: 28, fontWeight: 600, color: '#1e293b' }}
                     formatter={(val: any) =>
                       card.isNum && typeof val === 'number' ? val.toLocaleString() : String(val)
                     }
@@ -241,9 +241,9 @@ const StatsPage: React.FC = () => {
       </Row>
 
       {/* ===== 区域 2：访问趋势图（Canvas 占位） ===== */}
-      <Card bordered={false} style={{ ...glassStyle, padding: 24, marginBottom: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <span style={{ fontSize: 16, fontWeight: 500, color: '#1e293b' }}>访问趋势</span>
+      <Card bordered={false} style={{ ...glassStyle, padding: 16, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b' }}>访问趋势</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
               <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: themeColor }} /> PV</span>
@@ -255,23 +255,23 @@ const StatsPage: React.FC = () => {
             />
           </div>
         </div>
-        <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {states.trend === 'loading' ? (
             <LoadingBlock />
           ) : states.trend === 'error'? (
             <ErrorBlock onRetry={fetchData} />
           ) : trend ? (
-            <Suspense fallback={<LoadingBlock />}><TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={240} /></Suspense>
+            <Suspense fallback={<LoadingBlock />}><TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={200} /></Suspense>
           ) : <EmptyBlock />}
         </div>
       </Card>
 
       {/* ===== 区域 3+4：热门页面 + 来源饼图 ===== */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
         {/* 区域 3：热门页面 */}
         <Col xs={24} lg={14}>
-          <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>热门页面 Top 10</h3>
+          <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>热门页面 Top 10</h3>
             {states.topPages === 'loading' ? (
               <Skeleton active paragraph={{ rows: 5 }} />
             ) : states.topPages === 'error'? (
@@ -279,13 +279,14 @@ const StatsPage: React.FC = () => {
             ) : topPages.length === 0 ? (
               <EmptyBlock />
             ) : (
-              <Table
-                dataSource={topPages}
-                rowKey="path"
-                pagination={false}
-                scroll={{ x: 600 }}
-                size="small"
-                columns={[
+              <div style={{ height: 320 }}>
+                <Table
+                  dataSource={topPages}
+                  rowKey="path"
+                  pagination={false}
+                  scroll={{ x: 600, y: 280 }}
+                  size="small"
+                  columns={[
                   {
                     title: '排名', key: 'rank', width: 60, align: 'center',
                     render: (_: any, __: any, idx: number) =>
@@ -308,14 +309,15 @@ const StatsPage: React.FC = () => {
                   },
                 ]}
               />
+              </div>
             )}
           </Card>
         </Col>
 
         {/* 区域 4：来源饼图 */}
         <Col xs={24} lg={10}>
-          <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>访客来源</h3>
+          <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>访客来源</h3>
             {states.referers === 'loading' ? (
               <Skeleton active avatar paragraph={{ rows: 1 }} />
             ) : states.referers === 'error'? (
@@ -329,16 +331,16 @@ const StatsPage: React.FC = () => {
                 colorField="name"
                 innerRadius={0.6}
                 statistic={{
-                  title: { style: { fontSize: '12px', color: '#64748b' }, content: '总访问' },
+                  title: { style: { fontSize: '11px', color: '#64748b' }, content: '总访问' },
                   value: {
-                    style: { fontSize: '24px', fontWeight: 'bold', color: '#1e293b' },
+                    style: { fontSize: '20px', fontWeight: 'bold', color: '#1e293b' },
                     content: referers.reduce((s, r) => s + r.count, 0).toLocaleString(),
                   },
                 }}
                 legend={{ position: 'bottom' as const }}
                 label={false}
                 interactions={[{ type: 'element-active' }]}
-                style={{ height: 280 }}
+                height={320}
               />
             )}
           </Card>
@@ -346,16 +348,16 @@ const StatsPage: React.FC = () => {
       </Row>
 
       {/* ===== 区域 5：访问记录 ===== */}
-      <Card bordered={false} style={{ ...glassStyle, padding: 20 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 500, color: '#1e293b', marginBottom: 16 }}>访问记录</h3>
+      <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>访问记录</h3>
 
         {/* 筛选栏 */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
           <Input
             placeholder="输入页面路径筛选"
             value={filter.path}
             onChange={e => setFilter(prev => ({ ...prev, path: e.target.value }))}
-            style={{ width: 240 }}
+            style={{ width: 200 }}
             onPressEnter={handleVisitsSearch}
             prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
           />
@@ -363,7 +365,7 @@ const StatsPage: React.FC = () => {
             type="date"
             value={filter.startDate}
             onChange={e => setFilter(prev => ({ ...prev, startDate: e.target.value }))}
-            style={{ width: 160 }}
+            style={{ width: 140 }}
             placeholder="开始日期"
           />
           <span style={{ color: '#64748b', lineHeight: '32px' }}>~</span>
@@ -371,7 +373,7 @@ const StatsPage: React.FC = () => {
             type="date"
             value={filter.endDate}
             onChange={e => setFilter(prev => ({ ...prev, endDate: e.target.value }))}
-            style={{ width: 160 }}
+            style={{ width: 140 }}
             placeholder="结束日期"
           />
           <Button type="primary" onClick={handleVisitsSearch} style={{ background: themeColor, borderColor: themeColor }}>
@@ -422,6 +424,10 @@ const StatsPage: React.FC = () => {
                 pageSizeOptions={['10', '20', '50']}
                 onChange={handlePageChange}
                 onShowSizeChange={handlePageChange}
+                style={{
+                  color: '#1e293b',
+                }}
+                className="stats-pagination"
               />
             </div>
           </>

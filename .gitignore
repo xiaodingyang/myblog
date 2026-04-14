@@ -27,3 +27,10 @@ test.js
 
 # Large generated files
 tree.txt
+node_modules
+.vercel
+
+# graphify
+graphify-out/
+.graphify*
+CLAUDE.md

@@ -106,6 +106,13 @@ export default defineConfig({
   initialState: {},
   model: {},
   request: {},
+
+  // 环境变量定义
+  define: {
+    'process.env.API_BASE_URL': process.env.NODE_ENV === 'production'
+      ? 'http://162.14.83.58:8081'  // 生产环境后端地址
+      : 'http://localhost:8081',     // 开发环境后端地址
+  },
   
   // 路由配置
   routes: [
@@ -155,17 +162,19 @@ export default defineConfig({
     { path: '/*', component: '@/pages/404' },
   ],
   
-  // 代理配置 - 开发环境将请求转发到本地后端
-  proxy: {
+  // 代理配置 - 仅开发环境生效，生产环境不需要代理
+  proxy: process.env.NODE_ENV === 'development' ? {
     '/api': {
-      target: 'http://localhost:3000',
+      target: 'https://xiaodingyang.art',
       changeOrigin: true,
+      secure: false,
     },
     '/uploads': {
-      target: 'http://localhost:3000',
+      target: 'https://xiaodingyang.art',
       changeOrigin: true,
+      secure: false,
     },
-  },
+  } : {},
   
   // Mock 配置 - 设置为 false 使用真实后端 API
   mock: false,
@@ -178,10 +187,10 @@ export default defineConfig({
   // ── SSG 静态站点生成 ──
   // 启用静态导出，为每个路由生成独立 HTML 文件
   // 动态路由页面（如 /article/:id）保持 CSR，不预渲染
-  exportStatic: {
-    // 忽略预渲染错误，确保构建不中断
-    ignorePreRenderError: true,
-  },
+  // exportStatic: {
+  //   // 忽略预渲染错误，确保构建不中断
+  //   ignorePreRenderError: true,
+  // },
 
   // 代码分割优化（仅生产构建生效，开发模式 MFSU 自行管理）
   chainWebpack(config: any, { env }: any) {
@@ -191,43 +200,36 @@ export default defineConfig({
 
       config.optimization.splitChunks({
         chunks: 'all',
-        maxInitialRequests: 25,
-        minSize: 20000,
         cacheGroups: {
+          react: {
+            name: 'react',
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
+            priority: 30,
+            enforce: true,
+          },
           antd: {
             name: 'antd',
             test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
             priority: 20,
-          },
-          react: {
-            name: 'react',
-            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
-            priority: 30,
+            enforce: true,
           },
           markdown: {
             name: 'markdown',
-            test: /[\\/]node_modules[\\/](react-markdown|remark-gfm|rehype-raw|rehype-highlight)[\\/]/,
+            test: /[\\/]node_modules[\\/](react-markdown|remark-gfm|rehype-raw|rehype-highlight|react-syntax-highlighter)[\\/]/,
             priority: 25,
-          },
-          syntax: {
-            name: 'syntax',
-            test: /[\\/]node_modules[\\/]react-syntax-highlighter[\\/]/,
-            priority: 25,
+            enforce: true,
           },
           particles: {
             name: 'particles',
-            test: /[\\/]node_modules[\\/](@xdy-npm|@tsparticles|three)[\\/]/,
+            test: /[\\/]node_modules[\\/](@xdy-npm|@tsparticles|three|framer-motion)[\\/]/,
             priority: 25,
-          },
-          motion: {
-            name: 'motion',
-            test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-            priority: 25,
+            enforce: true,
           },
           vendors: {
             name: 'vendors',
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
+            enforce: true,
           },
         },
       });
