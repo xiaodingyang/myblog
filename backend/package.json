@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "db:ensure-e2e-admin": "node scripts/ensure-e2e-admin.js",
     "lint": "eslint src/**/*.js",
     "test": "jest"
   },

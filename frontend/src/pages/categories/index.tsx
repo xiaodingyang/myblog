@@ -127,7 +127,7 @@ const CategoriesPage: React.FC = () => {
                           {category.name}
                         </Title>
                         <Paragraph
-                          ellipsis={{ rows: 2 }}
+                          ellipsis={{ rows: 1 }}
                           className="!mb-4 !text-white/65"
                           style={{
                             textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',

@@ -4,7 +4,9 @@
 const { Tag, Article } = require('../models');
 
 async function getTags() {
-  return Tag.find().populate('articleCount').sort({ createdAt: -1 });
+  const tags = await Tag.find().populate('articleCount');
+  // 按照文章数量降序排序
+  return tags.sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0));
 }
 
 async function getTag(id) {

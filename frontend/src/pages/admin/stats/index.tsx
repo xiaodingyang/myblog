@@ -3,7 +3,9 @@
  * 5 区域：数据卡片 / 趋势图 / 热门页面 / 来源饼图 / 访问记录
  */
 
-import React, { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import React, {
+  useEffect, useState, useCallback, lazy, Suspense, useRef, useLayoutEffect,
+} from 'react';
 import {
   Card, Row, Col, Statistic, Table, Segmented, Input, DatePicker, Button,
   Spin, Empty, Skeleton, Pagination, message,
@@ -118,6 +120,10 @@ const StatsPage: React.FC = () => {
   // 访问记录筛选
   const [filter, setFilter] = useState({ page: 1, pageSize: 20, path: '', startDate: '', endDate: '' });
 
+  /** 访问记录表格可滚动区域高度（随主区 flex 变化，避免用 100vh 撑出整页滚动条） */
+  const visitsTableBodyRef = useRef<HTMLDivElement>(null);
+  const [visitsTableScrollY, setVisitsTableScrollY] = useState(200);
+
   // 设置区域状态
   const setRegion = useCallback((region: string, state: RegionState) => {
     setStates(prev => ({ ...prev, [region]: state }));
@@ -179,6 +185,19 @@ const StatsPage: React.FC = () => {
     return () => clearInterval(timer);
   }, [timeRange]);
 
+  useLayoutEffect(() => {
+    const el = visitsTableBodyRef.current;
+    if (!el) return;
+    const measure = () => {
+      const h = el.getBoundingClientRect().height;
+      setVisitsTableScrollY(Math.max(96, Math.floor(h)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [states.visits, visits?.data?.length, filter.page, filter.pageSize]);
+
   // ===== 事件处理 =====
 
   const handleVisitsSearch = useCallback(() => {
@@ -196,18 +215,39 @@ const StatsPage: React.FC = () => {
   // ===== 渲染 =====
 
   return (
-    <div style={{ padding: 16, minHeight: '100vh' }}>
+    <div
+      style={{
+        height: '100%',
+        minHeight: 0,
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        padding: '4px 4px 0',
+      }}
+    >
+      {/* 顶部区块不设 overflow:hidden，避免卡片 box-shadow 被裁切 */}
+      <div style={{ flexShrink: 0, overflow: 'visible' }}>
       {/* 页面标题 + 时间范围切换 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>访客统计</h1>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 8,
+          height: 40,
+          flexShrink: 0,
+        }}
+      >
+        <h1 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b', margin: 0 }}>访客统计</h1>
         <Segmented
           options={['今日', '昨日', '本周', '本月']}
           onChange={(val) => setTimeRange(RANGE_MAP[val as string] || 'today')}
         />
       </div>
 
-      {/* ===== 区域 1：数据卡片 ===== */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+      {/* ===== 区域 1：数据卡片（上下留白给阴影） ===== */}
+      <Row gutter={[8, 8]} style={{ marginBottom: 8, marginTop: 4, paddingTop: 4, paddingBottom: 6, flexShrink: 0 }}>
         {([
           { icon: <EyeOutlined />, label: 'PV（页面浏览）', value: overview?.pv ?? 0, isNum: true },
           { icon: <UserOutlined />, label: 'UV（独立访客）', value: overview?.uv ?? 0, isNum: true },
@@ -215,20 +255,20 @@ const StatsPage: React.FC = () => {
           { icon: <BarChartOutlined />, label: '昨日 UV', value: '--', isNum: false },
         ] as const).map((card, i) => (
           <Col xs={24} sm={12} lg={6} key={i}>
-            <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
+            <Card bordered={false} style={{ ...glassStyle, padding: '0.5vh 0.8vw', height: '100%' }}>
               {states.overview === 'loading' ? (
-                <Skeleton active paragraph={{ rows: 2 }} />
+                <Skeleton active paragraph={{ rows: 1 }} />
               ) : states.overview === 'error' ? (
                 <ErrorBlock onRetry={fetchData} />
               ) : (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                    <span style={{ color: themeColor, fontSize: 18 }}>{card.icon}</span>
-                    <span style={{ fontSize: 13, color: '#64748b' }}>{card.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '0.3vh' }}>
+                    <span style={{ color: themeColor, fontSize: '1rem' }}>{card.icon}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{card.label}</span>
                   </div>
                   <Statistic
                     value={card.value}
-                    valueStyle={{ fontSize: 28, fontWeight: 600, color: '#1e293b' }}
+                    valueStyle={{ fontSize: '1.5rem', fontWeight: 600, color: '#1e293b' }}
                     formatter={(val: any) =>
                       card.isNum && typeof val === 'number' ? val.toLocaleString() : String(val)
                     }
@@ -241,50 +281,54 @@ const StatsPage: React.FC = () => {
       </Row>
 
       {/* ===== 区域 2：访问趋势图（Canvas 占位） ===== */}
-      <Card bordered={false} style={{ ...glassStyle, padding: 16, marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <span style={{ fontSize: 15, fontWeight: 500, color: '#1e293b' }}>访问趋势</span>
+      <Card
+        bordered={false}
+        style={{ ...glassStyle, padding: '12px 16px', marginBottom: 8, height: 180, flexShrink: 0 }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4vh' }}>
+          <span style={{ fontSize: '0.9rem', fontWeight: 500, color: '#1e293b' }}>访问趋势</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
+            <div style={{ display: 'flex', gap: 16, fontSize: '0.75rem', color: '#64748b' }}>
               <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: themeColor }} /> PV</span>
               <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: themeColor, opacity: 0.5 }} /> UV</span>
             </div>
             <Segmented
               options={['7天', '30天']}
               onChange={(val) => setTrendDays(val === '7天' ? 7 : 30)}
+              size="small"
             />
           </div>
         </div>
-        <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ height: 'calc(180px - 50px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {states.trend === 'loading' ? (
             <LoadingBlock />
           ) : states.trend === 'error'? (
             <ErrorBlock onRetry={fetchData} />
           ) : trend ? (
-            <Suspense fallback={<LoadingBlock />}><TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={200} /></Suspense>
+            <Suspense fallback={<LoadingBlock />}><TrendChart dates={trend.dates} pv={trend.pv} uv={trend.uv} height={120} /></Suspense>
           ) : <EmptyBlock />}
         </div>
       </Card>
 
       {/* ===== 区域 3+4：热门页面 + 来源饼图 ===== */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+      <Row gutter={[8, 8]} style={{ marginBottom: 8, height: 272, flexShrink: 0 }}>
         {/* 区域 3：热门页面 */}
         <Col xs={24} lg={14}>
-          <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>热门页面 Top 10</h3>
+          <Card bordered={false} style={{ ...glassStyle, padding: '12px 16px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: '#1e293b', marginBottom: '8px' }}>热门页面 Top 10</h3>
             {states.topPages === 'loading' ? (
-              <Skeleton active paragraph={{ rows: 5 }} />
+              <Skeleton active paragraph={{ rows: 3 }} />
             ) : states.topPages === 'error'? (
               <ErrorBlock onRetry={fetchData} />
             ) : topPages.length === 0 ? (
               <EmptyBlock />
             ) : (
-              <div style={{ height: 320 }}>
+              <div style={{ flex: 1, overflow: 'hidden' }}>
                 <Table
                   dataSource={topPages}
                   rowKey="path"
                   pagination={false}
-                  scroll={{ x: 600, y: 280 }}
+                  scroll={{ x: 600, y: 200 }}
                   size="small"
                   columns={[
                   {
@@ -316,8 +360,8 @@ const StatsPage: React.FC = () => {
 
         {/* 区域 4：来源饼图 */}
         <Col xs={24} lg={10}>
-          <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>访客来源</h3>
+          <Card bordered={false} style={{ ...glassStyle, padding: '12px 16px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: '#1e293b', marginBottom: '8px' }}>访客来源</h3>
             {states.referers === 'loading' ? (
               <Skeleton active avatar paragraph={{ rows: 1 }} />
             ) : states.referers === 'error'? (
@@ -325,34 +369,70 @@ const StatsPage: React.FC = () => {
             ) : referers.length === 0 ? (
               <EmptyBlock />
             ) : (
-              <Pie
-                data={referers.map(r => ({ name: r.source, value: r.count }))}
-                angleField="value"
-                colorField="name"
-                innerRadius={0.6}
-                statistic={{
-                  title: { style: { fontSize: '11px', color: '#64748b' }, content: '总访问' },
-                  value: {
-                    style: { fontSize: '20px', fontWeight: 'bold', color: '#1e293b' },
-                    content: referers.reduce((s, r) => s + r.count, 0).toLocaleString(),
-                  },
-                }}
-                legend={{ position: 'bottom' as const }}
-                label={false}
-                interactions={[{ type: 'element-active' }]}
-                height={320}
-              />
+              <div style={{ flex: 1 }}>
+                <Pie
+                  data={referers.map(r => ({ name: r.source, value: r.count }))}
+                  angleField="value"
+                  colorField="name"
+                  innerRadius={0.6}
+                  statistic={{
+                    title: { style: { fontSize: '0.7rem', color: '#64748b' }, content: '总访问' },
+                    value: {
+                      style: { fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' },
+                      content: referers.reduce((s, r) => s + r.count, 0).toLocaleString(),
+                    },
+                  }}
+                  legend={{ position: 'bottom' as const }}
+                  label={false}
+                  interactions={[{ type: 'element-active' }]}
+                  height={188}
+                />
+              </div>
             )}
           </Card>
         </Col>
       </Row>
 
-      {/* ===== 区域 5：访问记录 ===== */}
-      <Card bordered={false} style={{ ...glassStyle, padding: 16 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 500, color: '#1e293b', marginBottom: 12 }}>访问记录</h3>
+      </div>
+
+      {/* 仅访问记录区裁切溢出，避免整页 overflow 吃掉卡片阴影 */}
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      {/* ===== 区域 5：访问记录（占满剩余高度，仅表格内部滚动） ===== */}
+      <Card
+        bordered={false}
+        style={{
+          ...glassStyle,
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+        styles={{
+          body: {
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            padding: '12px 16px 10px',
+          },
+        }}
+      >
+        <h3
+          style={{
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            color: '#1e293b',
+            marginBottom: 8,
+            flexShrink: 0,
+          }}
+        >
+          访问记录
+        </h3>
 
         {/* 筛选栏 */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap', flexShrink: 0 }}>
           <Input
             placeholder="输入页面路径筛选"
             value={filter.path}
@@ -360,6 +440,7 @@ const StatsPage: React.FC = () => {
             style={{ width: 200 }}
             onPressEnter={handleVisitsSearch}
             prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+            size="small"
           />
           <Input
             type="date"
@@ -367,55 +448,59 @@ const StatsPage: React.FC = () => {
             onChange={e => setFilter(prev => ({ ...prev, startDate: e.target.value }))}
             style={{ width: 140 }}
             placeholder="开始日期"
+            size="small"
           />
-          <span style={{ color: '#64748b', lineHeight: '32px' }}>~</span>
+          <span style={{ color: '#64748b', lineHeight: '24px' }}>~</span>
           <Input
             type="date"
             value={filter.endDate}
             onChange={e => setFilter(prev => ({ ...prev, endDate: e.target.value }))}
             style={{ width: 140 }}
             placeholder="结束日期"
+            size="small"
           />
-          <Button type="primary" onClick={handleVisitsSearch} style={{ background: themeColor, borderColor: themeColor }}>
+          <Button type="primary" onClick={handleVisitsSearch} style={{ background: themeColor, borderColor: themeColor }} size="small">
             搜索
           </Button>
-          <Button onClick={handleResetFilter}>重置</Button>
+          <Button onClick={handleResetFilter} size="small">重置</Button>
         </div>
 
         {/* 表格 */}
         {states.visits === 'loading' ? (
-          <Skeleton active paragraph={{ rows: 5 }} />
+          <Skeleton active paragraph={{ rows: 3 }} />
         ) : states.visits === 'error'? (
           <ErrorBlock onRetry={fetchData} />
         ) : (
-          <>
-            <Table
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div ref={visitsTableBodyRef} style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <Table
               dataSource={visits?.data || []}
               rowKey="_id"
               pagination={false}
-              scroll={{ x: 800 }}
+              scroll={{ x: 800, y: visitsTableScrollY }}
               size="small"
               columns={[
                 {
-                  title: '时间', dataIndex: 'timestamp', width: 180,
+                  title: '时间', dataIndex: 'timestamp', width: 160,
                   render: (t: string) => new Date(t).toLocaleString('zh-CN'),
                 },
                 { title: '页面路径', dataIndex: 'path', ellipsis: { showTitle: true } },
-                { title: '标题', dataIndex: 'title', width: 200, ellipsis: { showTitle: true } },
+                { title: '标题', dataIndex: 'title', width: 180, ellipsis: { showTitle: true } },
                 {
-                  title: 'IP', dataIndex: 'ip', width: 140,
+                  title: 'IP', dataIndex: 'ip', width: 120,
                   render: (ip: string) => <span>{ip || '--'}</span>,
                 },
                 {
-                  title: '来源', dataIndex: 'referer', width: 160, ellipsis: { showTitle: true },
+                  title: '来源', dataIndex: 'referer', width: 140, ellipsis: { showTitle: true },
                   render: (r: string) => {
                     if (!r) return '直接访问';
                     try { return new URL(r).hostname; } catch { return r; }
                   },
                 },
               ]}
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8, flexShrink: 0 }}>
               <Pagination
                 current={filter.page}
                 pageSize={filter.pageSize}
@@ -424,15 +509,17 @@ const StatsPage: React.FC = () => {
                 pageSizeOptions={['10', '20', '50']}
                 onChange={handlePageChange}
                 onShowSizeChange={handlePageChange}
+                size="small"
                 style={{
                   color: '#1e293b',
                 }}
                 className="stats-pagination"
               />
             </div>
-          </>
+          </div>
         )}
       </Card>
+      </div>
     </div>
   );
 };

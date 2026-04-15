@@ -165,12 +165,12 @@ export default defineConfig({
   // 代理配置 - 仅开发环境生效，生产环境不需要代理
   proxy: process.env.NODE_ENV === 'development' ? {
     '/api': {
-      target: 'https://xiaodingyang.art',
+      target: 'http://localhost:8081',
       changeOrigin: true,
       secure: false,
     },
     '/uploads': {
-      target: 'https://xiaodingyang.art',
+      target: 'http://localhost:8081',
       changeOrigin: true,
       secure: false,
     },

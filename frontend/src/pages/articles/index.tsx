@@ -509,6 +509,10 @@ const ArticlesPage: React.FC = () => {
               value={categoryId || undefined}
               onChange={(v) => updateParams('category', v || '')}
               allowClear
+              showSearch
+              filterOption={(input, option) =>
+                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+              }
               className="!min-w-[120px] [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white/80 [&_.ant-select-selector]:!border-white/15 [&_.ant-select-selection-placeholder]:!text-white/50"
               suffixIcon={<FolderOutlined className="text-white/60" />}
               popupMatchSelectWidth={false}
@@ -524,6 +528,10 @@ const ArticlesPage: React.FC = () => {
               value={tagId || undefined}
               onChange={(v) => updateParams('tag', v || '')}
               allowClear
+              showSearch
+              filterOption={(input, option) =>
+                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+              }
               className="!min-w-[120px] [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white/80 [&_.ant-select-selector]:!border-white/15 [&_.ant-select-selection-placeholder]:!text-white/50"
               suffixIcon={<TagsOutlined className="text-white/60" />}
               popupMatchSelectWidth={false}

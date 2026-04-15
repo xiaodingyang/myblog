@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Typography,
   Table,
@@ -22,6 +22,8 @@ const { Title, Text } = Typography;
 const TagsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState<API.Tag[]>([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTag, setEditingTag] = useState<API.Tag | null>(null);
   const [form] = Form.useForm();
@@ -44,6 +46,16 @@ const TagsPage: React.FC = () => {
   useEffect(() => {
     fetchTags();
   }, []);
+
+  const pagedTags = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return tags.slice(start, start + pageSize);
+  }, [tags, page, pageSize]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(tags.length / pageSize) || 1);
+    if (page > maxPage) setPage(maxPage);
+  }, [tags.length, pageSize, page]);
 
   const handleAdd = () => {
     setEditingTag(null);
@@ -117,7 +129,7 @@ const TagsPage: React.FC = () => {
       dataIndex: 'name',
       key: 'name',
       render: (name, _, index) => (
-        <Tag color={getTagColor(index)} icon={<TagOutlined />}>
+        <Tag color={getTagColor((page - 1) * pageSize + index)} icon={<TagOutlined />}>
           {name}
         </Tag>
       ),
@@ -199,10 +211,22 @@ const TagsPage: React.FC = () => {
       >
         <Table
           columns={columns}
-          dataSource={tags}
+          dataSource={pagedTags}
           rowKey="_id"
           loading={loading}
-          pagination={false}
+          pagination={{
+            current: page,
+            pageSize,
+            total: tags.length,
+            showSizeChanger: true,
+            showTotal: (t) => `共 ${t} 个标签`,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            className: 'stats-pagination',
+            onChange: (p, ps) => {
+              setPage(p);
+              setPageSize(ps);
+            },
+          }}
         />
       </Card>
 

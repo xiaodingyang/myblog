@@ -25,37 +25,10 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS 配置 - 支持开发环境和 Vercel 部署
-const allowedOrigins = [
-  'http://localhost:8001',
-  'http://127.0.0.1:8001',
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-  'http://localhost:8080',  // Umi 默认端口
-  'http://127.0.0.1:8080',
-];
-
-// 生产环境添加 Vercel 域名
-if (process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
-
+// CORS：允许任意来源（origin: '*' 与 credentials: true 不能同时使用）
 app.use(cors({
-  origin: function (origin, callback) {
-    // 允许无 origin 的请求（如 Postman、服务器端请求）
-    if (!origin) return callback(null, true);
-
-    // 检查是否在白名单中，或匹配 Vercel 预览环境
-    const isAllowed = allowedOrigins.includes(origin) ||
-                      /^https:\/\/.*\.vercel\.app$/.test(origin);
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
+  origin: '*',
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -77,7 +50,7 @@ const windowMs = Number.isFinite(envWindowMs) && envWindowMs > 0
   : (isProd ? 15 * 60 * 1000 : 5 * 60 * 1000);
 const max = Number.isFinite(envMax) && envMax > 0
   ? envMax
-  : (isProd ? 100 : 2000);
+  : (isProd ? 100 : 10000); // 开发环境提高到10000次
 
 const apiLimiter = rateLimit({
   windowMs,
@@ -85,12 +58,15 @@ const apiLimiter = rateLimit({
   message: { code: 10008, message: '请求过于频繁，请稍后再试', data: null },
   standardHeaders: true,
   legacyHeaders: false,
-  // 管理员用户豁免频率限制
+  // 开发环境完全禁用限流
   skip: (req) => {
+    // 非生产环境跳过限流
+    if (!isProd) return true;
+
     // 从 Authorization header 中提取 token
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) return false;
-    
+
     try {
       const jwt = require('jsonwebtoken');
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');

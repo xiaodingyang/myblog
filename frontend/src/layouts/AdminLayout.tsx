@@ -142,8 +142,11 @@ const AdminLayout: React.FC = () => {
     return path;
   };
 
+  /** 访客统计：主区占满一屏，避免外层再出现滚动条 */
+  const isStatsPage = location.pathname === '/admin/stats';
+
   return (
-    <Layout className="min-h-screen">
+    <Layout className={isStatsPage ? 'min-h-screen flex flex-col' : 'min-h-screen'}>
       {/* 侧边栏 */}
       <Sider
         trigger={null}
@@ -189,7 +192,22 @@ const AdminLayout: React.FC = () => {
         />
       </Sider>
 
-      <Layout style={{ marginLeft: collapsed ? 80 : 240, transition: 'margin-left 0.2s' }}>
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 240,
+          transition: 'margin-left 0.2s',
+          minHeight: '100vh',
+          ...(isStatsPage
+            ? {
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              maxHeight: '100vh',
+              overflow: 'hidden',
+            }
+            : {}),
+        }}
+      >
         {/* 顶部栏 */}
         <Header 
           className="flex items-center justify-between px-6"
@@ -224,12 +242,36 @@ const AdminLayout: React.FC = () => {
         </Header>
 
         {/* 内容区 */}
-        <Content className="m-6">
-          <div 
-            className="p-6 min-h-[calc(100vh-64px-48px)]"
-            style={{ 
-              background: colorBgContainer, 
+        <Content
+          className={isStatsPage ? undefined : 'm-6'}
+          style={
+            isStatsPage
+              ? {
+                flex: 1,
+                minHeight: 0,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '8px 16px 16px',
+                padding: 0,
+              }
+              : undefined
+          }
+        >
+          <div
+            className={isStatsPage ? undefined : 'p-6 min-h-[calc(100vh-64px-48px)]'}
+            style={{
+              background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              ...(isStatsPage
+                ? {
+                  flex: 1,
+                  minHeight: 0,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }
+                : {}),
             }}
           >
             <Outlet />

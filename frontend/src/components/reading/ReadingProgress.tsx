@@ -75,8 +75,9 @@ const ReadingProgress: React.FC<ReadingProgressProps> = ({
         right: 0,
         height,
         zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        backgroundColor: 'rgba(0, 0, 0, 0.08)',
         pointerEvents: 'none',
+        backdropFilter: 'blur(4px)',
       }}
     >
       <div
@@ -84,11 +85,26 @@ const ReadingProgress: React.FC<ReadingProgressProps> = ({
         style={{
           height: '100%',
           width: `${progress}%`,
-          background: `linear-gradient(90deg, ${gradientColor}, ${gradientColor}aa)`,
-          transition: 'width 0.1s linear',
-          boxShadow: `0 0 8px ${gradientColor}66`,
+          background: `linear-gradient(90deg, ${gradientColor}, ${gradientColor}dd, ${gradientColor})`,
+          transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: `0 0 12px ${gradientColor}88, 0 0 24px ${gradientColor}44`,
+          position: 'relative',
+          overflow: 'hidden',
         }}
-      />
+      >
+        {/* 添加流动光效 */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: `linear-gradient(90deg, transparent, ${gradientColor}66, transparent)`,
+            animation: 'shimmer 2s infinite',
+          }}
+        />
+      </div>
       {showPercent && (
         <div
           style={{

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Typography,
   Table,
@@ -23,6 +23,8 @@ const { TextArea } = Input;
 const CategoriesPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<API.Category[]>([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState<API.Category | null>(null);
   const [form] = Form.useForm();
@@ -45,6 +47,16 @@ const CategoriesPage: React.FC = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const pagedCategories = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return categories.slice(start, start + pageSize);
+  }, [categories, page, pageSize]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(categories.length / pageSize) || 1);
+    if (page > maxPage) setPage(maxPage);
+  }, [categories.length, pageSize, page]);
 
   const handleAdd = () => {
     setEditingCategory(null);
@@ -204,10 +216,22 @@ const CategoriesPage: React.FC = () => {
       >
         <Table
           columns={columns}
-          dataSource={categories}
+          dataSource={pagedCategories}
           rowKey="_id"
           loading={loading}
-          pagination={false}
+          pagination={{
+            current: page,
+            pageSize,
+            total: categories.length,
+            showSizeChanger: true,
+            showTotal: (t) => `共 ${t} 个分类`,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            className: 'stats-pagination',
+            onChange: (p, ps) => {
+              setPage(p);
+              setPageSize(ps);
+            },
+          }}
         />
       </Card>
 

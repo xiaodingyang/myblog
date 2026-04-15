@@ -262,6 +262,7 @@ const MessagesPage: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total) => `共 ${total} 条`,
+            className: 'stats-pagination',
             onChange: (p, ps) => {
               setPage(p);
               setPageSize(ps);

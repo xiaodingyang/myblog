@@ -287,11 +287,17 @@ const TrendChart: React.FC<TrendChartProps> = ({ dates = [], pv = [], uv = [], h
     // === Tooltip ===
     if (S.hoveredIdx >= 0 && S.hoveredIdx < dates.length) {
       const i = S.hoveredIdx;
-      const tw = 150, th = 72;
+      const tw = 150;
+      const th = 72;
+      const pad = 10;
       let tx = S.mouseX + 12;
       let ty = S.mouseY - th - 12;
-      if (tx + tw > W - 10) tx = S.mouseX - tw - 12;
-      if (ty < 10) ty = S.mouseY + 12;
+      if (tx + tw > W - pad) tx = S.mouseX - tw - 12;
+      if (tx < pad) tx = pad;
+      // 优先在指针上方；顶上不去则改到下方，再整体钳在画布内（避免被 canvas 底部裁切）
+      if (ty < pad) ty = S.mouseY + 12;
+      if (ty + th > H - pad) ty = H - th - pad;
+      if (ty < pad) ty = pad;
 
       // 毛玻璃背景
       ctx.save();

@@ -41,6 +41,9 @@ const TagsPage: React.FC = () => {
     return 14 + ratio * 10; // 14px - 24px
   };
 
+  // 按文章数量降序排序
+  const sortedTags = [...tags].sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0));
+
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   
@@ -102,7 +105,7 @@ const TagsPage: React.FC = () => {
               textShadow: '0 1px 12px rgba(0, 0, 0, 0.35)',
             }}
           >
-            共 {tags.length} 个标签
+            共 {sortedTags.length} 个标签
           </Text>
         </div>
         </ScrollReveal>
@@ -132,7 +135,7 @@ const TagsPage: React.FC = () => {
             }}
           >
             <div className="flex flex-wrap justify-center gap-4 md:gap-5 py-8">
-              {tags.map((tag, index) => (
+              {sortedTags.map((tag, index) => (
                 <ScrollReveal key={tag._id} direction="up" delay={index * 0.03} duration={0.3}>
                 <Link to={`/tag/${tag._id}`}>
                   <Tag

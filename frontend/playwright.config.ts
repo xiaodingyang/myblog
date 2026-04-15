@@ -1,8 +1,18 @@
 import { defineConfig } from '@playwright/test';
 import testConfig from './tests/config';
 
+/** 可视化分批：由 `pnpm e2e:visual` 设置 `PLAYWRIGHT_VISUAL_BATCH=public|admin`；未设置时从默认 e2e 中排除 */
+const visualBatch = process.env.PLAYWRIGHT_VISUAL_BATCH;
+const visualRouting =
+  visualBatch === 'public'
+    ? { testMatch: '**/visual-public.spec.ts' as const, testIgnore: [] as string[] }
+    : visualBatch === 'admin'
+      ? { testMatch: '**/visual-admin.spec.ts' as const, testIgnore: [] as string[] }
+      : { testIgnore: ['**/visual-public.spec.ts', '**/visual-admin.spec.ts'] as string[] };
+
 export default defineConfig({
   testDir: './tests/e2e',
+  ...visualRouting,
   retries: testConfig.target === 'production' ? 2 : 0,
   workers: testConfig.target === 'production' ? 1 : 4,
   use: {

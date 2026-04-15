@@ -672,67 +672,114 @@ body {
     background: rgba(30, 41, 59, 0.95) !important;
   }
 }
-/* 后台统计页面分页器样式 - 白色背景适配 */
-.stats-pagination .ant-pagination-item a {
-  color: #525252 !important;
+/*
+ * 后台统计页分页器：白底高对比
+ * 使用 .stats-pagination.ant-pagination 双类提高优先级，压过全局「暗色玻璃」分页样式
+ */
+.stats-pagination.ant-pagination {
+  color: #334155 !important;
 }
 
-.stats-pagination .ant-pagination-item {
+.stats-pagination.ant-pagination .ant-pagination-total-text {
+  color: #334155 !important;
+  font-weight: 500;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-options {
+  color: #334155 !important;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-item {
   background: #ffffff !important;
-  border-color: #e5e5e5 !important;
+  border-color: #cbd5e1 !important;
 }
 
-.stats-pagination .ant-pagination-item:hover a {
+.stats-pagination.ant-pagination .ant-pagination-item a,
+.stats-pagination.ant-pagination .ant-pagination-item button {
   color: #1e293b !important;
 }
 
-.stats-pagination .ant-pagination-item:hover {
+.stats-pagination.ant-pagination .ant-pagination-item:hover {
   border-color: var(--theme-primary, #6366f1) !important;
 }
 
-.stats-pagination .ant-pagination-item-active {
+.stats-pagination.ant-pagination .ant-pagination-item:hover a,
+.stats-pagination.ant-pagination .ant-pagination-item:hover button {
+  color: var(--theme-primary, #6366f1) !important;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-item-active {
   border-color: var(--theme-primary, #6366f1) !important;
   background: var(--theme-primary, #6366f1) !important;
 }
 
-.stats-pagination .ant-pagination-item-active a {
+.stats-pagination.ant-pagination .ant-pagination-item-active a,
+.stats-pagination.ant-pagination .ant-pagination-item-active button {
   color: #ffffff !important;
 }
 
-.stats-pagination .ant-pagination-prev .ant-pagination-item-link,
-.stats-pagination .ant-pagination-next .ant-pagination-item-link {
-  color: #525252 !important;
+.stats-pagination.ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.stats-pagination.ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: #1e293b !important;
   background: #ffffff !important;
-  border-color: #e5e5e5 !important;
+  border-color: #cbd5e1 !important;
 }
 
-.stats-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
-.stats-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+.stats-pagination.ant-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.stats-pagination.ant-pagination .ant-pagination-next:hover .ant-pagination-item-link {
   color: var(--theme-primary, #6366f1) !important;
   border-color: var(--theme-primary, #6366f1) !important;
 }
 
-.stats-pagination .ant-pagination-total-text {
-  color: #525252 !important;
+.stats-pagination.ant-pagination .ant-pagination-disabled .ant-pagination-item-link,
+.stats-pagination.ant-pagination .ant-pagination-prev.ant-pagination-disabled .ant-pagination-item-link,
+.stats-pagination.ant-pagination .ant-pagination-next.ant-pagination-disabled .ant-pagination-item-link {
+  color: #94a3b8 !important;
 }
 
-.stats-pagination .ant-pagination-options-quick-jumper {
-  color: #525252 !important;
-}
-
-.stats-pagination .ant-pagination-options-quick-jumper input {
+.stats-pagination.ant-pagination .ant-pagination-jump-prev .ant-pagination-item-link,
+.stats-pagination.ant-pagination .ant-pagination-jump-next .ant-pagination-item-link {
   color: #1e293b !important;
-  border-color: #e5e5e5 !important;
-}
-
-.stats-pagination .ant-select-selector {
-  color: #525252 !important;
   background: #ffffff !important;
-  border-color: #e5e5e5 !important;
+  border-color: #cbd5e1 !important;
 }
 
-.stats-pagination .ant-select-arrow {
-  color: #525252 !important;
+.stats-pagination.ant-pagination .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.stats-pagination.ant-pagination .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #475569 !important;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper,
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper > span {
+  color: #334155 !important;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper input,
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper .ant-input,
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper,
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper input {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper .ant-input::placeholder,
+.stats-pagination.ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper input::placeholder {
+  color: #64748b !important;
+}
+
+.stats-pagination.ant-pagination .ant-select-selector {
+  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.stats-pagination.ant-pagination .ant-select-selection-item {
+  color: #1e293b !important;
+}
+
+.stats-pagination.ant-pagination .ant-select-arrow {
+  color: #475569 !important;
 }
 
 /* 后台统计页面分页器下拉菜单 - 白色背景适配（全局覆盖） */
@@ -757,6 +804,12 @@ body .ant-select-dropdown .ant-select-item-option-selected {
   background: #e0e9ff !important;
   color: var(--theme-primary, #6366f1) !important;
   font-weight: 600;
+}
+
+/* 阅读进度条流动光效 */
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
 }
 
 /* 头部搜索框玻璃态样式 */

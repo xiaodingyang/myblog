@@ -21,13 +21,24 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
   const articleId = article._id || (article as API.Article & { id?: string }).id;
+  const [isTouching, setIsTouching] = React.useState(false);
 
   // 计算文章状态
   const isNew = useMemo(() => isNewArticle(article.createdAt), [article.createdAt]);
   const isHot = useMemo(() => isHotArticle(article.views), [article.views]);
 
+  // 移动端触摸反馈
+  const handleTouchStart = () => setIsTouching(true);
+  const handleTouchEnd = () => setIsTouching(false);
+
   return (
-    <Link to={articleId ? `/article/${articleId}` : '/articles'} className="no-underline" onMouseEnter={() => { if (articleId) fetchArticleDetail(articleId); }}>
+    <Link
+      to={articleId ? `/article/${articleId}` : '/articles'}
+      className="no-underline"
+      onMouseEnter={() => { if (articleId) fetchArticleDetail(articleId); }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <Card
         hoverable
         className="card-hover glass-card overflow-hidden group"
@@ -37,8 +48,17 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
-          transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: isTouching ? 'scale(0.98)' : 'scale(1)',
           ...style,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+          e.currentTarget.style.boxShadow = `0 12px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px ${currentColorTheme.primary}33`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0) scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
         }}
         cover={
           article.cover ? (
@@ -47,7 +67,7 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                 alt={article.title}
                 src={article.cover}
                 loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               {/* 左下角：分类标签 */}

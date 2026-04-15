@@ -107,6 +107,15 @@ const HomePage: React.FC = () => {
     return sortByPopularity(unread).slice(0, 3);
   }, [articles]);
 
+  /** 首页热门标签：优先有文章数的标签，最多展示 18 个，避免占满整屏 */
+  const hotTagsDisplay = useMemo(() => {
+    const withArticles = tagsList.filter((t) => (t.articleCount || 0) > 0);
+    const cap = 18;
+    if (withArticles.length >= cap) return withArticles.slice(0, cap);
+    if (withArticles.length > 0) return withArticles;
+    return tagsList.slice(0, 10);
+  }, [tagsList]);
+
   // 侧边文章列表：合并最新+推荐，去重，排除主推，最多5篇
   const sideArticles = useMemo(() => {
     const mainId = featuredArticles[0]?._id;
@@ -731,8 +740,11 @@ const HomePage: React.FC = () => {
                   全部 →
                 </Link>
               </div>
-              <div className="flex flex-wrap gap-2.5">
-                {tagsList.map((tag) => (
+              <div
+                className="flex flex-wrap gap-2.5 max-h-[min(280px,42vh)] overflow-y-auto overscroll-contain pr-0.5"
+                style={{ scrollbarWidth: 'thin' }}
+              >
+                {hotTagsDisplay.map((tag) => (
                   <Link key={tag._id} to={`/tag/${tag._id}`}>
                     <span
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer"
@@ -761,13 +773,23 @@ const HomePage: React.FC = () => {
                 ))}
                 {tagsList.length === 0 && <div className="text-center py-4 text-gray-500 text-sm w-full">暂无标签</div>}
               </div>
+              {tagsList.length > 0 && tagsList.length > hotTagsDisplay.length && (
+                <div className="mt-3 text-center border-t border-white/10 pt-3">
+                  <Link
+                    to="/tags"
+                    className="text-xs hover:underline opacity-90 hover:opacity-100"
+                    style={{ color: currentColorTheme.primary }}
+                  >
+                    还有 {tagsList.length - hotTagsDisplay.length} 个标签，去标签页查看 →
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
           </LazyMotionDiv>
 
           {/* 下半部分：CTA */}
           <LazyMotionDiv
-            className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
             className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
             variants={itemVariants}
             style={{

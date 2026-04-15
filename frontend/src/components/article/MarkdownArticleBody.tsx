@@ -37,13 +37,23 @@ const CodeBlockWithCopy: React.FC<{
   }, [code]);
 
   return (
-    <div className="relative group/code my-4 rounded-lg overflow-hidden">
+    <div className="relative group/code my-4 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20">
+      {/* 语言标签 */}
+      <div className="absolute top-2 left-3 z-20 px-2 py-0.5 text-xs font-medium rounded bg-slate-700/90 text-slate-300 border border-slate-600/50">
+        {language}
+      </div>
       <button
         type="button"
         onClick={handleCopy}
-        className="absolute top-2 right-2 z-20 px-2.5 py-1 text-xs font-medium rounded-md border border-white/20 bg-slate-800/85 text-slate-100 hover:bg-slate-700/95 hover:border-white/30 shadow-md transition-colors"
+        className="absolute top-2 right-2 z-20 px-3 py-1.5 text-xs font-medium rounded-md border transition-all duration-200"
+        style={{
+          borderColor: copied ? '#10b981' : 'rgba(255, 255, 255, 0.2)',
+          background: copied ? 'rgba(16, 185, 129, 0.15)' : 'rgba(30, 41, 59, 0.85)',
+          color: copied ? '#10b981' : '#e2e8f0',
+          transform: copied ? 'scale(0.95)' : 'scale(1)',
+        }}
       >
-        {copied ? '已复制' : '复制'}
+        {copied ? '✓ 已复制' : '复制代码'}
       </button>
       <SyntaxHighlighter
         style={vscDarkPlus}
@@ -52,9 +62,12 @@ const CodeBlockWithCopy: React.FC<{
         customStyle={{
           margin: 0,
           borderRadius: '8px',
-          fontSize: '12px',
+          fontSize: '13px',
+          lineHeight: '1.6',
           overflowX: 'auto',
-          paddingTop: '2.25rem',
+          paddingTop: '2.75rem',
+          paddingBottom: '1.25rem',
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
         }}
         showLineNumbers
         wrapLines

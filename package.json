@@ -11,7 +11,8 @@
     "build": "pnpm --filter blog-backend build && pnpm --filter blog-frontend build",
     "start": "concurrently \"npm:start:backend\" \"npm:start:frontend\"",
     "start:backend": "pnpm --filter blog-backend start",
-    "start:frontend": "pnpm --filter blog-frontend start"
+    "start:frontend": "pnpm --filter blog-frontend start",
+    "db:ensure-e2e-admin": "pnpm --filter blog-backend db:ensure-e2e-admin"
   },
   "devDependencies": {
     "bson": "^7.2.0",
