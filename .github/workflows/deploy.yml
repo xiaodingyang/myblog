@@ -73,7 +73,14 @@ jobs:
             pnpm install --frozen-lockfile 2>/dev/null || pnpm install --no-optional
 
             echo "🔄 Restarting backend (pm2)..."
-            pm2 restart blog-api 2>/dev/null || pm2 start src/index.js --name blog-api
+            # 线上常见：ecosystem.config.js 进程名为 blog-backend（PORT=8081），与历史 blog-api 并存；只重启 blog-api 会导致 Nginx 仍打到旧进程
+            if pm2 describe blog-backend >/dev/null 2>&1; then
+              pm2 restart blog-backend
+            elif pm2 describe blog-api >/dev/null 2>&1; then
+              pm2 restart blog-api
+            else
+              pm2 start src/index.js --name blog-api
+            fi
             pm2 save
 
             echo "🔄 Reloading Nginx..."
