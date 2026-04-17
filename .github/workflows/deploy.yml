@@ -138,9 +138,10 @@ jobs:
           echo "❌ Health check failed after 5 attempts"
           exit 1
 
-      # ── 微信通知：成功 ──
+      # ── 微信通知：成功 ──（Server 酱等非 2xx 时 curl -f 会失败；不应把整次部署标红）
       - name: Notify WeChat (success)
         if: success()
+        continue-on-error: true
         run: |
           COMMIT_MSG=$(git log -1 --pretty=format:'%s')
           COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
@@ -166,9 +167,10 @@ jobs:
           ---
           *GitHub Actions · Run [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
 
-      # ── 微信通知：失败 ──
+      # ── 微信通知：失败 ──（同上，避免通知接口拖垮 workflow 结论）
       - name: Notify WeChat (failure)
         if: failure()
+        continue-on-error: true
         run: |
           COMMIT_MSG=$(git log -1 --pretty=format:'%s')
           DEPLOY_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
