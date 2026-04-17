@@ -8,7 +8,7 @@ import { ARTICLE_AI_ASSISTANT_NAME } from '@/components/shared/floatingActionsCo
 
 const LazyMarkdownArticleBody = lazy(() => import('@/components/article/MarkdownArticleBody'));
 
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 const DISCLAIMER_KEY = 'blog_ai_assistant_disclaimer_ok_v1';
@@ -120,7 +120,12 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
       if (res?.code === 0 && res.data) {
         setResult(res.data as AskAiResponse);
       } else {
-        setErrText(res?.message || '请求失败');
+        const msg = res?.message || '请求失败';
+        setErrText(
+          res?.code === 27001
+            ? `${msg}\n\n（站长）用 SSH 登录服务器，编辑 /var/www/myblog/backend/.env，填好上述三项后执行：pm2 restart blog-backend`
+            : msg,
+        );
       }
     } catch (e: any) {
       const status = e?.response?.status;
@@ -134,6 +139,14 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
         setErrText('等待模型回复超时，请稍后再试或缩短问题');
       } else if (status === 429 || code === 42901) {
         setErrText('提问过于频繁，请稍后再试');
+      } else if (code === 27001) {
+        const base =
+          body?.message ||
+          e?.info?.errorMessage ||
+          'AI 答疑未配置：请设置 AI_API_BASE、AI_API_KEY、AI_CHAT_MODEL';
+        setErrText(
+          `${base}\n\n（站长）用 SSH 登录服务器，编辑 /var/www/myblog/backend/.env，填好上述三项后执行：pm2 restart blog-backend`,
+        );
       } else {
         setErrText(
           body?.message ||
@@ -230,31 +243,34 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
           {step === 'disclaimer' ? (
             <Space direction="vertical" size="large" className="w-full">
               <div
-                className="rounded-lg p-4 border"
+                className="ai-assistant-disclaimer-box rounded-lg p-4 border"
                 style={{
                   borderRadius: 10,
                   borderColor: 'rgba(255,255,255,0.1)',
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                  color: 'rgba(255,255,255,0.88)',
                 }}
               >
-                <Paragraph className="!mb-0 text-[13px] leading-relaxed text-white/82">
-                  <span className="font-semibold text-white/95">使用前须知</span>
-                  <span className="mx-1.5 text-white/25">·</span>
-                  <span className="text-white/68">
+                {/* 不用 Typography.Paragraph，避免 .ant-typography 在暗色下仍用默认近黑字 */}
+                <p className="m-0 text-[13px] leading-relaxed text-white/88">
+                  <span className="ai-disclaimer-title font-semibold">使用前须知</span>
+                  <span className="ai-disclaimer-dot mx-1.5">·</span>
+                  <span className="ai-disclaimer-body">
                     回答依据本站已发布正文检索生成，可能存在疏漏或过时。请勿输入密钥、隐私信息。
                   </span>
-                </Paragraph>
+                </p>
               </div>
               <div className="flex justify-end pt-1">
                 <Button
                   type="primary"
                   size="large"
                   onClick={acceptDisclaimer}
-                  className="!rounded-lg !h-10 !px-6 !font-medium !border-0 min-w-[200px] !text-neutral-950 hover:!text-neutral-950"
+                  className="ai-assistant-disclaimer-continue !rounded-lg !h-10 !px-6 !font-medium !border-0 min-w-[200px]"
                   style={{
                     borderRadius: 8,
                     backgroundImage: theme.gradient,
                     boxShadow: `0 6px 22px ${theme.primary}45, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.35)',
                   }}
                 >
                   已知上述限制，继续提问
@@ -272,7 +288,13 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                   autoSize={{ minRows: 4, maxRows: 10 }}
                   maxLength={2000}
                   disabled={loading}
-                  className="!rounded-lg !text-[13px] !leading-relaxed !text-white/92 !border-white/[0.12] placeholder:!text-white/38 [&_textarea]:!min-h-[120px] !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
+                  className="ai-assistant-q-textarea !rounded-lg !text-[13px] !leading-relaxed !border-white/[0.12] [&_textarea]:!min-h-[120px] [&_textarea]:!text-white/92 [&_textarea]:!caret-white [&_textarea::placeholder]:!text-white/45 [&_textarea::-webkit-input-placeholder]:!text-white/45 [&_textarea::-moz-placeholder]:!text-white/45 [&_textarea:-ms-input-placeholder]:!text-white/45 !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
+                  styles={{
+                    textarea: {
+                      color: 'rgba(255,255,255,0.92)',
+                      caretColor: '#fff',
+                    },
+                  }}
                   style={{
                     borderRadius: 8,
                     color: 'rgba(255,255,255,0.92)',
@@ -304,7 +326,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
               {errText && (
                 <Alert
                   type="error"
-                  message={errText}
+                  message={<span className="whitespace-pre-line">{errText}</span>}
                   showIcon
                   className="!text-[13px] !rounded-lg !bg-rose-950/45 !border-rose-500/25 [&_.ant-alert-message]:!text-rose-50 [&_.ant-alert-icon]:!text-rose-300"
                 />

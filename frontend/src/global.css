@@ -1052,3 +1052,42 @@ body .ant-select-dropdown .ant-select-item-option-selected {
   background: rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 0 0 2px rgba(255, 179, 217, 0.2), 0 4px 16px rgba(0, 0, 0, 0.15) !important;
 }
+
+/* 小苹果答疑：多行输入内文与 placeholder（antd 默认会把 placeholder 收成深色） */
+.ai-assistant-q-textarea textarea.ant-input,
+.ai-assistant-q-textarea textarea {
+  color: rgba(255, 255, 255, 0.92) !important;
+  caret-color: #fff !important;
+}
+
+.ai-assistant-q-textarea textarea::placeholder,
+.ai-assistant-q-textarea textarea::-webkit-input-placeholder,
+.ai-assistant-q-textarea textarea::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+  opacity: 1;
+}
+
+/* 小苹果「使用前须知」：兜底浅色字（避免 antd 主题把段落收成深色） */
+.ai-assistant-disclaimer-box p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.ai-assistant-disclaimer-box .ai-disclaimer-title {
+  color: #fff !important;
+}
+
+.ai-assistant-disclaimer-box .ai-disclaimer-dot {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.ai-assistant-disclaimer-box .ai-disclaimer-body {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* 主按钮内文：antd primary 在部分主题下会给 span 深色字 */
+.ai-assistant-disclaimer-continue.ant-btn-primary,
+.ai-assistant-disclaimer-continue.ant-btn-primary:hover,
+.ai-assistant-disclaimer-continue.ant-btn-primary:focus,
+.ai-assistant-disclaimer-continue.ant-btn-primary span {
+  color: #fff !important;
+}

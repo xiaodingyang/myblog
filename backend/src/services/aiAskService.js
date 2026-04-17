@@ -174,7 +174,11 @@ async function callChatCompletions({ messages, temperature = 0.25, maxTokens = 2
   const key = process.env.AI_API_KEY;
   const model = process.env.AI_CHAT_MODEL || process.env.AI_MODEL;
   if (!key || !base || !model) {
-    throw new ApiError(503, ErrorCode.AI_NOT_CONFIGURED, 'AI 答疑未配置：请设置 AI_API_BASE、AI_API_KEY、AI_CHAT_MODEL');
+    throw new ApiError(
+      503,
+      ErrorCode.AI_NOT_CONFIGURED,
+      'AI 答疑未配置：请在服务器 backend/.env 中设置 AI_API_BASE、AI_API_KEY、AI_CHAT_MODEL（说明见仓库 backend/.env.example），保存后执行 pm2 restart blog-backend',
+    );
   }
   const url = chatCompletionsUrl(base);
   const controller = new AbortController();
