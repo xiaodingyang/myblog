@@ -73,14 +73,45 @@ jobs:
             pnpm install --frozen-lockfile 2>/dev/null || pnpm install --no-optional
 
             echo "🔄 Restarting backend (pm2)..."
-            # 线上常见：ecosystem.config.js 进程名为 blog-backend（PORT=8081），与历史 blog-api 并存；只重启 blog-api 会导致 Nginx 仍打到旧进程
+            # 线上常见：Nginx /api 指向 blog-backend（ecosystem 里 PORT=8081），与历史 blog-api（多为 3000）并存；两者都重启以免只热更其一
             if pm2 describe blog-backend >/dev/null 2>&1; then
-              pm2 restart blog-backend
-            elif pm2 describe blog-api >/dev/null 2>&1; then
-              pm2 restart blog-api
-            else
+              pm2 restart blog-backend --update-env || true
+            fi
+            if pm2 describe blog-api >/dev/null 2>&1; then
+              pm2 restart blog-api --update-env || true
+            fi
+            if ! pm2 describe blog-backend >/dev/null 2>&1 && ! pm2 describe blog-api >/dev/null 2>&1; then
               pm2 start src/index.js --name blog-api
             fi
+            sleep 3
+
+            echo "🔎 Upstream health on server (Node /health):"
+            ok=0
+            for port in 8081 3000; do
+              code=$(curl -sf -o /dev/null -w "%{http_code}" "http://127.0.0.1:${port}/health" || echo 000)
+              echo "  127.0.0.1:${port}/health -> HTTP ${code}"
+              if [ "$code" = "200" ]; then ok=1; fi
+            done
+            if [ "$ok" != "1" ] && [ -f ecosystem.config.js ]; then
+              echo "⚠️ Retrying blog-backend with clean pm2 start..."
+              pm2 delete blog-backend 2>/dev/null || true
+              pm2 start ecosystem.config.js --only blog-backend
+              sleep 3
+              ok=0
+              for port in 8081 3000; do
+                code=$(curl -sf -o /dev/null -w "%{http_code}" "http://127.0.0.1:${port}/health" || echo 000)
+                echo "  (retry) 127.0.0.1:${port}/health -> HTTP ${code}"
+                if [ "$code" = "200" ]; then ok=1; fi
+              done
+            fi
+            if [ "$ok" != "1" ]; then
+              echo "❌ No healthy Node on 8081/3000 — pm2 list + blog-backend logs:"
+              pm2 list
+              pm2 logs blog-backend --lines 80 --nostream 2>&1 || true
+              pm2 logs blog-api --lines 40 --nostream 2>&1 || true
+              exit 1
+            fi
+
             pm2 save
 
             echo "🔄 Reloading Nginx..."
@@ -94,16 +125,17 @@ jobs:
         run: |
           echo "⏳ Waiting for service to stabilize..."
           sleep 5
-          for i in 1 2 3; do
-            STATUS=$(curl -sf -o /dev/null -w "%{http_code}" https://www.xiaodingyang.art/ || true)
-            if [ "$STATUS" = "200" ]; then
-              echo "✅ Health check passed (HTTP $STATUS)"
+          for i in 1 2 3 4 5; do
+            HOME=$(curl -sf -o /dev/null -w "%{http_code}" https://www.xiaodingyang.art/ || true)
+            API=$(curl -sf -o /dev/null -w "%{http_code}" "https://www.xiaodingyang.art/api/articles?page=1&pageSize=1" || true)
+            if [ "$HOME" = "200" ] && [ "$API" = "200" ]; then
+              echo "✅ Health check passed (home HTTP $HOME, api HTTP $API)"
               exit 0
             fi
-            echo "⏳ Attempt $i: HTTP $STATUS, retrying in 5s..."
+            echo "⏳ Attempt $i: home=$HOME api=$API, retrying in 5s..."
             sleep 5
           done
-          echo "❌ Health check failed after 3 attempts"
+          echo "❌ Health check failed after 5 attempts"
           exit 1
 
       # ── 微信通知：成功 ──
