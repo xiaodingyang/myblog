@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { Article, Category } = require('../models');
 
-const SITE_URL = process.env.FRONTEND_URL || 'https://www.xiaodingyang.art';
+const SITE_URL = (process.env.FRONTEND_URL || 'https://www.xiaodingyang.art')
+  .split(',')[0]
+  .trim()
+  .replace(/\/+$/, '');
 const SITE_TITLE = '若风的博客';
 const SITE_DESC = '若风的个人技术博客，专注前端开发，分享 React、TypeScript、Node.js 等技术文章与实践经验。';
 

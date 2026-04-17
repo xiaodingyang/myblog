@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { Article, Category, Tag } = require('../models');
 
-const SITE_URL = process.env.FRONTEND_URL || 'https://www.xiaodingyang.art';
+const SITE_URL = (process.env.FRONTEND_URL || 'https://www.xiaodingyang.art')
+  .split(',')[0]
+  .trim()
+  .replace(/\/+$/, '');
 
 router.get('/', async (req, res) => {
   try {

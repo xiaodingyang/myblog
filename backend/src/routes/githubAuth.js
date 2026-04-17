@@ -9,7 +9,34 @@ const crypto = require('crypto');
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8001';
+
+/** FRONTEND_URL 支持逗号分隔多前端（CORS 等）；OAuth 回调重定向必须选「当前站点」对应的一项，不能整串拼接 */
+function parseFrontendOrigins() {
+  const raw = process.env.FRONTEND_URL || 'http://localhost:8001';
+  return raw
+    .split(',')
+    .map((s) => s.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+}
+
+function resolveOAuthRedirectBase(req) {
+  const candidates = parseFrontendOrigins();
+  const host = String(req.get('x-forwarded-host') || req.get('host') || '')
+    .split(':')[0]
+    .toLowerCase();
+  const norm = (h) => h.replace(/^www\./, '');
+  if (host) {
+    const matched = candidates.find((u) => {
+      try {
+        return norm(new URL(u).hostname) === norm(host);
+      } catch {
+        return false;
+      }
+    });
+    if (matched) return matched;
+  }
+  return candidates[0] || 'http://localhost:8001';
+}
 
 function httpsRequest(url, options = {}) {
   return new Promise((resolve, reject) => {
@@ -60,16 +87,17 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/callback', async (req, res) => {
+  const base = resolveOAuthRedirectBase(req);
   try {
     const { code, state } = req.query;
 
     if (!code) {
-      return res.redirect(`${FRONTEND_URL}?login_error=missing_code`);
+      return res.redirect(`${base}?login_error=missing_code`);
     }
 
     const stateData = stateStore.get(state);
     if (!stateData) {
-      return res.redirect(`${FRONTEND_URL}?login_error=invalid_state`);
+      return res.redirect(`${base}?login_error=invalid_state`);
     }
     stateStore.delete(state);
     const { returnUrl } = stateData;
@@ -86,7 +114,7 @@ router.get('/callback', async (req, res) => {
 
     if (tokenData.error || !tokenData.access_token) {
       console.error('GitHub token exchange failed:', tokenData);
-      return res.redirect(`${FRONTEND_URL}?login_error=token_failed`);
+      return res.redirect(`${base}?login_error=token_failed`);
     }
 
     const githubUserInfo = await httpsRequest('https://api.github.com/user', {
@@ -95,13 +123,13 @@ router.get('/callback', async (req, res) => {
 
     if (!githubUserInfo.id) {
       console.error('GitHub user info fetch failed:', githubUserInfo);
-      return res.redirect(`${FRONTEND_URL}?login_error=user_info_failed`);
+      return res.redirect(`${base}?login_error=user_info_failed`);
     }
 
     let user = await GithubUser.findOne({ githubId: githubUserInfo.id });
     if (user) {
       if (user.status === 'banned') {
-        return res.redirect(`${FRONTEND_URL}?login_error=user_banned`);
+        return res.redirect(`${base}?login_error=user_banned`);
       }
       user.nickname = githubUserInfo.name || githubUserInfo.login;
       user.avatar = githubUserInfo.avatar_url || '';
@@ -138,12 +166,13 @@ router.get('/callback', async (req, res) => {
       themeId: user.themeId,
     }));
 
-    const redirectUrl = `${FRONTEND_URL}${returnUrl}`;
+    const path = returnUrl.startsWith('/') ? returnUrl : `/${returnUrl}`;
+    const redirectUrl = `${base}${path}`;
     const separator = redirectUrl.includes('?') ? '&' : '?';
     res.redirect(`${redirectUrl}${separator}github_token=${token}&github_user=${userInfo}`);
   } catch (error) {
     console.error('GitHub OAuth callback error:', error);
-    res.redirect(`${FRONTEND_URL}?login_error=server_error`);
+    res.redirect(`${resolveOAuthRedirectBase(req)}?login_error=server_error`);
   }
 });
 
