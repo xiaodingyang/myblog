@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Input, Typography, Space, Alert, List, Spin, Tag, Tooltip } from 'antd';
+import { Button, ConfigProvider, Input, Typography, Space, Alert, List, Spin, Tag, Tooltip } from 'antd';
 import { Link, request, useModel } from 'umi';
 import { RobotOutlined, CloseOutlined } from '@ant-design/icons';
 import { getColorThemeById } from '@/config/colorThemes';
@@ -173,6 +173,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
       <div className="absolute inset-0 bg-black/55 backdrop-blur-sm pointer-events-none" aria-hidden />
 
       <div
+        id="blog-ai-assistant-dialog"
         className="relative z-10 w-full max-w-[min(52rem,calc(100vw-1.5rem))] max-h-[min(90vh,800px)] flex flex-col overflow-hidden pointer-events-auto"
         style={{
           borderRadius: 16,
@@ -281,27 +282,38 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
             <div className="flex flex-col gap-4 w-full">
               <div>
                 <div className="text-[11px] font-medium uppercase tracking-wider text-white/40 mb-2">你的问题</div>
-                <TextArea
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="用一句话描述你的疑问…"
-                  autoSize={{ minRows: 4, maxRows: 10 }}
-                  maxLength={2000}
-                  disabled={loading}
-                  className="ai-assistant-q-textarea !rounded-lg !text-[13px] !leading-relaxed !border-white/[0.12] [&_textarea]:!min-h-[120px] [&_textarea]:!text-white/92 [&_textarea]:!caret-white [&_textarea::placeholder]:!text-white/45 [&_textarea::-webkit-input-placeholder]:!text-white/45 [&_textarea::-moz-placeholder]:!text-white/45 [&_textarea:-ms-input-placeholder]:!text-white/45 !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
-                  styles={{
-                    textarea: {
-                      color: 'rgba(255,255,255,0.92)',
-                      caretColor: '#fff',
+                {/* 全局 ConfigProvider 为浅色 token，placeholder 默认深灰；在深色卡片内需覆盖 antd 的 --ant-color-text-placeholder */}
+                <ConfigProvider
+                  theme={{
+                    inherit: true,
+                    token: {
+                      /* 与副标题、说明类小字一致（Tailwind text-white/50） */
+                      colorTextPlaceholder: 'rgba(255, 255, 255, 0.5)',
                     },
                   }}
-                  style={{
-                    borderRadius: 8,
-                    color: 'rgba(255,255,255,0.92)',
-                    background: 'rgba(10,12,18,0.55)',
-                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.35)',
-                  }}
-                />
+                >
+                  <TextArea
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    placeholder="用一句话描述你的疑问…"
+                    autoSize={{ minRows: 4, maxRows: 10 }}
+                    maxLength={2000}
+                    disabled={loading}
+                    className="ai-assistant-q-textarea !rounded-lg !text-[13px] !leading-relaxed !border-white/[0.12] [&_textarea]:!min-h-[120px] [&_textarea]:!text-[rgba(255,255,255,0.92)] [&_textarea]:!caret-white !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
+                    styles={{
+                      textarea: {
+                        color: 'rgba(255,255,255,0.92)',
+                        caretColor: '#fff',
+                      },
+                    }}
+                    style={{
+                      borderRadius: 8,
+                      color: 'rgba(255,255,255,0.92)',
+                      background: 'rgba(10,12,18,0.55)',
+                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.35)',
+                    }}
+                  />
+                </ConfigProvider>
               </div>
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
                 <Text type="secondary" className="!text-[11px] !text-white/35 sm:order-first">

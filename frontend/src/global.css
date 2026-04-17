@@ -1055,16 +1055,30 @@ body .ant-select-dropdown .ant-select-item-option-selected {
 
 /* 小苹果答疑：多行输入内文与 placeholder（antd 默认会把 placeholder 收成深色） */
 .ai-assistant-q-textarea textarea.ant-input,
-.ai-assistant-q-textarea textarea {
+.ai-assistant-q-textarea textarea,
+textarea.ai-assistant-q-textarea.ant-input,
+textarea.ai-assistant-q-textarea {
   color: rgba(255, 255, 255, 0.92) !important;
   caret-color: #fff !important;
 }
 
-.ai-assistant-q-textarea textarea::placeholder,
-.ai-assistant-q-textarea textarea::-webkit-input-placeholder,
-.ai-assistant-q-textarea textarea::-moz-placeholder {
-  color: rgba(255, 255, 255, 0.45) !important;
-  opacity: 1;
+/* 灰白提示字：弹窗内为深色底，全局浅色主题的 antd placeholder token 会过暗；用 #blog-ai-assistant-dialog 提高优先级 */
+#blog-ai-assistant-dialog .ai-assistant-q-textarea.ant-input-textarea textarea.ant-input::placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea.ant-input-textarea textarea::placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea.ant-input::-webkit-input-placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea::-webkit-input-placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea.ant-input::-moz-placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea::-moz-placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea.ant-input:-ms-input-placeholder,
+#blog-ai-assistant-dialog .ai-assistant-q-textarea textarea:-ms-input-placeholder,
+#blog-ai-assistant-dialog textarea.ai-assistant-q-textarea.ant-input::placeholder,
+#blog-ai-assistant-dialog textarea.ai-assistant-q-textarea::placeholder,
+#blog-ai-assistant-dialog textarea.ai-assistant-q-textarea::-webkit-input-placeholder,
+#blog-ai-assistant-dialog textarea.ai-assistant-q-textarea::-moz-placeholder,
+#blog-ai-assistant-dialog textarea.ai-assistant-q-textarea:-ms-input-placeholder {
+  /* 与弹窗内 text-white/50 小字一致 */
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
 }
 
 /* 小苹果「使用前须知」：兜底浅色字（避免 antd 主题把段落收成深色） */
