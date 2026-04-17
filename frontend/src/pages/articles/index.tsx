@@ -142,10 +142,9 @@ const HeroArticle: React.FC<{ article: API.Article; colorTheme: ReturnType<typeo
 interface TimelineCardProps {
   article: API.Article;
   colorTheme: ReturnType<typeof getColorThemeById>;
-  showCover: boolean; // 交替展示封面，制造高度差
 }
 
-const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCover }) => {
+const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme }) => {
   const id = artId(article);
   const isNew = isNewArticle(article.createdAt);
   const isHot = isHotArticle(article.views);
@@ -169,8 +168,8 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCo
           border: `1px solid ${themeBg(colorTheme.primary, 0.2)}`,
           boxShadow: `0 4px 16px rgba(0, 0, 0, 0.2)`,
         }}>
-        {/* cover — 部分卡片显示，部分不显示，制造瀑布流高度差 */}
-        {showCover && article.cover && (
+        {/* 有封面则始终展示（避免用户误以为「封面丢失」） */}
+        {article.cover && (
           <div className="h-36 sm:h-44 overflow-hidden">
             <OptimizedImage
               src={article.cover}
@@ -211,7 +210,7 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme, showCo
           </h3>
 
           {/* summary — 仅无封面的卡片展示更多摘要行 */}
-          <p className={`text-xs text-white/65 mb-3 leading-relaxed ${showCover && article.cover ? 'line-clamp-2' : 'line-clamp-3'}`}>
+          <p className={`text-xs text-white/65 mb-3 leading-relaxed ${article.cover ? 'line-clamp-2' : 'line-clamp-3'}`}>
             {article.summary || '暂无摘要'}
           </p>
 
@@ -267,13 +266,6 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
   const rightCol: API.Article[] = [];
   articles.forEach((a, i) => (i % 2 === 0 ? leftCol : rightCol).push(a));
 
-  // 根据索引决定是否显示封面图（交替显示，制造高度差）
-  const shouldShowCover = (globalIndex: number) => {
-    // 模式: 显示 → 不显示 → 显示 → 显示 → 不显示 → ...  不规则感
-    const pattern = [true, false, true, true, false, true, false, false, true];
-    return pattern[globalIndex % pattern.length];
-  };
-
   return (
     <div className="relative mt-12 md:mt-16">
       {/* ── 时间线标题 ── */}
@@ -305,7 +297,7 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
                 className="absolute -left-8 top-4 w-[10px] h-[10px] rounded-full ring-[3px] ring-white z-10"
                 style={{ background: colorTheme.primary, left: 4 }}
               />
-              <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(i)} />
+              <TimelineCard article={article} colorTheme={colorTheme} />
               </div>
             </ScrollReveal>
           ))}
@@ -339,7 +331,7 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
                   className="absolute -right-[18px] top-[23px] w-[14px] h-[2px]"
                   style={{ background: colorTheme.primary, opacity: 0.3 }}
                 />
-                <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(globalIdx)} />
+                <TimelineCard article={article} colorTheme={colorTheme} />
               </div>
               </ScrollReveal>
             );
@@ -365,7 +357,7 @@ const MasonryTimeline: React.FC<{ articles: API.Article[]; colorTheme: ReturnTyp
                   className="absolute -left-[18px] top-[23px] w-[14px] h-[2px]"
                   style={{ background: colorTheme.primary, opacity: 0.3 }}
                 />
-                <TimelineCard article={article} colorTheme={colorTheme} showCover={shouldShowCover(globalIdx)} />
+                <TimelineCard article={article} colorTheme={colorTheme} />
               </div>
               </ScrollReveal>
             );

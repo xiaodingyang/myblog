@@ -165,8 +165,8 @@ const TagDetailPage: React.FC = () => {
         <Empty
           description="标签不存在"
           showAction
-          actionText="返回标签列表"
-          actionLink="/tags"
+          actionText="返回分类页"
+          actionLink="/categories#article-tags"
         />
       </div>
     );
@@ -194,7 +194,7 @@ const TagDetailPage: React.FC = () => {
           <div className="flex items-center justify-center gap-2 text-white/60 text-xs mb-4">
             <Link to="/" className="text-white/60 hover:text-white/90 transition-colors">首页</Link>
             <span>/</span>
-            <Link to="/tags" className="text-white/60 hover:text-white/90 transition-colors">标签</Link>
+            <Link to="/categories#article-tags" className="text-white/60 hover:text-white/90 transition-colors">标签</Link>
             <span>/</span>
             <span className="text-white/80">#{tag.name}</span>
           </div>

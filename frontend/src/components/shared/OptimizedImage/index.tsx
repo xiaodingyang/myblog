@@ -49,6 +49,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           alt={alt}
           loading={loading}
           onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
           style={{ width: '100%', height: '100%', objectFit: (style?.objectFit as any) || 'cover' }}
         />
       </picture>

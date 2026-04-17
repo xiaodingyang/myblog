@@ -50,8 +50,8 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
       jsonLdItems.push({ name: categoryName, url: `${SITE_ORIGIN}${path}` });
     }
   } else if (path.startsWith('/tag/')) {
-    items.push({ title: <Link to="/tags">标签</Link> });
-    jsonLdItems.push({ name: '标签', url: `${SITE_ORIGIN}/tags` });
+    items.push({ title: <Link to="/categories#article-tags">标签</Link> });
+    jsonLdItems.push({ name: '标签', url: `${SITE_ORIGIN}/categories#article-tags` });
     if (tagName) {
       items.push({ title: <span className="text-gray-500">{tagName}</span> });
       jsonLdItems.push({ name: tagName, url: `${SITE_ORIGIN}${path}` });

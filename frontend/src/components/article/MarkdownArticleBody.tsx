@@ -81,16 +81,30 @@ const CodeBlockWithCopy: React.FC<{
 
 interface MarkdownArticleBodyProps {
   content: string;
-  toc: TocItem[];
+  /** 目录锚点；AI 等场景可传空数组 */
+  toc?: TocItem[];
+  /** 是否启用 HTML（文章正文）；AI 等不可信 Markdown 应传 false */
+  enableHtml?: boolean;
+  /** 深色弹窗内：行内 code 等与暗底协调 */
+  embeddedInDarkPanel?: boolean;
 }
 
-const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({ content, toc }) => {
+const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({
+  content,
+  toc = [],
+  enableHtml = true,
+  embeddedInDarkPanel = false,
+}) => {
   let tocWalk = 0;
+
+  const inlineCodeClass = embeddedInDarkPanel
+    ? 'bg-white/15 text-sky-100/95 px-1.5 py-0.5 rounded text-[13px] font-mono'
+    : 'bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono';
 
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw]}
+      rehypePlugins={enableHtml ? [rehypeRaw] : []}
       components={{
         img: ({ src, alt, ...props }) => (
           <img
@@ -136,10 +150,7 @@ const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({ content, toc 
             );
           }
           return (
-            <code
-              className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono"
-              {...props}
-            >
+            <code className={inlineCodeClass} {...props}>
               {children}
             </code>
           );

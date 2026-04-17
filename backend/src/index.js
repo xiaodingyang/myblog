@@ -1,14 +1,19 @@
-// 加载环境变量（如果 .env 文件存在）
+const path = require('path');
+
+// 始终从 backend 根目录加载 .env（避免从 monorepo 根目录启动时 cwd 不对读不到变量）
+const envPath = path.join(__dirname, '../.env');
 try {
-  require('dotenv').config();
+  const envResult = require('dotenv').config({ path: envPath });
+  if (envResult.error) {
+    console.log(`ℹ️  未加载 ${envPath}: ${envResult.error.message}`);
+  }
 } catch (e) {
-  console.log('ℹ️  No .env file found, using default configuration');
+  console.log('ℹ️  dotenv 异常，使用进程已有环境变量');
 }
 
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const path = require('path');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const connectDB = require('./config/database');
@@ -16,6 +21,11 @@ const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
 
 const app = express();
+
+// 反向代理后正确识别客户端 IP（供 express-rate-limit 等使用）
+if (process.env.TRUST_PROXY === '1' || process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1);
+}
 
 // 连接数据库
 connectDB();
@@ -112,6 +122,12 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 API docs: http://localhost:${PORT}/api`);
+  const aiOk = process.env.AI_API_BASE && process.env.AI_API_KEY && process.env.AI_CHAT_MODEL;
+  console.log(
+    aiOk
+      ? '🤖 AI 答疑：已检测到 AI_API_BASE / KEY / MODEL'
+      : `⚠️  AI 答疑未配置（请检查 ${envPath} 是否存在且含 AI_* 变量，改完后需重启本进程）`,
+  );
 });
 
 // 优雅退出

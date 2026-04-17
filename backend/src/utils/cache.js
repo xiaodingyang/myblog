@@ -11,11 +11,13 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
  * 缓存键生成器 — 根据路由 path + query 生成唯一键
  */
 function buildCacheKey(req) {
-  const { path } = req.route || {};
+  // 不能用 req.route.path：挂载在子路由上的 GET / 都是 '/'，会与 /api/tags、/api/categories 等撞键
+  const pathKey =
+    [req.baseUrl, req.path].filter(Boolean).join('') || req.originalUrl || '';
   const qs = Object.keys(req.query).length
     ? JSON.stringify(req.query)
     : '';
-  return `api:${req.method}:${path || req.originalUrl}:${qs}`;
+  return `api:${req.method}:${pathKey}:${qs}`;
 }
 
 /**

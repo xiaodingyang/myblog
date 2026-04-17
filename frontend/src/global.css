@@ -183,6 +183,57 @@ body {
   border: 0;
 }
 
+/* 与正文同一套 .markdown-body 排版，用于 AI 弹窗等深色容器 */
+.markdown-body.markdown-body--dark-panel {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.markdown-body.markdown-body--dark-panel h1,
+.markdown-body.markdown-body--dark-panel h2,
+.markdown-body.markdown-body--dark-panel h3,
+.markdown-body.markdown-body--dark-panel h4,
+.markdown-body.markdown-body--dark-panel h5,
+.markdown-body.markdown-body--dark-panel h6 {
+  color: rgba(255, 255, 255, 0.95);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.markdown-body.markdown-body--dark-panel a {
+  color: #7dd3fc;
+}
+
+.markdown-body.markdown-body--dark-panel a:hover {
+  color: #bae6fd;
+}
+
+.markdown-body.markdown-body--dark-panel code {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(224, 242, 254, 0.95);
+}
+
+.markdown-body.markdown-body--dark-panel blockquote {
+  color: rgba(226, 232, 240, 0.88);
+  background: rgba(255, 255, 255, 0.06);
+  border-left-color: rgba(125, 211, 252, 0.55);
+}
+
+.markdown-body.markdown-body--dark-panel th,
+.markdown-body.markdown-body--dark-panel td {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.markdown-body.markdown-body--dark-panel th {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.markdown-body.markdown-body--dark-panel tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.markdown-body.markdown-body--dark-panel hr {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
 /* 页面切换动画 */
 .page-enter {
   opacity: 0;
@@ -392,6 +443,48 @@ body {
 
 .front-header-dark .ant-menu-horizontal .ant-menu-item-selected::after {
   border-bottom-color: var(--theme-primary, #ffb3d9) !important;
+}
+
+/* 顶栏「分类」下拉：与深色毛玻璃顶栏一致 */
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu > .ant-menu-submenu-title,
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu > .ant-menu-submenu-title .anticon {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu-selected > .ant-menu-submenu-title .anticon,
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu-open > .ant-menu-submenu-title,
+.front-header-dark .ant-menu-horizontal > .ant-menu-submenu-open > .ant-menu-submenu-title .anticon {
+  color: var(--theme-primary, #ffb3d9) !important;
+}
+
+.front-header-dark-submenu .ant-menu {
+  background: rgba(15, 23, 42, 0.96) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 6px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35) !important;
+}
+
+.front-header-dark-submenu .ant-menu-item,
+.front-header-dark-submenu .ant-menu-item a,
+.front-header-dark-submenu .ant-menu-item .anticon {
+  color: rgba(248, 250, 252, 0.92) !important;
+  border-radius: 8px !important;
+}
+
+.front-header-dark-submenu .ant-menu-item:hover,
+.front-header-dark-submenu .ant-menu-item:hover a {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.front-header-dark-submenu .ant-menu-item-selected,
+.front-header-dark-submenu .ant-menu-item-selected a {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: var(--theme-primary, #ffb3d9) !important;
 }
 
 /* 首页特殊样式 */
@@ -779,6 +872,116 @@ body {
 }
 
 .stats-pagination.ant-pagination .ant-select-arrow {
+  color: #475569 !important;
+}
+
+/*
+ * 后台管理主区（AdminLayout 包裹层 .admin-console）：表格分页白底可读
+ * 与 .stats-pagination 一致，压过全局「暗色玻璃」.ant-pagination 规则
+ */
+.admin-console .ant-pagination {
+  color: #334155 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-total-text {
+  color: #334155 !important;
+  font-weight: 500;
+}
+
+.admin-console .ant-pagination .ant-pagination-options {
+  color: #334155 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item a,
+.admin-console .ant-pagination .ant-pagination-item button {
+  color: #1e293b !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item:hover {
+  border-color: var(--theme-primary, #6366f1) !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item:hover a,
+.admin-console .ant-pagination .ant-pagination-item:hover button {
+  color: var(--theme-primary, #6366f1) !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item-active {
+  border-color: var(--theme-primary, #6366f1) !important;
+  background: var(--theme-primary, #6366f1) !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-item-active a,
+.admin-console .ant-pagination .ant-pagination-item-active button {
+  color: #ffffff !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.admin-console .ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.admin-console .ant-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  color: var(--theme-primary, #6366f1) !important;
+  border-color: var(--theme-primary, #6366f1) !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-disabled .ant-pagination-item-link,
+.admin-console .ant-pagination .ant-pagination-prev.ant-pagination-disabled .ant-pagination-item-link,
+.admin-console .ant-pagination .ant-pagination-next.ant-pagination-disabled .ant-pagination-item-link {
+  color: #94a3b8 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-jump-prev .ant-pagination-item-link,
+.admin-console .ant-pagination .ant-pagination-jump-next .ant-pagination-item-link {
+  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.admin-console .ant-pagination .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #475569 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper,
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper > span {
+  color: #334155 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper input,
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper .ant-input,
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper,
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper input {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper .ant-input::placeholder,
+.admin-console .ant-pagination .ant-pagination-options-quick-jumper .ant-input-affix-wrapper input::placeholder {
+  color: #64748b !important;
+}
+
+.admin-console .ant-pagination .ant-select-selector {
+  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-console .ant-pagination .ant-select-selection-item {
+  color: #1e293b !important;
+}
+
+.admin-console .ant-pagination .ant-select-arrow {
   color: #475569 !important;
 }
 

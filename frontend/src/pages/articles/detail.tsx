@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
+import React, { useEffect, useState, useMemo, lazy, Suspense } from 'react';
 import { useParams, Link, history } from 'umi';
-import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin } from 'antd';
+import { Typography, Tag, Space, Avatar, Divider, Card, Button, Input, List, Pagination, message, Spin, Tooltip } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import {
@@ -15,7 +15,7 @@ import {
   HeartFilled,
   StarOutlined,
   StarFilled,
-  CommentOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import { request } from 'umi';
 import dayjs from 'dayjs';
@@ -31,7 +31,8 @@ import ArticleDetailSkeleton from '@/components/layout/Skeleton/ArticleDetailSke
 import Breadcrumb from '@/components/layout/Breadcrumb';
 import { addReadingHistory } from '@/components/reading/ReadingHistory';
 import { checkAchievements } from '@/utils/achievements';
-import { FAB_COMMENT_BOTTOM_PX, FAB_RIGHT_PX, FAB_SIZE_PX } from '@/components/shared/floatingActionsConstants';
+import { ARTICLE_AI_ASSISTANT_NAME } from '@/components/shared/floatingActionsConstants';
+import { useAiApple } from '@/contexts/AiAppleContext';
 import Lightbox from '@/components/shared/Lightbox';
 import { useLightbox } from '@/hooks/useLightbox';
 import useSEO from '@/hooks/useSEO';
@@ -65,11 +66,10 @@ const ArticleDetailPage: React.FC = () => {
   const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
   const [articleLikeLoading, setArticleLikeLoading] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
-  const [showCommentButton, setShowCommentButton] = useState(false);
+  const { openAssistant } = useAiApple();
   const [submitting, setSubmitting] = useState(false);
   const [commentContent, setCommentContent] = useState('');
   const commentPageSize = 10;
-  const commentsRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const toc = useMemo(
@@ -141,26 +141,6 @@ const ArticleDetailPage: React.FC = () => {
       request(`/api/articles/${id}/view`).catch(() => {});
     }
   }, [id]);
-
-  // 监听滚动，显示/隐藏"跳到评论"按钮
-  useEffect(() => {
-    const handleScroll = () => {
-      const commentsSection = commentsRef.current;
-      if (!commentsSection) return;
-
-      const rect = commentsSection.getBoundingClientRect();
-      // 当评论区顶部在视口上方时显示按钮
-      setShowCommentButton(rect.top > window.innerHeight);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // 初始化检查
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToComments = () => {
-    commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   // Bug Fix #1: 确保在回调内部再次检查登录状态和 githubToken，防止竞态条件
   const handleSubmitComment = () => {
@@ -496,6 +476,17 @@ const ArticleDetailPage: React.FC = () => {
                   summary={article.summary || ''}
                   cover={article.cover}
                 />
+                <Button
+                  type="default"
+                  size="middle"
+                  icon={<RobotOutlined />}
+                  onClick={() =>
+                    openAssistant({ id: String(article._id), title: article.title })
+                  }
+                  className="!rounded-lg"
+                >
+                  {ARTICLE_AI_ASSISTANT_NAME}
+                </Button>
               </Space>
             </div>
             <div className="mt-6">
@@ -512,47 +503,12 @@ const ArticleDetailPage: React.FC = () => {
           />
           </div>
 
-          {/* 跳到评论浮动按钮 */}
-          <button
-            type="button"
-            onClick={scrollToComments}
-            className="rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
-            style={{
-              position: 'fixed',
-              bottom: FAB_COMMENT_BOTTOM_PX,
-              right: FAB_RIGHT_PX,
-              width: FAB_SIZE_PX,
-              height: FAB_SIZE_PX,
-              padding: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 0,
-              flexShrink: 0,
-              zIndex: 100,
-              opacity: showCommentButton ? 1 : 0,
-              transform: showCommentButton ? 'scale(1)' : 'scale(0.8)',
-              pointerEvents: showCommentButton ? 'auto' : 'none',
-              transition: 'opacity 0.3s ease, transform 0.3s ease',
-              background: currentColorTheme.gradient,
-              color: '#fff',
-              border: 'none',
-              boxShadow: `0 4px 14px ${currentColorTheme.primary}55`,
-              cursor: 'pointer',
-            }}
-            aria-label="跳到评论区"
-          >
-            <span className="inline-flex items-center justify-center" style={{ width: 22, height: 22 }}>
-              <CommentOutlined style={{ fontSize: 20, lineHeight: 1 }} />
-            </span>
-          </button>
-
           {/* 评论区 + 相关推荐：lg 下为 fixed 目录预留与上方 flex（w-56 + gap-8）同宽的右侧空间，避免白底卡片盖住目录 */}
           <div className="lg:pr-[calc(14rem+2rem)]">
-          {/* 评论区 */}
+          {/* 评论区：ref 挂在原生 div 上（Card 不保证 forwardRef） */}
+          <div id="article-comments-section">
           <Card
             className="mt-10"
-            ref={commentsRef as any}
             style={{
               background: '#ffffff',
               borderRadius: 16,
@@ -709,6 +665,7 @@ const ArticleDetailPage: React.FC = () => {
               <Empty description="暂无评论，快来抢沙发吧！" />
             )}
           </Card>
+          </div>
 
           {/* Series navigation */}
           {article.series && (

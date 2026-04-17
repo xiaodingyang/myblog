@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Link } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
-import { Typography, Row, Col, Tag } from 'antd';
-import { FolderOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Typography, Row, Col, Tag, Divider } from 'antd';
+import { FolderOutlined, FileTextOutlined, TagsOutlined } from '@ant-design/icons';
 import Empty from '@/components/shared/Empty';
 import useSEO from '@/hooks/useSEO';
-import { useCategories } from '@/hooks/useQueries';
+import { useCategories, useTags } from '@/hooks/useQueries';
 import { themeBg } from '@/utils/themeHelpers';
 import ScrollReveal from '@/components/visual/ScrollReveal';
 
@@ -33,8 +33,24 @@ const CategoriesPage: React.FC = () => {
     },
   });
   const { data: categories = [], isLoading: loading } = useCategories();
+  const { data: tags = [], isLoading: tagsLoading } = useTags();
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
+
+  /** 仅展示有关联文章的标签（避免空白占位与无意义入口） */
+  const hotTags = useMemo(
+    () =>
+      [...tags]
+        .filter((t) => (t.articleCount || 0) > 0)
+        .sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0)),
+    [tags],
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.location.hash !== '#article-tags') return;
+    const el = document.getElementById('article-tags');
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [loading, tagsLoading, hotTags.length]);
 
   // 骨架屏
   const CategoriesSkeleton = () => (
@@ -148,6 +164,50 @@ const CategoriesPage: React.FC = () => {
           </Row>
         ) : (
           <Empty description="暂无分类" />
+        )}
+
+        {!tagsLoading && hotTags.length > 0 && (
+          <section id="article-tags" className="scroll-mt-24">
+            <Divider
+              className="!mt-10 !mb-6"
+              style={{ borderColor: themeBg(currentColorTheme.primary, 0.2) }}
+            >
+              <span className="text-white/50 text-xs px-2">技术标签</span>
+            </Divider>
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <div className="flex items-center gap-2 text-white/90 text-sm font-medium">
+                <TagsOutlined style={{ color: currentColorTheme.primary }} />
+                按标签浏览（仅显示有文章的标签）
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {hotTags.map((t) => (
+                <Link key={t._id} to={`/tag/${t._id}`}>
+                  <span
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors border"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: 'rgba(248, 250, 252, 0.95)',
+                      borderColor: 'rgba(255, 255, 255, 0.14)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `${currentColorTheme.primary}28`;
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = `${currentColorTheme.primary}55`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                      e.currentTarget.style.color = 'rgba(248, 250, 252, 0.95)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
+                    }}
+                  >
+                    {t.name}
+                    <span style={{ opacity: 0.5 }}>({t.articleCount || 0})</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
         </div>
       </div>

@@ -15,8 +15,21 @@ const MobileTabBar: React.FC = () => {
   const { themeId: colorThemeId } = useModel('colorModel');
   const currentColorTheme = getColorThemeById(colorThemeId);
 
-  const activeKey = tabs.find(t => t.key !== '/' && location.pathname.startsWith(t.key))?.key
-    || (location.pathname === '/' ? '/' : '');
+  const path = location.pathname;
+  const activeKey = (() => {
+    const hit = tabs.find((t) => t.key !== '/' && path.startsWith(t.key));
+    if (hit) return hit.key;
+    if (path === '/') return '/';
+    if (
+      path.startsWith('/tag') ||
+      path.startsWith('/tags') ||
+      path.startsWith('/category') ||
+      path.startsWith('/categories')
+    ) {
+      return '/categories';
+    }
+    return '';
+  })();
 
   return (
     <nav

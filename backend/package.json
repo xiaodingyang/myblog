@@ -7,6 +7,8 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "db:ensure-e2e-admin": "node scripts/ensure-e2e-admin.js",
+    "db:migrate-categories-tags": "node scripts/migrateCategoriesAndTags.js",
+    "db:auto-classify-articles": "node scripts/autoClassifyArticlesByTitle.js",
     "lint": "eslint src/**/*.js",
     "test": "jest"
   },

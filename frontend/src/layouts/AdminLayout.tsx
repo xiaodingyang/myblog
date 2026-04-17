@@ -259,7 +259,11 @@ const AdminLayout: React.FC = () => {
           }
         >
           <div
-            className={isStatsPage ? undefined : 'p-6 min-h-[calc(100vh-64px-48px)]'}
+            className={
+              isStatsPage
+                ? 'admin-console'
+                : 'p-6 min-h-[calc(100vh-64px-48px)] admin-console'
+            }
             style={{
               background: colorBgContainer,
               borderRadius: borderRadiusLG,

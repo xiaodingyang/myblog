@@ -281,6 +281,22 @@ async function deleteArticle(id) {
   return article;
 }
 
+/**
+ * 同分类已发布文章（排除指定篇），供 AI 答疑扩展检索
+ * @param {string|import('mongoose').Types.ObjectId} categoryId
+ * @param {string|import('mongoose').Types.ObjectId} excludeArticleId
+ * @param {number} limit
+ */
+async function findPublishedInCategoryExcept(categoryId, excludeArticleId, limit = 8) {
+  if (categoryId == null || categoryId === '') return [];
+  const lim = Math.min(Math.max(parseInt(String(limit), 10) || 8, 1), 30);
+  const query = { status: 'published', category: categoryId };
+  if (excludeArticleId != null && excludeArticleId !== '') {
+    query._id = { $ne: excludeArticleId };
+  }
+  return Article.find(query).select('title content').sort({ updatedAt: -1 }).limit(lim).lean();
+}
+
 module.exports = {
   getArticles,
   getArticlesWithCache,
@@ -294,4 +310,5 @@ module.exports = {
   updateArticle,
   deleteArticle,
   clearArticleListCache,
+  findPublishedInCategoryExcept,
 };

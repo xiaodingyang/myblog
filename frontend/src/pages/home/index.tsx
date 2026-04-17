@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'umi';
-import { Typography, Tag, Space, Button } from 'antd';
+import { Typography, Tag, Space, Button, Divider } from 'antd';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import HomeSkeleton from '@/components/layout/Skeleton/HomeSkeleton';
@@ -107,14 +107,18 @@ const HomePage: React.FC = () => {
     return sortByPopularity(unread).slice(0, 3);
   }, [articles]);
 
-  /** 首页热门标签：优先有文章数的标签，最多展示 18 个，避免占满整屏 */
+  /** 首页热门标签：仅展示有关联文章的标签，最多 18 个 */
   const hotTagsDisplay = useMemo(() => {
-    const withArticles = tagsList.filter((t) => (t.articleCount || 0) > 0);
-    const cap = 18;
-    if (withArticles.length >= cap) return withArticles.slice(0, cap);
-    if (withArticles.length > 0) return withArticles;
-    return tagsList.slice(0, 10);
+    return tagsList
+      .filter((t) => (t.articleCount || 0) > 0)
+      .sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0))
+      .slice(0, 18);
   }, [tagsList]);
+
+  const tagsInUseCount = useMemo(
+    () => tagsList.filter((t) => (t.articleCount || 0) > 0).length,
+    [tagsList],
+  );
 
   // 侧边文章列表：合并最新+推荐，去重，排除主推，最多5篇
   const sideArticles = useMemo(() => {
@@ -384,7 +388,7 @@ const HomePage: React.FC = () => {
               {[
                 { label: '文章', value: articleCount || '0', icon: '📝' },
                 { label: '分类', value: categoriesList.length || '0', icon: '📂' },
-                { label: '标签', value: tagsList.length || '0', icon: '🏷️' },
+                { label: '标签', value: tagsInUseCount || '0', icon: '🏷️' },
               ].map((item, i) => (
                 <div
                   key={i}
@@ -664,19 +668,37 @@ const HomePage: React.FC = () => {
           animate={currentSection === 2 ? 'visible' : 'hidden'}
         >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
-          {/* 上半部分：分类 + 标签 */}
-          <LazyMotionDiv className="grid grid-cols-1 lg:grid-cols-5 gap-5 md:gap-6 mb-8 md:mb-10" variants={itemVariants}>
-            {/* 分类 - 占 3 列，网格卡片 */}
-            <div className="lg:col-span-3">
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  <FolderOutlined style={{ color: currentColorTheme.primary, fontSize: 14 }} />
-                  <span className="text-white font-semibold text-sm">文章分类</span>
+          {/* 分类区块：栏目 + 标签同一卡片、纵向层级（标签在分类下） */}
+          <LazyMotionDiv className="mb-8 md:mb-10" variants={itemVariants}>
+            <div
+              className="rounded-2xl p-5 md:p-7"
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-5">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <FolderOutlined style={{ color: currentColorTheme.primary, fontSize: 16 }} />
+                    <span className="text-white font-semibold text-base md:text-lg tracking-tight">内容分类</span>
+                  </div>
+                  <p className="text-gray-500 text-xs md:text-sm m-0 pl-0.5">
+                    先选栏目把握方向，再用标签精确定位话题
+                  </p>
                 </div>
-                <Link to="/categories" className="text-xs hover:underline" style={{ color: currentColorTheme.primary }}>
-                  全部 →
+                <Link
+                  to="/categories"
+                  className="text-xs hover:underline shrink-0 self-start sm:self-auto"
+                  style={{ color: currentColorTheme.primary }}
+                >
+                  栏目总览 →
                 </Link>
               </div>
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {categoriesList.slice(0, 6).map((cat, index) => {
                   const hue = index * 50;
@@ -717,31 +739,33 @@ const HomePage: React.FC = () => {
                   );
                 })}
               </div>
-              {categoriesList.length === 0 && <div className="text-center py-6 text-gray-500 text-sm">暂无分类</div>}
-            </div>
+              {categoriesList.length === 0 && (
+                <div className="text-center py-6 text-gray-500 text-sm">暂无分类</div>
+              )}
 
-            {/* 标签云 - 占 2 列 */}
-            <div className="lg:col-span-2">
-              <div
-                className="rounded-2xl p-5 md:p-6 h-full"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                }}
+              <Divider
+                className="!my-6 md:!my-7"
+                style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
               >
+                <span className="text-gray-500 text-xs px-2">标签</span>
+              </Divider>
+
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <TagsOutlined style={{ color: currentColorTheme.primary }} />
-                  <span className="text-white font-semibold text-sm md:text-base">热门标签</span>
+                  <TagsOutlined style={{ color: currentColorTheme.primary, fontSize: 15 }} />
+                  <span className="text-white/90 font-medium text-sm">热门标签</span>
+                  <span className="text-gray-600 text-xs hidden sm:inline">与栏目互补，按技术点筛选</span>
                 </div>
-                <Link to="/tags" className="text-xs hover:underline" style={{ color: currentColorTheme.primary }}>
-                  全部 →
+                <Link
+                  to="/categories#article-tags"
+                  className="text-xs hover:underline shrink-0"
+                  style={{ color: currentColorTheme.primary }}
+                >
+                  更多标签 →
                 </Link>
               </div>
               <div
-                className="flex flex-wrap gap-2.5 max-h-[min(280px,42vh)] overflow-y-auto overscroll-contain pr-0.5"
+                className="flex flex-wrap gap-2.5 max-h-[min(260px,40vh)] overflow-y-auto overscroll-contain pr-0.5"
                 style={{ scrollbarWidth: 'thin' }}
               >
                 {hotTagsDisplay.map((tag) => (
@@ -749,11 +773,9 @@ const HomePage: React.FC = () => {
                     <span
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        backdropFilter: 'blur(10px) saturate(180%)',
-                        WebkitBackdropFilter: 'blur(10px) saturate(180%)',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: 'rgba(255, 255, 255, 0.72)',
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = `${currentColorTheme.primary}22`;
@@ -761,9 +783,9 @@ const HomePage: React.FC = () => {
                         e.currentTarget.style.borderColor = `${currentColorTheme.primary}33`;
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.72)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
                       }}
                     >
                       # {tag.name}
@@ -771,21 +793,24 @@ const HomePage: React.FC = () => {
                     </span>
                   </Link>
                 ))}
-                {tagsList.length === 0 && <div className="text-center py-4 text-gray-500 text-sm w-full">暂无标签</div>}
+                {hotTagsDisplay.length === 0 && (
+                  <div className="text-center py-4 text-gray-500 text-sm w-full">暂无已使用的标签</div>
+                )}
               </div>
-              {tagsList.length > 0 && tagsList.length > hotTagsDisplay.length && (
-                <div className="mt-3 text-center border-t border-white/10 pt-3">
+              {tagsList.filter((t) => (t.articleCount || 0) > 0).length > hotTagsDisplay.length && (
+                <div className="mt-4 text-center">
                   <Link
-                    to="/tags"
+                    to="/categories#article-tags"
                     className="text-xs hover:underline opacity-90 hover:opacity-100"
                     style={{ color: currentColorTheme.primary }}
                   >
-                    还有 {tagsList.length - hotTagsDisplay.length} 个标签，去标签页查看 →
+                    还有{' '}
+                    {tagsList.filter((t) => (t.articleCount || 0) > 0).length - hotTagsDisplay.length}{' '}
+                    个标签，在分类页查看 →
                   </Link>
                 </div>
               )}
             </div>
-          </div>
           </LazyMotionDiv>
 
           {/* 下半部分：CTA */}

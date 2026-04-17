@@ -44,6 +44,13 @@ const ErrorCode = {
   FOLLOW_EXISTS: 26001,
   FOLLOW_NOT_EXISTS: 26002,
 
+  // 站内 AI 答疑（27xxx）
+  AI_NOT_CONFIGURED: 27001,
+  AI_UPSTREAM_ERROR: 27002,
+
+  /** AI 问答专用限流（与 HTTP 429 语义一致，便于与全站 RATE_LIMITED 区分） */
+  AI_ASK_RATE_LIMITED: 42901,
+
   // 文件上传错误（3xxxx）
   FILE_TOO_LARGE: 30001,
   FILE_TYPE_NOT_ALLOWED: 30002,

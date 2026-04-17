@@ -90,9 +90,10 @@ const ArticleToc: React.FC<ArticleTocProps> = ({
             <li key={`${item.level}-${item.id}`} className="m-0 p-0">
               <button
                 type="button"
+                title={item.text}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => scrollToId(item.id)}
-                className="group w-full border-0 bg-transparent text-left cursor-pointer rounded-r-md transition-[color,background-color] duration-200"
+                className="group w-full min-w-0 border-0 bg-transparent text-left cursor-pointer rounded-r-md transition-[color,background-color] duration-200"
                 style={{
                   marginLeft: -1,
                   paddingLeft: 10 + indent,
@@ -112,7 +113,7 @@ const ArticleToc: React.FC<ArticleTocProps> = ({
                 }}
               >
                 <span
-                  className="line-clamp-2"
+                  className="block w-full min-w-0 truncate"
                   style={{
                     fontSize: item.level === 3 ? 12 : 13,
                     color: active ? primaryColor : item.level === 3 ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.92)',
@@ -159,7 +160,8 @@ const ArticleToc: React.FC<ArticleTocProps> = ({
         </div>
       </div>
 
-      <div className="lg:hidden fixed right-4 bottom-24 z-40">
+      {/* bottom 需高于 FloatingActionsRail（含小苹果 + 文章「跳评论」等），避免与竖向 FAB 叠在一起 */}
+      <div className="lg:hidden fixed right-4 bottom-[22rem] z-40 max-[380px]:bottom-[20rem]">
         <Button
           type="primary"
           shape="circle"

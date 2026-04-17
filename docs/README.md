@@ -48,6 +48,7 @@ docs/
 | [计数功能UI设计规格.md](./feature-design/计数功能UI设计规格.md) | 计数功能 UI 设计规范 | ⭐ |
 | [计数功能UI设计审查报告.md](./feature-design/计数功能UI设计审查报告.md) | 计数功能 UI 审查结果 | ⭐ |
 | [访客统计优化方案.md](./feature-design/访客统计优化方案.md) | 访客统计功能优化 | ⭐ |
+| [站内AI答疑助手-设计方案.md](./feature-design/站内AI答疑助手-设计方案.md) | 基于站内语料的 RAG 答疑：架构、分阶段、接口与安全 | ⭐⭐ |
 
 ---
 

@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Outlet, Link, useLocation, history } from 'umi';
 import PageTransition from '@/components/visual/PageTransition';
-import {
-  FAB_RIGHT_PX,
-  FAB_KEYBOARD_BOTTOM_PX,
-  FAB_GAP_PX,
-} from '@/components/shared/floatingActionsConstants';
+import { ARTICLE_AI_ASSISTANT_NAME } from '@/components/shared/floatingActionsConstants';
 import { Layout, Menu, Input, Space, Typography, Divider, Row, Col, ConfigProvider, Drawer, Avatar, Dropdown, message } from 'antd';
+import type { MenuProps } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import {
   HomeOutlined,
   ReadOutlined,
-  TagsOutlined,
   FolderOutlined,
   MessageOutlined,
   UserOutlined,
@@ -23,23 +19,24 @@ import {
   LogoutOutlined,
   TrophyOutlined,
   StarOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import { useModel } from 'umi';
 import GradientText from '@/components/visual/GradientText';
 import GithubLoginModal from '@/components/shared/GithubLoginModal';
 import GuestLoginPrompt from '@/components/shared/GuestLoginPrompt';
 import ReadingProgressBar from '@/components/reading/ReadingProgressBar';
-import BackToTop from '@/components/layout/BackToTop';
-import KeyboardHelpButton from '@/components/shared/KeyboardHelpButton';
+import FloatingActionsRail from '@/components/layout/FloatingActionsRail';
 import KeyboardShortcutsHelpModal from '@/components/shared/KeyboardShortcutsHelpModal';
 import GlobalSearch from '@/components/shared/GlobalSearch';
 import NotificationBell from '@/components/shared/NotificationBell';
 import ReadingStatsModal from '@/components/reading/ReadingStats';
 import MobileTabBar from '@/components/layout/MobileTabBar';
+import GlobalAppleDock from '@/components/ai/GlobalAppleDock';
+import { AiAppleProvider, useAiApple } from '@/contexts/AiAppleContext';
 import { getColorThemeById } from '@/config/colorThemes';
 import analytics from '@/utils/analytics';
 import ParticlesBackground from '@/components/visual/ParticlesBackground';
-import ParticleThemeSelector from '@/components/visual/ParticleThemeSelector';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -244,8 +241,9 @@ const FrontLayout: React.FC = () => {
   const headerTextColor = useDarkHeader ? 'rgba(248, 250, 252, 0.95)' : '#1e293b';
   const isDarkTheme = false; // 粒子/毛玻璃底：浅色参数；顶栏单独用 useDarkHeader
 
-  const menuItems = useMemo(() => {
-    const items = [
+  /** PC 顶栏：标签并入「分类」页展示，此处不提供独立「标签」菜单 */
+  const menuItems = useMemo((): MenuProps['items'] => {
+    const items: MenuProps['items'] = [
       { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
       { key: '/articles', icon: <ReadOutlined />, label: <Link to="/articles">文章</Link> },
       { key: '/categories', icon: <FolderOutlined />, label: <Link to="/categories">分类</Link> },
@@ -259,16 +257,68 @@ const FrontLayout: React.FC = () => {
     return items;
   }, [isLoggedIn]);
 
+  /** 抽屉导航：与顶栏一致的一级列表 */
+  const mobileDrawerNav = useMemo(() => {
+    const rows: {
+      key: string;
+      to: string;
+      icon: React.ReactNode;
+      label: string;
+    }[] = [
+      { key: '/', to: '/', icon: <HomeOutlined />, label: '首页' },
+      { key: '/articles', to: '/articles', icon: <ReadOutlined />, label: '文章' },
+      { key: '/categories', to: '/categories', icon: <FolderOutlined />, label: '分类' },
+      { key: '/rankings', to: '/rankings', icon: <TrophyOutlined />, label: '排行榜' },
+    ];
+    if (isLoggedIn) {
+      rows.push({
+        key: '/favorites',
+        to: '/favorites',
+        icon: <StarOutlined />,
+        label: '我的收藏',
+      });
+    }
+    rows.push(
+      { key: '/message', to: '/message', icon: <MessageOutlined />, label: '留言' },
+      { key: '/about', to: '/about', icon: <UserOutlined />, label: '关于' },
+    );
+    return rows;
+  }, [isLoggedIn]);
+
   const getSelectedKey = () => {
     const path = location.pathname;
     if (path === '/') return '/';
     if (path.startsWith('/article/')) return '/articles';
+    if (
+      path.startsWith('/category/') ||
+      path.startsWith('/categories') ||
+      path.startsWith('/tag/') ||
+      path.startsWith('/tags')
+    ) {
+      return '/categories';
+    }
     const firstPath = '/' + path.split('/')[1];
     return firstPath;
   };
 
+  const isDrawerLinkActive = (key: string) => {
+    const path = location.pathname;
+    if (key === '/') return path === '/';
+    if (key === '/categories') {
+      return (
+        path.startsWith('/categories') ||
+        path.startsWith('/category/') ||
+        path.startsWith('/tags') ||
+        path.startsWith('/tag/')
+      );
+    }
+    if (key === '/articles') return path.startsWith('/articles') || path.startsWith('/article/');
+    return path.startsWith(key);
+  };
+
   return (
-    <ConfigProvider
+    <AiAppleProvider>
+      <ConfigProvider
       locale={zhCN}
       theme={{
         token: {
@@ -304,15 +354,7 @@ const FrontLayout: React.FC = () => {
         {/* 粒子背景（内含玻璃背景层） */}
         <ParticlesBackground isDark={isDarkTheme} />
 
-        {/* 右侧悬浮按钮：单容器竖向排列，保证同一条垂直线与间距一致 */}
-        <div
-          className="fixed z-[60] flex flex-col items-center"
-          style={{ right: FAB_RIGHT_PX, bottom: FAB_KEYBOARD_BOTTOM_PX, gap: FAB_GAP_PX }}
-        >
-          <BackToTop embedded />
-          <ParticleThemeSelector isDark={isDarkTheme} embedded />
-          <KeyboardHelpButton embedded />
-        </div>
+        <FloatingActionsRail isDarkTheme={isDarkTheme} />
 
         {/* 头部导航 */}
         <ReadingProgressBar />
@@ -452,6 +494,8 @@ const FrontLayout: React.FC = () => {
               </svg>
             </a>
 
+            <HeaderAppleButton gradient={currentColorTheme.gradient} primary={currentColorTheme.primary} />
+
             {/* 搜索框 - PC端显示 */}
             <div className="hidden sm:block" style={{ width: 200 }}>
               <Input
@@ -482,6 +526,8 @@ const FrontLayout: React.FC = () => {
                 }}
               />
             </div>
+
+            <MobileHeaderAppleButton gradient={currentColorTheme.gradient} primary={currentColorTheme.primary} />
 
             {/* 移动端搜索按钮 */}
             <button
@@ -582,38 +628,25 @@ const FrontLayout: React.FC = () => {
             </div>
 
             {/* 菜单列表 */}
-            <nav className="flex-1 px-2">
-              {menuItems.map((item) => {
-                const isActive = getSelectedKey() === item.key;
+            <nav className="flex-1 px-2 overflow-y-auto">
+              <div className="px-2 pt-2">
+                <DrawerAppleEntry primary={currentColorTheme.primary} onDone={() => setMobileMenuOpen(false)} />
+              </div>
+              {mobileDrawerNav.map((row) => {
+                const isActive = isDrawerLinkActive(row.key);
                 return (
                   <Link
-                    key={item.key}
-                    to={item.key}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl mb-1 no-underline transition-all"
+                    key={row.key}
+                    to={row.to}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl mb-0.5 no-underline transition-all"
                     style={{
                       background: isActive ? `${currentColorTheme.primary}15` : 'transparent',
                       color: isActive ? currentColorTheme.primary : '#475569',
                     }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="font-medium">
-                      {item.key === '/'
-                        ? '首页'
-                        : item.key === '/articles'
-                          ? '文章'
-                          : item.key === '/categories'
-                            ? '分类'
-                            : item.key === '/tags'
-                              ? '标签'
-                              : item.key === '/rankings'
-                                ? '排行榜'
-                                : item.key === '/favorites'
-                                  ? '我的收藏'
-                                  : item.key === '/message'
-                                    ? '留言'
-                                    : '关于'}
-                    </span>
+                    <span className="text-lg shrink-0">{row.icon}</span>
+                    <span className="font-medium">{row.label}</span>
                   </Link>
                 );
               })}
@@ -737,8 +770,76 @@ const FrontLayout: React.FC = () => {
         <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
         <ReadingStatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
         <MobileTabBar />
+        <GlobalAppleDock />
       </Layout>
-    </ConfigProvider>
+      </ConfigProvider>
+    </AiAppleProvider>
+  );
+};
+
+/** 顶栏小苹果（需在 AiAppleProvider 内渲染） */
+const HeaderAppleButton: React.FC<{ gradient: string; primary: string }> = ({ gradient, primary }) => {
+  const { openAssistant } = useAiApple();
+  return (
+    <button
+      type="button"
+      onClick={() => openAssistant()}
+      className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:scale-[1.02]"
+      style={{
+        backgroundImage: gradient,
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: `0 2px 10px ${primary}44`,
+      }}
+      aria-label={`打开 ${ARTICLE_AI_ASSISTANT_NAME}`}
+    >
+      <RobotOutlined />
+      <span className="max-w-[5.5rem] truncate">{ARTICLE_AI_ASSISTANT_NAME}</span>
+    </button>
+  );
+};
+
+const MobileHeaderAppleButton: React.FC<{ gradient: string; primary: string }> = ({ gradient, primary }) => {
+  const { openAssistant } = useAiApple();
+  return (
+    <button
+      type="button"
+      onClick={() => openAssistant()}
+      className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+      style={{
+        background: gradient,
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: `0 2px 10px ${primary}44`,
+      }}
+      aria-label={`打开 ${ARTICLE_AI_ASSISTANT_NAME}`}
+    >
+      <RobotOutlined style={{ fontSize: 16 }} />
+    </button>
+  );
+};
+
+const DrawerAppleEntry: React.FC<{ primary: string; onDone: () => void }> = ({ primary, onDone }) => {
+  const { openAssistant } = useAiApple();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        openAssistant();
+        onDone();
+      }}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 text-left border-0"
+      style={{
+        background: `${primary}12`,
+        color: '#0f172a',
+      }}
+    >
+      <RobotOutlined className="text-lg" style={{ color: primary }} />
+      <span className="font-medium">{ARTICLE_AI_ASSISTANT_NAME}</span>
+      <span className="text-xs text-slate-500 ml-auto">全站可问</span>
+    </button>
   );
 };
 
