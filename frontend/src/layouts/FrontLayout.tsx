@@ -33,6 +33,7 @@ import NotificationBell from '@/components/shared/NotificationBell';
 import ReadingStatsModal from '@/components/reading/ReadingStats';
 import MobileTabBar from '@/components/layout/MobileTabBar';
 import GlobalAppleDock from '@/components/ai/GlobalAppleDock';
+import SiteContextMenu from '@/components/layout/SiteContextMenu';
 import { AiAppleProvider, useAiApple } from '@/contexts/AiAppleContext';
 import { getColorThemeById } from '@/config/colorThemes';
 import analytics from '@/utils/analytics';
@@ -729,7 +730,7 @@ const FrontLayout: React.FC = () => {
                     <Link to="/articles" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">文章</Link>
                     <Link to="/categories" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">分类</Link>
                     <Link to="/rankings" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">排行榜</Link>
-                    <Link to="/about" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">关于我</Link>
+                    <Link to="/about" style={{ color: 'rgba(255, 255, 255, 0.8)' }} className="hover:text-white transition-colors">关于作者</Link>
                   </Space>
                 </Col>
                 <Col xs={24} md={8}>
@@ -749,7 +750,7 @@ const FrontLayout: React.FC = () => {
               </Row>
               <Divider style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} className="!my-8" />
               <div className="text-center text-sm" style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
-                © {new Date().getFullYear()} 肖定阳的博客. All rights reserved.
+                © {new Date().getFullYear()} 若风的博客. All rights reserved.
                 <span className="mx-2">|</span>
                 <a
                   href="https://beian.miit.gov.cn/"
@@ -771,6 +772,7 @@ const FrontLayout: React.FC = () => {
         <ReadingStatsModal open={statsOpen} onClose={() => setStatsOpen(false)} />
         <MobileTabBar />
         <GlobalAppleDock />
+        <SiteContextMenu />
       </Layout>
       </ConfigProvider>
     </AiAppleProvider>

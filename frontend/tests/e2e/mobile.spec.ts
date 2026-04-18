@@ -134,7 +134,7 @@ test.describe('Mobile - Common', () => {
   test('M007 - 关于页在移动端正常显示', async ({ appPage }) => {
     await appPage.goto('/about', { waitUntil: 'domcontentloaded' });
 
-    await expect(appPage.getByText('肖定阳', { exact: true })).toBeVisible({ timeout: 20000 });
+    await expect(appPage.getByText('若风', { exact: true })).toBeVisible({ timeout: 20000 });
 
     // 验证内容可滚动查看
     await appPage.evaluate(() => {

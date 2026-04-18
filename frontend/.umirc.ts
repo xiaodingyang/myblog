@@ -62,8 +62,9 @@ export default defineConfig({
         window.location.reload();
       }
     })();`,
-    // 异步 chunk 加载失败时自动刷新页面（仅重试一次，防止死循环）
+    // 异步 chunk 加载失败时自动刷新页面（仅生产；开发环境 HMR/偶发脚本错误易误判，避免「一开弹窗就整页 reload」）
     `(function(){
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
       window.addEventListener('error', function(e) {
         var target = e.target || e.srcElement;
         if (target && target.tagName === 'SCRIPT' && /\\.async\\.js/.test(target.src || '')) {

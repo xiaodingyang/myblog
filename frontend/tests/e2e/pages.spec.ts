@@ -118,7 +118,7 @@ test('TC005 - 标签页', async ({ appPage }) => {
 test('TC006 - 关于页', async ({ appPage }) => {
   await appPage.goto('/about', { waitUntil: 'domcontentloaded' });
 
-  await expect(appPage.getByText('肖定阳', { exact: true })).toBeVisible({ timeout: 20_000 });
+  await expect(appPage.getByText('若风', { exact: true })).toBeVisible({ timeout: 20_000 });
   await expect(appPage.getByText(/8年经验/).first()).toBeVisible({ timeout: 20_000 });
 });
 

@@ -1,0 +1,85 @@
+.favorites-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: transparent; /* 移除渐变背景，让粒子背景透出来 */
+}
+
+.favorites-header {
+  max-width: 1200px;
+  margin: 0 auto 48px;
+  text-align: center;
+
+  &__icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff; /* 改为白色 */
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* 添加阴影增强可读性 */
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 16px;
+    color: #6b7280;
+  }
+}
+
+.favorites-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  justify-items: center;
+}
+
+// 浮动动画
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .favorites-page {
+    padding: 24px 16px;
+  }
+
+  .favorites-header {
+    margin-bottom: 32px;
+
+    &__icon {
+      font-size: 48px;
+    }
+
+    &__title {
+      font-size: 32px;
+    }
+
+    &__subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

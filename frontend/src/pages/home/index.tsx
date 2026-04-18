@@ -443,7 +443,7 @@ const HomePage: React.FC = () => {
                     <span className="text-purple-400">const</span>{' '}
                     <span style={{ color: currentColorTheme.primary }}>developer</span> = {'{'}
                     {'\n'}  <span className="text-green-400">name</span>:{' '}
-                    <span className="text-yellow-400">"肖定阳"</span>,
+                    <span className="text-yellow-400">"若风"</span>,
                     {'\n'}  <span className="text-green-400">experience</span>:{' '}
                     <span className="text-yellow-400">"8年"</span>,
                     {'\n'}  <span className="text-green-400">skills</span>: [
@@ -889,7 +889,7 @@ const HomePage: React.FC = () => {
                       boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.12)',
                     }}
                   >
-                    🙋 关于我
+                    🙋 关于作者
                   </MotionButton>
                 </Link>
               </div>

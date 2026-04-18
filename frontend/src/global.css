@@ -537,6 +537,99 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 179, 217, 0.2) !important;
 }
 
+/* 全站自定义右键菜单（SiteContextMenu + Ant Design Dropdown） */
+.site-context-menu-root .ant-dropdown-menu {
+  background: rgba(15, 23, 42, 0.96) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35) !important;
+  padding: 6px !important;
+  min-width: 200px;
+}
+
+.site-context-menu-root .ant-dropdown-menu-item,
+.site-context-menu-root .ant-dropdown-menu-submenu-title {
+  color: rgba(248, 250, 252, 0.92) !important;
+  border-radius: 8px !important;
+}
+
+.site-context-menu-root .ant-dropdown-menu-item:hover,
+.site-context-menu-root .ant-dropdown-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.site-context-menu-root .ant-dropdown-menu-item-disabled,
+.site-context-menu-root .ant-dropdown-menu-submenu-title-disabled {
+  color: rgba(248, 250, 252, 0.35) !important;
+}
+
+.site-context-menu-root .ant-dropdown-menu-item-icon,
+.site-context-menu-root .ant-dropdown-menu-submenu-arrow {
+  color: rgba(248, 250, 252, 0.65) !important;
+}
+
+.site-context-menu-root .ant-dropdown-menu-item-divider {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.site-context-menu-root .ant-dropdown-menu-submenu .ant-dropdown-menu {
+  background: rgba(15, 23, 42, 0.98) !important;
+}
+
+/* 留言板多行输入：与顶栏 .header-search 同系的暗色毛玻璃，避免默认白底 textarea */
+.message-board-glass-textarea.ant-input-affix-wrapper.ant-input-textarea-affix-wrapper,
+.message-board-glass-textarea.ant-input-outlined,
+.message-board-glass-textarea.ant-input-textarea-affix-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  padding: 8px 11px !important;
+}
+
+.message-board-glass-textarea textarea.ant-input {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  resize: vertical;
+}
+
+.message-board-glass-textarea textarea.ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.message-board-glass-textarea.ant-input-affix-wrapper:hover,
+.message-board-glass-textarea.ant-input-outlined:hover,
+.message-board-glass-textarea.ant-input-textarea-affix-wrapper:hover {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.message-board-glass-textarea.ant-input-affix-wrapper-focused,
+.message-board-glass-textarea.ant-input-outlined-focused,
+.message-board-glass-textarea.ant-input-textarea-affix-wrapper-focused {
+  border-color: var(--theme-primary, #ffb3d9) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 0 2px rgba(255, 179, 217, 0.2) !important;
+}
+
+.message-board-glass-textarea .ant-input-data-count,
+.message-board-glass-textarea .ant-input-suffix {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .message-board-glass-textarea.ant-input-affix-wrapper.ant-input-textarea-affix-wrapper,
+  .message-board-glass-textarea.ant-input-outlined,
+  .message-board-glass-textarea.ant-input-textarea-affix-wrapper {
+    background: rgba(30, 41, 59, 0.75) !important;
+  }
+}
+
 /* ========== 首页移动端全屏滚动 ========== */
 /* 布局容器高度：使用 dvh 适配移动端浏览器地址栏 */
 .home-layout-content {

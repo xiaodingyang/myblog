@@ -20,9 +20,9 @@ const { Title, Text, Paragraph } = Typography;
 
 const AboutPage: React.FC = () => {
   const seo = useSEO({
-    title: '关于我',
+    title: '关于作者',
     description: '了解若风——一名热爱前端开发的工程师，专注于 React、TypeScript、Node.js 技术栈。',
-    keywords: '若风,关于我,前端工程师,个人介绍',
+    keywords: '若风,关于作者,前端工程师,个人介绍',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'Person',
@@ -95,7 +95,7 @@ const AboutPage: React.FC = () => {
               className="!mb-3 !text-white"
               style={{ textShadow: '0 2px 24px rgba(0, 0, 0, 0.45)' }}
             >
-              关于我
+              关于作者
             </Title>
             <Text
               className="!text-white/85 text-lg"
@@ -161,7 +161,7 @@ const AboutPage: React.FC = () => {
                       textShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                     }}
                   >
-                    肖定阳
+                    若风
                   </span>
                   <Text
                     className="!text-white/60 text-lg"
@@ -207,7 +207,7 @@ const AboutPage: React.FC = () => {
                   textShadow: '0 1px 6px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                👋 你好！我是肖定阳，一名拥有 8 年经验的前端开发工程师。
+                👋 你好！我是若风，一名拥有 8 年经验的前端开发工程师。
                 <br /><br />
                 曾就职于上海携程、精锐教育等公司，参与过多个大型项目的开发。
                 擅长 React、Vue、TypeScript 等前端技术栈，对前端工程化、性能优化有丰富经验。

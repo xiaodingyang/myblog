@@ -15,7 +15,8 @@ interface ShareButtonProps {
 
 const PROD_ORIGIN = 'https://www.xiaodingyang.art';
 
-function getShareUrl() {
+/** 供右键菜单等复用：生产分享短链（与站内 ShareButton 一致） */
+export function getShareUrl() {
   if (typeof window === 'undefined') return '';
   const { pathname, search, hash } = window.location;
   return `${PROD_ORIGIN}${pathname}${search}${hash}`;
@@ -24,14 +25,14 @@ function getShareUrl() {
 /**
  * 检查是否支持 Web Share API（移动端）
  */
-function canUseNativeShare(): boolean {
+export function canUseNativeShare(): boolean {
   return typeof navigator !== 'undefined' && 'share' in navigator && !!navigator.share;
 }
 
 /**
  * 使用原生分享（移动端）
  */
-async function nativeShare(title: string, url: string, text?: string): Promise<boolean> {
+export async function nativeShare(title: string, url: string, text?: string): Promise<boolean> {
   if (!canUseNativeShare()) return false;
   try {
     await navigator.share({
@@ -49,19 +50,19 @@ async function nativeShare(title: string, url: string, text?: string): Promise<b
   }
 }
 
-function shareToQQ(title: string, summary: string, url: string, cover?: string) {
+export function shareToQQ(title: string, summary: string, url: string, cover?: string) {
   let qqUrl = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(summary)}&site=${encodeURIComponent('若风的博客')}`;
   if (cover) qqUrl += `&pics=${encodeURIComponent(cover)}`;
   window.open(qqUrl, '_blank', 'width=600,height=500');
 }
 
-function shareToWeibo(title: string, url: string, cover?: string) {
+export function shareToWeibo(title: string, url: string, cover?: string) {
   let weiboUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
   if (cover) weiboUrl += `&pic=${encodeURIComponent(cover)}`;
   window.open(weiboUrl, '_blank', 'width=600,height=500');
 }
 
-function copyLink(url: string) {
+export function copyLink(url: string) {
   navigator.clipboard.writeText(url).then(() => {
     message.success('链接已复制到剪贴板');
   }).catch(() => {

@@ -29,9 +29,34 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
   const handleSubmit = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
+      // 开发环境：如果无法连接后端，使用测试用户
+      const isDev = process.env.NODE_ENV === 'development';
+      
       const res = await request<API.Response<{ token: string; user: API.User }>>('/api/auth/login', {
         method: 'POST',
         data: values,
+      }).catch((error) => {
+        // 开发环境下如果后端连接失败，返回模拟数据
+        if (isDev && (error.message?.includes('ECONNREFUSED') || error.message?.includes('Network Error'))) {
+          return {
+            code: 0,
+            message: '登录成功（开发模式）',
+            data: {
+              token: 'dev-test-token-' + Date.now(),
+              user: {
+                id: 1,
+                username: 'dev-admin',
+                email: 'dev@test.com',
+                nickname: '开发测试用户',
+                avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dev',
+                role: 'admin',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            },
+          };
+        }
+        throw error;
       });
 
       if (res.code === 0) {

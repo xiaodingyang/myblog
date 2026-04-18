@@ -20,13 +20,20 @@ const KeyboardShortcutsHelpModal: React.FC<KeyboardShortcutsHelpModalProps> = ({
   visible,
   onClose,
 }) => {
+  const stopAndClose = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
+    onClose();
+  };
+
   return (
     <Modal
       open={visible}
-      onCancel={onClose}
-      onOk={onClose}
+      onCancel={stopAndClose}
+      onOk={stopAndClose}
       okText="关闭"
-      cancelButtonProps={{ style: { display: 'none' } }}
+      okButtonProps={{ htmlType: 'button' }}
+      cancelButtonProps={{ style: { display: 'none' }, htmlType: 'button' }}
       title={
         <Space>
           <KeyOutlined />

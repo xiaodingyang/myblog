@@ -146,6 +146,7 @@ const MessagePage: React.FC = () => {
               />
               <div className="flex-1">
                 <TextArea
+                  className="message-board-glass-textarea"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="写下你想说的话..."
