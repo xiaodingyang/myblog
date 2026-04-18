@@ -121,6 +121,35 @@ async function saveNews(articles) {
   return result;
 }
 
+/** InfoQ 主站 RSS（与定时脚本一致） */
+const INFOQ_FEED_URL = 'https://www.infoq.cn/feed';
+
+/**
+ * 稍宽的关键词：仅拉丁词时中文标题容易全被过滤，导致「有 RSS 但 0 条入库」
+ */
+const INFOQ_KEYWORDS_WIDE = [
+  'ai', 'gpt', 'llm', 'chatgpt', 'openai', 'agent', 'rag', 'embedding',
+  '模型', '智能', '学习', '深度', '算法', '推理', '训练', '数据',
+  '机器学习', '人工智能', '神经网络', '大模型', '多模态', '云原生',
+];
+
+/**
+ * 抓取 InfoQ 条目：先带关键词，若全被过滤则退回「RSS 前若干条全要」
+ */
+async function fetchInfoqArticlesForIngest() {
+  const base = { id: 'infoq', name: 'InfoQ', url: INFOQ_FEED_URL };
+  let articles = await fetchFromRSS({ ...base, limit: 40, keywords: INFOQ_KEYWORDS_WIDE });
+  if (articles.length === 0) {
+    console.warn('[AiNews] 关键词过滤后无条目，改为无关键词取 RSS 前 30 条');
+    articles = await fetchFromRSS({ ...base, limit: 30, keywords: [] });
+  }
+  return articles;
+}
+
+/** 列表为空时自动拉 RSS 入库（线上常未单独跑 scheduleAiNews.js） */
+let lastAutoSyncWhenEmptyAt = 0;
+const AUTO_SYNC_WHEN_EMPTY_COOLDOWN_MS = 2 * 60 * 1000;
+
 /**
  * SSE 推送最新新闻
  */
@@ -183,12 +212,33 @@ const getLatestNews = async (req, res, next) => {
     const limitValidated = Math.min(limit, 100);
 
     const collection = getNewsCollection();
-    const news = await collection
-      .find()
-      .sort({ publishedAt: -1 })
-      .limit(limitValidated)
-      .toArray();
-    
+    const querySorted = () =>
+      collection
+        .find()
+        .sort({ publishedAt: -1 })
+        .limit(limitValidated)
+        .toArray();
+
+    let news = await querySorted();
+
+    if (
+      news.length === 0 &&
+      mongoose.connection.readyState === 1 &&
+      Date.now() - lastAutoSyncWhenEmptyAt >= AUTO_SYNC_WHEN_EMPTY_COOLDOWN_MS
+    ) {
+      lastAutoSyncWhenEmptyAt = Date.now();
+      try {
+        const articles = await fetchInfoqArticlesForIngest();
+        const result = await saveNews(articles);
+        console.log(
+          `[AiNews] 列表为空已自动同步: RSS 解析 ${articles.length} 条, 新增 ${result.added}, 重复 ${result.duplicates}, 错误 ${result.errors}`,
+        );
+        news = await querySorted();
+      } catch (syncErr) {
+        console.error('[AiNews] 空库自动同步失败:', syncErr.message);
+      }
+    }
+
     return res.json({
       success: true,
       data: news,
@@ -205,16 +255,8 @@ const getLatestNews = async (req, res, next) => {
  */
 const refreshNews = async (req, res, next) => {
   try {
-    const source = {
-      id: 'infoq',
-      name: 'InfoQ',
-      url: 'https://www.infoq.cn/feed',
-      limit: 20,
-      keywords: ['AI', '人工智能', '机器学习', 'GPT', 'LLM'],
-    };
-    
-    console.log(`[RSS] 开始抓取 [${source.name}] - ${new Date().toLocaleString()}`);
-    const articles = await fetchFromRSS(source);
+    console.log(`[RSS] 开始抓取 [InfoQ] - ${new Date().toLocaleString()}`);
+    const articles = await fetchInfoqArticlesForIngest();
     console.log(`[RSS] 抓取完成: ${articles.length} 条新闻`);
     
     const result = await saveNews(articles);

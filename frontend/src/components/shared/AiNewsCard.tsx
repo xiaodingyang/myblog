@@ -1,21 +1,61 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Space, Typography } from 'antd';
-import { ClockCircleOutlined, EyeOutlined } from '@ant-design/icons';
-import { useSSENews, NewsList } from '@xdy-npm/realtime-rss-hub-react';
+import { ClockCircleOutlined } from '@ant-design/icons';
 
-const { Text, Title, Paragraph } = Typography;
+const { Title } = Typography;
+
+type AiNewsItem = {
+  _id?: string;
+  articleId?: string;
+  title: string;
+  url: string;
+  publishedAt: string;
+  source?: { name?: string };
+  tags?: string[];
+};
+
+const REFRESH_MS = 10 * 60 * 1000;
 
 const AiNewsCard: React.FC = () => {
-  const { news, loading, error } = useSSENews('/api/ai-news/stream', {
-    limit: 8,
-    autoConnect: true,
-  });
+  const [news, setNews] = useState<AiNewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // 如果使用 NewsList 组件（来自开源包）
-  const useNewsList = false;
+  const loadNews = useCallback(async (opts?: { silent?: boolean }) => {
+    const silent = opts?.silent === true;
+    if (!silent) {
+      setError(null);
+      setLoading(true);
+    }
+    try {
+      const res = await fetch('/api/ai-news?limit=8');
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const json = await res.json();
+      if (!json.success || !Array.isArray(json.data)) {
+        throw new Error(json.message || '接口返回异常');
+      }
+      setNews(json.data);
+      if (silent) setError(null);
+    } catch (e) {
+      if (!silent) {
+        setError(e instanceof Error ? e : new Error('加载失败'));
+        setNews([]);
+      }
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadNews({ silent: false });
+    const id = window.setInterval(() => void loadNews({ silent: true }), REFRESH_MS);
+    return () => window.clearInterval(id);
+  }, [loadNews]);
 
   return (
-    <Card 
+    <Card
       className="ai-news-card"
       style={{
         background: 'rgba(255, 255, 255, 0.04)',
@@ -40,31 +80,18 @@ const AiNewsCard: React.FC = () => {
         </span>
       </div>
 
-      {useNewsList ? (
-        // 使用开源包的 NewsList 组件
-        <NewsList
-          endpoint="/api/ai-news/stream"
-          limit={8}
-          title=""
-          emptyText="暂无新闻"
-          loadingText="加载中..."
-        />
-      ) : (
-        // 使用自定义渲染，保持博客原有样式
-        <div>
-          {loading ? (
-            <div className="text-center py-8 text-gray-400">
-              加载中...
-            </div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-400">
-              加载失败: {error.message}
-            </div>
-          ) : news && news.length > 0 ? (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
-              {news.map((item) => (
+      <div>
+        {loading ? (
+          <div className="text-center py-8 text-gray-400">加载中...</div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-400">加载失败: {error.message}</div>
+        ) : news.length > 0 ? (
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {news.map((item) => {
+              const key = item._id || item.articleId || item.url;
+              return (
                 <a
-                  key={item._id}
+                  key={key}
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -84,7 +111,7 @@ const AiNewsCard: React.FC = () => {
                         <ClockCircleOutlined />{' '}
                         {new Date(item.publishedAt).toLocaleDateString('zh-CN')}
                       </span>
-                      {item.source && (
+                      {item.source?.name && (
                         <>
                           <span>·</span>
                           <span>{item.source.name}</span>
@@ -99,17 +126,18 @@ const AiNewsCard: React.FC = () => {
                     </Space>
                   </div>
                 </a>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-400">
-              暂无新闻
-            </div>
-          )}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-400">暂无新闻</div>
+        )}
+      </div>
 
-      <div className="text-xs text-gray-400 mt-4 text-center" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+      <div
+        className="text-xs text-gray-400 mt-4 text-center"
+        style={{ color: 'rgba(255, 255, 255, 0.4)' }}
+      >
         数据来源：InfoQ · 每10分钟更新
       </div>
     </Card>
