@@ -43,10 +43,10 @@ export default defineConfig({
         });
       }
     })();`,
-    // 版本检测 - 自动更新到最新版本（无感知刷新）
+    // 版本检测：构建时写入唯一号。优先 GitHub Actions 的 RUN_ID（每次部署必变），避免仅 Date.now() 与 CDN/浏览器旧 index 对齐失败导致 chunk 与 HTML 不一致
     `(function(){
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
-      var BUILD_VERSION = '${Date.now()}';
+      var BUILD_VERSION = '${process.env.GITHUB_RUN_ID || process.env.GITHUB_SHA || Date.now()}';
       var STORAGE_KEY = 'app_build_version';
       var stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) {
