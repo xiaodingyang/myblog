@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Spin } from 'antd';
 import { LeftOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
+import { BORDER_RADIUS, FONT_SIZE } from '@/styles/designTokens';
 
 interface LightboxProps {
   visible: boolean;
@@ -161,8 +162,8 @@ const Lightbox: React.FC<LightboxProps> = ({ visible, images, currentIndex, onCl
       <div
         style={{
           position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-          color: 'rgba(255,255,255,0.7)', fontSize: 14, background: 'rgba(0,0,0,0.4)',
-          padding: '4px 16px', borderRadius: 20,
+          color: 'rgba(255,255,255,0.7)', fontSize: FONT_SIZE.BODY, background: 'rgba(0,0,0,0.4)',
+          padding: '4px 16px', borderRadius: BORDER_RADIUS.BUTTON_PILL,
         }}
       >
         {currentIndex + 1} / {images.length}

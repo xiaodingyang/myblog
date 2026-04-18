@@ -13,6 +13,9 @@ router.get('/archives', cacheMiddleware(600), articleController.getArchives);
 // 增加文章阅读量
 router.get('/:id/view', articleController.incArticleView);
 
+// 获取上一篇和下一篇文章（缓存 5 分钟）
+router.get('/:id/adjacent', cacheMiddleware(300), articleController.getAdjacentArticles);
+
 // 文章点赞（需登录，须放在 /:id 之前避免误匹配时可区分的路径）
 router.post('/:id/like', githubAuth, articleController.toggleArticleLike);
 

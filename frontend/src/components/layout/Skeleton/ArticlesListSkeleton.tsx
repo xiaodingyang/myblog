@@ -6,7 +6,7 @@ import React from 'react';
 const shimmer = 'bg-gradient-to-r from-white/10 via-white/6 to-white/10 bg-[length:200%_100%] animate-[skeleton-shimmer_1.5s_ease_infinite]';
 
 const CardSkeleton: React.FC<{ showCover?: boolean }> = ({ showCover = true }) => (
-  <div className="bg-white rounded-xl border border-white/10 overflow-hidden">
+  <div className="bg-white rounded-card-lg border border-white/10 overflow-hidden">
     {showCover && <div className={`h-36 sm:h-44 ${shimmer}`} />}
     <div className="p-4 space-y-2.5">
       <div className={`h-3 w-24 rounded ${shimmer}`} />
@@ -31,7 +31,7 @@ const ArticlesListSkeleton: React.FC = () => {
   return (
     <div className="space-y-10">
       {/* Hero skeleton */}
-      <div className={`h-[260px] sm:h-[340px] md:h-[420px] rounded-2xl ${shimmer}`} />
+      <div className={`h-[260px] sm:h-[340px] md:h-[420px] rounded-card-lg ${shimmer}`} />
 
       {/* Section divider */}
       <div className="flex items-center gap-3">
@@ -75,7 +75,7 @@ const ArticlesListSkeleton: React.FC = () => {
 
       {/* Pagination skeleton */}
       <div className="flex justify-center">
-        <div className={`h-8 w-64 rounded-lg ${shimmer}`} />
+        <div className={`h-8 w-64 rounded-card-sm ${shimmer}`} />
       </div>
     </div>
   );

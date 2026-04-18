@@ -43,7 +43,7 @@ const KeyboardShortcutsHelpModal: React.FC<KeyboardShortcutsHelpModalProps> = ({
             <div key={s.key} className="flex items-center justify-between">
               <Text>{s.description}</Text>
               <kbd
-                className="px-3 py-1 rounded-lg text-sm font-mono"
+                className="px-3 py-1 rounded-card-sm text-sm font-mono"
                 style={{
                   background: '#f0f0f0',
                   border: '1px solid #d9d9d9',

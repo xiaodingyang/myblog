@@ -146,7 +146,7 @@ const DashboardPage: React.FC = () => {
                   valueStyle={{ color: item.color, fontWeight: 600 }}
                 />
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-xl text-white"
+                  className="w-12 h-12 rounded-card-lg flex items-center justify-center text-xl text-white"
                   style={{ background: item.color }}
                 >
                   {item.icon}

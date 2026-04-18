@@ -16,7 +16,7 @@ const FavoritesSkeleton: React.FC = () => (
   <Row gutter={[24, 24]}>
     {[1, 2, 3, 4, 5, 6].map((i) => (
       <Col xs={24} sm={12} lg={8} key={i}>
-        <div className="rounded-2xl overflow-hidden border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+        <div className="rounded-card-lg overflow-hidden border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
           <div className="h-48 bg-white/10 animate-pulse" />
           <div className="p-4 space-y-3">
             <div className="h-5 w-3/4 rounded bg-white/10 animate-pulse" />
@@ -83,7 +83,7 @@ const FavoritesPage: React.FC = () => {
           <ScrollReveal direction="up">
           <div className="text-center mb-12">
             <div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
               style={{ background: currentColorTheme.gradient }}
             >
               <HeartOutlined className="text-3xl text-white" />
@@ -97,7 +97,7 @@ const FavoritesPage: React.FC = () => {
             </Title>
           </div>
           </ScrollReveal>
-          <div className="rounded-2xl p-5 md:p-8 relative z-10 text-center" style={{
+          <div className="rounded-card-lg p-5 md:p-8 relative z-10 text-center" style={{
             minHeight: 300,
             background: themeBg(currentColorTheme.primary, 0.12),
             backdropFilter: 'blur(20px)',
@@ -130,7 +130,7 @@ const FavoritesPage: React.FC = () => {
         <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{ background: currentColorTheme.gradient }}
           >
             <HeartFilled className="text-3xl text-white" />
@@ -152,7 +152,7 @@ const FavoritesPage: React.FC = () => {
         </ScrollReveal>
 
         {/* 内容区域 - 玻璃拟态风格 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{
+        <div className="rounded-card-lg p-5 md:p-8 relative z-10" style={{
           minHeight: 300,
           background: themeBg(currentColorTheme.primary, 0.12),
           backdropFilter: 'blur(20px)',
@@ -164,7 +164,7 @@ const FavoritesPage: React.FC = () => {
             <Button
               icon={<ReadOutlined />}
               onClick={() => history.push('/articles')}
-              className="!rounded-lg"
+              className="!rounded-card-sm"
             >
               去逛逛文章
             </Button>

@@ -123,7 +123,7 @@ const ArticleReactions: React.FC<{ articleId: string }> = ({ articleId }) => {
             <Tooltip key={emoji} title={EMOJI_LABELS[emoji]} placement="top">
               <button
                 onClick={() => handleReact(emoji)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 ${
+                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-card-sm transition-all duration-200 ${
                   isActive ? 'bg-blue-50 scale-110' : 'bg-gray-50 hover:bg-gray-100'
                 }`}
                 style={{

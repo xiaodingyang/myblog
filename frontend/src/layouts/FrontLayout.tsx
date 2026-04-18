@@ -381,7 +381,7 @@ const FrontLayout: React.FC = () => {
           {/* Logo - 复用底部的实现，避免渐变条问题 */}
           <Link to="/" className="flex items-center gap-2 md:gap-3 no-underline shrink-0">
             <div
-              className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-bold text-base md:text-lg"
+              className="w-9 h-9 md:w-10 md:h-10 rounded-card-lg flex items-center justify-center text-white font-bold text-base md:text-lg"
               style={{
                 backgroundImage: currentColorTheme.gradient,
                 backgroundRepeat: 'no-repeat',
@@ -580,7 +580,7 @@ const FrontLayout: React.FC = () => {
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <Link to="/" className="flex items-center gap-2 no-underline" onClick={() => setMobileMenuOpen(false)}>
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold"
+                  className="w-9 h-9 rounded-card-lg flex items-center justify-center text-white font-bold"
                   style={{
                     backgroundImage: currentColorTheme.gradient,
                     backgroundRepeat: 'no-repeat',
@@ -638,7 +638,7 @@ const FrontLayout: React.FC = () => {
                   <Link
                     key={row.key}
                     to={row.to}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl mb-0.5 no-underline transition-all"
+                    className="flex items-center gap-3 px-4 py-3 rounded-card-lg mb-0.5 no-underline transition-all"
                     style={{
                       background: isActive ? `${currentColorTheme.primary}15` : 'transparent',
                       color: isActive ? currentColorTheme.primary : '#475569',
@@ -699,7 +699,7 @@ const FrontLayout: React.FC = () => {
                 <Col xs={24} md={8}>
                   <div className="flex items-center gap-3 mb-4">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+                      className="w-10 h-10 rounded-card-lg flex items-center justify-center text-white font-bold text-lg"
                       style={{
                         backgroundImage: currentColorTheme.gradient,
                         backgroundRepeat: 'no-repeat',
@@ -830,7 +830,7 @@ const DrawerAppleEntry: React.FC<{ primary: string; onDone: () => void }> = ({ p
         openAssistant();
         onDone();
       }}
-      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 text-left border-0"
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-card-lg mb-2 text-left border-0"
       style={{
         background: `${primary}12`,
         color: '#0f172a',

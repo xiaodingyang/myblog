@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "ai-news:schedule": "node scripts/scheduleAiNews.js",
+    "ai-news:refresh": "node -e \"require('./scripts/scheduleAiNews').runTask()\"",
     "db:ensure-e2e-admin": "node scripts/ensure-e2e-admin.js",
     "db:migrate-categories-tags": "node scripts/migrateCategoriesAndTags.js",
     "db:auto-classify-articles": "node scripts/autoClassifyArticlesByTitle.js",
@@ -13,6 +15,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@xdy-npm/realtime-rss-hub-server": "^0.1.0",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
@@ -28,6 +31,9 @@
     "morgan": "^1.10.1",
     "multer": "2.1.1",
     "node-cache": "^5.1.2",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "rss-parser": "^3.13.0",
     "sharp": "^0.34.5",
     "uuid": "^9.0.1"
   },

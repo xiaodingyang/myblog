@@ -119,7 +119,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         <div className="absolute top-0 left-0 w-full z-10 p-8 lg:p-10">
           <div className="flex items-center gap-3">
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg"
+              className="w-11 h-11 rounded-card-lg flex items-center justify-center text-white font-bold text-lg shadow-lg"
               style={{ backgroundImage: currentColorTheme.gradient }}
             >
               风
@@ -165,7 +165,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         <div className="lg:hidden flex flex-col items-center shrink-0 pt-5 pb-2 sm:pt-6 sm:pb-3">
           <div className="flex items-center gap-3 mb-6">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+              className="w-10 h-10 rounded-card-lg flex items-center justify-center text-white font-bold text-lg"
               style={{ backgroundImage: currentColorTheme.gradient }}
             >
               风
@@ -186,7 +186,7 @@ const AdminLoginLayout: React.FC<{ currentColorTheme: ColorTheme }> = ({ current
         {/* 表单居中区域（min-h-0 避免 flex 子项撑出整页滚动） */}
         <div className="flex-1 min-h-0 flex items-center justify-center px-6 sm:px-12 lg:px-16 xl:px-24 overflow-hidden">
           <div
-            className="admin-login-card w-full max-w-[400px] rounded-2xl px-6 py-8 sm:px-9 antialiased border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
+            className="admin-login-card w-full max-w-[400px] rounded-card-lg px-6 py-8 sm:px-9 antialiased border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
             style={{
               fontFamily: UI_FONT,
               background: `linear-gradient(165deg, rgba(15, 23, 42, 0.72) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12) 48%, rgba(15, 23, 42, 0.78) 100%)`,

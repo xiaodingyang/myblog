@@ -73,7 +73,7 @@ const GuestLoginPrompt: React.FC = () => {
       }}
     >
       <div
-        className="rounded-2xl overflow-hidden shadow-2xl border border-white/20"
+        className="rounded-card-lg overflow-hidden shadow-2xl border border-white/20"
         style={{
           background: 'linear-gradient(135deg, rgba(15,23,42,0.82) 0%, rgba(30,41,59,0.72) 50%, rgba(15,23,42,0.88) 100%)',
           backdropFilter: 'blur(16px) saturate(160%)',
@@ -98,7 +98,7 @@ const GuestLoginPrompt: React.FC = () => {
           </button>
           <div className="flex items-center gap-3 mb-3">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+              className="w-12 h-12 rounded-card-lg flex items-center justify-center shrink-0"
               style={{ backgroundImage: theme.gradient }}
             >
               <GithubOutlined className="text-xl text-white" />
@@ -130,7 +130,7 @@ const GuestLoginPrompt: React.FC = () => {
             type="button"
             onClick={openLogin}
             disabled={isLoading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white border-0 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-card-lg text-sm font-medium text-white border-0 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             style={{
               background: 'linear-gradient(180deg, #2ea043 0%, #238636 100%)',
               boxShadow: '0 4px 14px rgba(46,160,67,0.35)',

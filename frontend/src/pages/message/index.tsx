@@ -91,7 +91,7 @@ const MessagePage: React.FC = () => {
         <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{
               background: 'linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%)',
             }}
@@ -119,11 +119,11 @@ const MessagePage: React.FC = () => {
         </ScrollReveal>
 
         {/* 内容区域 - 暗色玻璃态背景 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+        <div className="rounded-card-lg p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
         {/* 留言表单 */}
         <ScrollReveal direction="up" delay={0.06}>
         <div
-          className="mb-8 rounded-2xl p-6"
+          className="mb-8 rounded-card-lg p-6"
           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           <Title
@@ -165,7 +165,7 @@ const MessagePage: React.FC = () => {
             </div>
           ) : (
             <div
-              className="text-center py-8 rounded-xl cursor-pointer transition-all hover:shadow-md"
+              className="text-center py-8 rounded-card-lg cursor-pointer transition-all hover:shadow-md"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px dashed rgba(255,255,255,0.15)' }}
               onClick={() => requireAuth()}
             >
@@ -182,7 +182,7 @@ const MessagePage: React.FC = () => {
         </ScrollReveal>
         {/* 留言列表 */}
         <div
-          className="rounded-2xl p-6"
+          className="rounded-card-lg p-6"
           style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           <Title level={4} className="!mb-6 !text-white" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>

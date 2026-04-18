@@ -3,6 +3,7 @@ import { useLocation, history } from 'umi';
 import { HomeOutlined, ReadOutlined, AppstoreOutlined, UserOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { FONT_SIZE, TRANSITION } from '@/styles/designTokens';
 
 const tabs = [
   { key: '/', icon: HomeOutlined, label: '首页' },
@@ -54,11 +55,11 @@ const MobileTabBar: React.FC = () => {
               justifyContent: 'center', gap: 2, border: 'none', background: 'none',
               cursor: 'pointer', padding: '6px 0',
               color: isActive ? currentColorTheme.primary : '#9ca3af',
-              transition: 'color 0.2s',
+              transition: `color ${TRANSITION.FAST}`,
             }}
           >
-            <Icon style={{ fontSize: 20 }} />
-            <span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400 }}>{tab.label}</span>
+            <Icon style={{ fontSize: FONT_SIZE.ICON_MEDIUM }} />
+            <span style={{ fontSize: FONT_SIZE.TAG, fontWeight: isActive ? 600 : 400 }}>{tab.label}</span>
           </button>
         );
       })}

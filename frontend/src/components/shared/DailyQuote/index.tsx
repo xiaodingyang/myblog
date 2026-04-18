@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Typography } from 'antd';
+import { FONT_SIZE } from '@/styles/designTokens';
 
 const { Text } = Typography;
 
@@ -65,7 +66,7 @@ const DailyQuote: React.FC = () => {
       >
         "{quote.text}"
       </Text>
-      <Text style={{ color: 'rgba(255, 255, 255, 0.25)', fontSize: 11 }} className="mt-1 block">
+      <Text style={{ color: 'rgba(255, 255, 255, 0.25)', fontSize: FONT_SIZE.CAPTION }} className="mt-1 block">
         —— {quote.author}
       </Text>
     </div>

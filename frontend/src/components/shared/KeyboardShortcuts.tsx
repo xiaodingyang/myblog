@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, List, Typography, Tag, Space } from 'antd';
 import { KeyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { BORDER_RADIUS, FONT_SIZE } from '@/styles/designTokens';
 
 const { Title, Text } = Typography;
 
@@ -103,11 +104,11 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
               style={{
                 display: 'inline-block',
                 padding: '2px 8px',
-                fontSize: 12,
+                fontSize: FONT_SIZE.BODY_SMALL,
                 fontFamily: 'SF Mono, Monaco, Consolas, monospace',
                 backgroundColor: '#f5f5f5',
                 border: '1px solid #d9d9d9',
-                borderRadius: 4,
+                borderRadius: BORDER_RADIUS.TAG,
                 boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                 margin: '0 2px',
               }}
@@ -163,7 +164,7 @@ const KeyboardShortcutsHelp: React.FC<KeyboardShortcutsHelpProps> = ({
               style={{ padding: '12px 0' }}
               extra={
                 item.articleOnly && (
-                  <Tag color="blue" style={{ fontSize: 11 }}>
+                  <Tag color="blue" style={{ fontSize: FONT_SIZE.CAPTION }}>
                     仅文章页
                   </Tag>
                 )

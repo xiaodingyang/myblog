@@ -160,3 +160,16 @@ exports.deleteArticle = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * 获取上一篇和下一篇文章
+ */
+exports.getAdjacentArticles = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await articleService.getAdjacentArticles(id);
+    return success(res, data);
+  } catch (err) {
+    next(err);
+  }
+};

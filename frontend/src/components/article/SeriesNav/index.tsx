@@ -5,6 +5,7 @@ import { OrderedListOutlined, LeftOutlined, RightOutlined } from '@ant-design/ic
 import { request } from 'umi';
 import { useModel } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
+import { BORDER_RADIUS, FONT_SIZE, BOX_SHADOW } from '@/styles/designTokens';
 
 const { Title, Text } = Typography;
 
@@ -48,12 +49,12 @@ const SeriesNav: React.FC<SeriesNavProps> = ({ seriesId, seriesTitle, currentArt
     <Card
       className="mt-8"
       style={{
-        borderRadius: 16, border: 'none',
-        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        borderRadius: BORDER_RADIUS.CARD_LARGE, border: 'none',
+        boxShadow: BOX_SHADOW.SMALL,
       }}
     >
       <div className="flex items-center gap-2 mb-4">
-        <OrderedListOutlined style={{ color: currentColorTheme.primary, fontSize: 18 }} />
+        <OrderedListOutlined style={{ color: currentColorTheme.primary, fontSize: FONT_SIZE.ICON_MEDIUM }} />
         <Title level={5} className="!mb-0">
           {seriesTitle || '系列文章'}
         </Title>
@@ -71,10 +72,11 @@ const SeriesNav: React.FC<SeriesNavProps> = ({ seriesId, seriesTitle, currentArt
               className="block"
             >
               <div
-                className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-3 px-3 py-2 rounded-card-sm transition-colors"
                 style={{
                   background: isCurrent ? `${currentColorTheme.primary}15` : 'transparent',
                   borderLeft: isCurrent ? `3px solid ${currentColorTheme.primary}` : '3px solid transparent',
+                  borderRadius: BORDER_RADIUS.CARD_SMALL,
                 }}
               >
                 <Text

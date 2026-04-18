@@ -85,7 +85,7 @@ const AboutPage: React.FC = () => {
         <ScrollReveal direction="up">
           <div className="text-center mb-12">
             <div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
               style={{ background: currentColorTheme.gradient }}
             >
               <UserOutlined className="text-3xl text-white" />
@@ -107,7 +107,7 @@ const AboutPage: React.FC = () => {
         </ScrollReveal>
 
         {/* 内容区域 - 玻璃拟态风格 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{
+        <div className="rounded-card-lg p-5 md:p-8 relative z-10" style={{
           minHeight: 300,
           background: themeBg(currentColorTheme.primary, 0.12),
           backdropFilter: 'blur(20px)',
@@ -118,7 +118,7 @@ const AboutPage: React.FC = () => {
           {/* 个人介绍卡片 */}
           <ScrollReveal direction="up" delay={0.06}>
           <div
-            className="mb-8 overflow-hidden rounded-3xl"
+            className="mb-8 overflow-hidden rounded-card-lg"
             style={{
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.08)',
@@ -143,7 +143,7 @@ const AboutPage: React.FC = () => {
             <div className="px-8 pb-8 -mt-16 relative">
               <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
                 <div
-                  className="w-32 h-32 rounded-3xl border-4 border-white flex items-center justify-center text-white text-4xl font-bold shadow-lg"
+                  className="w-32 h-32 rounded-card-lg border-4 border-white flex items-center justify-center text-white text-4xl font-bold shadow-lg"
                   style={{
                     background: currentColorTheme.gradient,
                   }}
@@ -220,7 +220,7 @@ const AboutPage: React.FC = () => {
             {/* 技能栈 */}
             <Col xs={24} lg={12}>
             <ScrollReveal direction="up" delay={0.12}>
-              <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
+              <div className="rounded-card-lg p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
                 <div className="mb-4">
                   <Space>
                     <CodeOutlined className="text-primary" />
@@ -270,7 +270,7 @@ const AboutPage: React.FC = () => {
             {/* 经历时间线 */}
             <Col xs={24} lg={12}>
             <ScrollReveal direction="up" delay={0.18}>
-              <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
+              <div className="rounded-card-lg p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', height: '100%' }}>
                 <div className="mb-4">
                   <Space>
                     <RocketOutlined className="text-primary" />
@@ -324,7 +324,7 @@ const AboutPage: React.FC = () => {
           {/* 兴趣爱好 */}
           <ScrollReveal direction="up" delay={0.24}>
           <div
-            className="mt-6 rounded-2xl p-6"
+            className="mt-6 rounded-card-lg p-6"
             style={{
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.08)',

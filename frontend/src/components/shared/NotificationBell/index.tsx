@@ -6,6 +6,7 @@ import { useModel } from 'umi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
+import { BORDER_RADIUS, FONT_SIZE, TRANSITION } from '@/styles/designTokens';
 
 dayjs.extend(relativeTime);
 dayjs.locale('zh-cn');
@@ -127,7 +128,7 @@ const NotificationBell: React.FC = () => {
               padding: '10px 8px',
               cursor: 'pointer',
               background: item.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.04)',
-              borderRadius: 8,
+              borderRadius: BORDER_RADIUS.CARD_SMALL,
             }}
             onClick={() => {
               if (!item.isRead) markAsRead(item._id);
@@ -143,34 +144,34 @@ const NotificationBell: React.FC = () => {
                   style={{
                     width: 36,
                     height: 36,
-                    borderRadius: '50%',
+                    borderRadius: BORDER_RADIUS.AVATAR,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     background: item.isRead ? '#f3f4f6' : '#eff6ff',
                   }}
                 >
-                  <MessageOutlined style={{ color: item.isRead ? '#9ca3af' : '#3b82f6' }} />
+                  <MessageOutlined style={{ color: item.isRead ? '#9ca3af' : '#3b82f6', fontSize: FONT_SIZE.ICON_MEDIUM }} />
                 </div>
               }
               title={
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 13, fontWeight: item.isRead ? 400 : 500 }}>
+                  <Text style={{ fontSize: FONT_SIZE.BODY_MEDIUM, fontWeight: item.isRead ? 400 : 500 }}>
                     {getNotificationText(item)}
                   </Text>
                   {!item.isRead && (
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
+                    <div style={{ width: 6, height: 6, borderRadius: BORDER_RADIUS.AVATAR, background: '#3b82f6', flexShrink: 0 }} />
                   )}
                 </div>
               }
               description={
                 <div>
                   {item.content && (
-                    <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
+                    <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL, display: 'block' }}>
                       "{item.content.slice(0, 40)}{item.content.length > 40 ? '...' : ''}"
                     </Text>
                   )}
-                  <Text type="secondary" style={{ fontSize: 11 }}>
+                  <Text type="secondary" style={{ fontSize: FONT_SIZE.CAPTION }}>
                     {dayjs(item.createdAt).fromNow()}
                     {item.articleId?.title && ` · ${item.articleId.title.slice(0, 15)}${item.articleId.title.length > 15 ? '...' : ''}`}
                   </Text>
@@ -194,8 +195,8 @@ const NotificationBell: React.FC = () => {
     <Popover
       content={content}
       title={
-        <span style={{ fontWeight: 600, fontSize: 14 }}>
-          🔔 通知 {unreadCount > 0 && <Text type="secondary" style={{ fontSize: 12 }}>({unreadCount} 条未读)</Text>}
+        <span style={{ fontWeight: 600, fontSize: FONT_SIZE.HEADING_SMALL }}>
+          🔔 通知 {unreadCount > 0 && <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>({unreadCount} 条未读)</Text>}
         </span>
       }
       trigger="click"
@@ -209,7 +210,7 @@ const NotificationBell: React.FC = () => {
             fontSize: 18,
             cursor: 'pointer',
             color: unreadCount > 0 ? '#3b82f6' : 'rgba(248, 250, 252, 0.85)',
-            transition: 'color 0.2s',
+            transition: `color ${TRANSITION.FAST}`,
           }}
         />
       </Badge>

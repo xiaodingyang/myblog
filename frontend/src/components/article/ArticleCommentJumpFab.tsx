@@ -70,7 +70,7 @@ const ArticleCommentJumpFab: React.FC = () => {
       <button
         type="button"
         onClick={scrollToComments}
-        className="rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
+        className="rounded-card-lg shadow-lg transition-all duration-300 hover:scale-105"
         style={{
           position: 'relative',
           width: FAB_SIZE_PX,

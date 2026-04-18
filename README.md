@@ -34,6 +34,8 @@
 ### 技术亮点
 
 - 🔐 GitHub OAuth 一键登录（无需注册）
+- 🤖 **AI 新闻实时推送**（SSE + NewsAPI）
+- 🤖 **站内 AI 答疑**（向量检索 + RAG）
 - ⚡ 前端打包体积优化 68%（细粒度分包 + 懒加载）
 - 🧪 Playwright E2E 自动化测试
 - 🔄 自动化 CI/CD 部署
@@ -53,6 +55,7 @@
 | **认证** | JWT (jsonwebtoken) + GitHub OAuth |
 | **数据验证** | Joi |
 | **文件上传** | Multer |
+| **定时任务** | node-cron |
 | **测试** | Playwright E2E |
 
 ## 项目结构
@@ -85,7 +88,7 @@ myblog/
 │   │   ├── middlewares/      # 中间件（认证、错误处理、验证）
 │   │   ├── models/          # 数据模型
 │   │   ├── routes/          # 路由
-│   │   ├── scripts/         # 数据库种子脚本
+│   │   ├── scripts/         # 数据库种子脚本、定时任务
 │   │   └── index.js         # 入口文件
 │   ├── uploads/             # 上传文件目录
 │   ├── .env.example         # 环境变量模板
@@ -139,6 +142,16 @@ node src/scripts/seed.js
 ```
 
 这会创建默认管理员账号和示例数据。
+
+### （可选）配置 AI 新闻推送
+
+如需使用 AI 新闻推送功能：
+
+1. 获取 NewsAPI Key: https://newsapi.org/register
+2. 在 `backend/.env` 中添加 `NEWSAPI_KEY=your_api_key`
+3. 启动定时任务：`cd backend && pnpm ai-news:schedule`
+
+详见：[AI 新闻推送文档](./backend/docs/AI_NEWS_QUICKSTART.md)
 
 ### 5. 启动开发服务器
 
@@ -224,6 +237,18 @@ pnpm dev
 |------|------|------|
 | GET | /api/rankings/comments | 评论活跃榜 Top 20（5分钟缓存） |
 
+### AI 新闻推送（新功能）
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | /api/ai-news/stream | SSE 推送最新 20 条新闻 |
+| GET | /api/ai-news | 获取新闻列表 |
+| POST | /api/ai-news/refresh | 手动刷新新闻 |
+| GET | /api/ai-news/stats | 获取 NewsAPI 请求统计 |
+| GET | /api/ai-news/config | 检查 NewsAPI 配置 |
+
+> 📖 详细文档：[AI 新闻推送快速启动](./backend/docs/AI_NEWS_QUICKSTART.md)
+
 ### 其他
 
 | 方法 | 路径 | 描述 |
@@ -247,9 +272,11 @@ pnpm build
 ```bash
 cd backend
 # 使用 PM2 守护进程
-pm2 start src/index.js --name blog-api
+pm2 start ecosystem.ai-news.config.js
 pm2 save
 ```
+
+> 生产环境推荐使用 `ecosystem.ai-news.config.js` 配置文件，包含主服务和 AI 新闻定时任务。
 
 ### 一键部署
 

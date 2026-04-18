@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { Button, Typography, Card } from 'antd';
 import { CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { BORDER_RADIUS } from '@/styles/designTokens';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -79,7 +80,7 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-[50vh] flex items-center justify-center p-6">
           <Card
             className="max-w-lg w-full text-center shadow-lg"
-            style={{ borderRadius: 16 }}
+            style={{ borderRadius: BORDER_RADIUS.CARD_LARGE }}
           >
             <div className="flex flex-col items-center gap-4">
               <CloseCircleOutlined className="text-5xl text-red-400" />
@@ -109,7 +110,7 @@ class ErrorBoundary extends Component<Props, State> {
               </div>
 
               {showDetails && error && (
-                <div className="w-full mt-4 p-4 bg-gray-50 rounded-lg text-left">
+                <div className="w-full mt-4 p-4 bg-gray-50 rounded-card-sm text-left">
                   <Text strong className="text-xs text-gray-500 block mb-1">
                     错误信息：
                   </Text>

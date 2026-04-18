@@ -9,6 +9,7 @@ import OptimizedImage from '@/components/shared/OptimizedImage';
 import { fetchArticleDetail } from '@/utils/prefetch';
 import dayjs from 'dayjs';
 import { themeBg, isNewArticle, isHotArticle, artId } from '@/utils/themeHelpers';
+import { BORDER_RADIUS, SPACING, FONT_SIZE, BOX_SHADOW } from '@/styles/designTokens';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -73,12 +74,13 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
               {/* 左下角：分类标签 */}
               <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4">
                 <Tag
-                  className="!border-none !text-white !px-2 md:!px-3 !py-0.5 md:!py-1 !rounded-lg !text-xs md:!text-sm"
+                  className="!border-none !text-white !px-2 md:!px-3 !py-0.5 md:!py-1 !text-xs md:!text-sm"
                   style={{
                     background: 'rgba(255, 255, 255, 0.2)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)',
                     border: '1px solid rgba(255, 255, 255, 0.3)',
+                    borderRadius: BORDER_RADIUS.CARD_SMALL,
                   }}
                 >
                   <FolderOutlined className="mr-1" />
@@ -90,11 +92,12 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                 <div className="absolute top-3 md:top-4 right-3 md:right-4 flex gap-2">
                   {isHot && (
                     <Tag
-                      className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
+                      className="!border-none !px-2 !py-0.5 !text-xs !font-medium"
                       style={{
                         background: currentColorTheme.gradient,
                         color: '#fff',
                         boxShadow: `0 2px 8px ${themeBg(currentColorTheme.primary, 0.4)}`,
+                        borderRadius: BORDER_RADIUS.TAG,
                       }}
                     >
                       <FireOutlined className="mr-1" />
@@ -103,11 +106,12 @@ const ArticleCard: React.FC<ArticleCardProps> = React.memo(({ article, style }) 
                   )}
                   {isNew && (
                     <Tag
-                      className="!border-none !px-2 !py-0.5 !rounded-lg !text-xs !font-medium"
+                      className="!border-none !px-2 !py-0.5 !text-xs !font-medium"
                       style={{
                         background: `linear-gradient(135deg, ${currentColorTheme.primary}88 0%, ${currentColorTheme.primary} 100%)`,
                         color: '#fff',
                         boxShadow: `0 2px 8px ${themeBg(currentColorTheme.primary, 0.35)}`,
+                        borderRadius: BORDER_RADIUS.TAG,
                       }}
                     >
                       新

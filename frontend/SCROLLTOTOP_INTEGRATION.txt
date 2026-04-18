@@ -1,0 +1,33 @@
+ScrollToTop 返回顶部按钮组件 - 实现完成
+================================================
+
+组件位置：
+  src/components/layout/BackToTop/index.tsx
+
+功能实现：
+  ✓ 滚动超过 300px 时自动显示按钮
+  ✓ 点击按钮平滑滚动到页面顶部（使用原生 behavior: 'smooth'）
+  ✓ 使用 Tailwind CSS 样式（渐变背景、阴影、悬停效果）
+  ✓ 性能优化（requestAnimationFrame 节流）
+  ✓ 支持首页特殊滚动容器
+
+集成状态：
+  已集成到 FrontLayout.tsx 主布局中
+  位置：右下角悬浮按钮组（与主题选择器、快捷键帮助按钮同组）
+
+使用方式：
+  // 独立使用（固定定位）
+  <BackToTop />
+  
+  // 嵌入式使用（相对定位，已在布局中使用）
+  <BackToTop embedded />
+
+技术特点：
+  - 使用 Tailwind CSS 工具类（bg-gradient-to-br, shadow-lg, hover:scale-105 等）
+  - 渐变背景：from-red-500 to-orange-500
+  - 平滑过渡动画：transition-all duration-300
+  - 无障碍支持：aria-label="回到顶部"
+  - 响应式设计：支持移动端和桌面端
+
+文档：
+  详细文档见 src/components/layout/BackToTop/README.md

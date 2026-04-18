@@ -33,7 +33,7 @@ const ArchivesSkeleton: React.FC = () => (
   <div className="space-y-8">
     {[1, 2].map((y) => (
       <div key={y}>
-        <div className="h-8 w-24 rounded-lg bg-white/10 animate-pulse mb-4" />
+        <div className="h-8 w-24 rounded-card-sm bg-white/10 animate-pulse mb-4" />
         <div className="space-y-3 pl-6 border-l-2 border-white/10">
           {[1, 2, 3].map((m) => (
             <div key={m} className="space-y-2">
@@ -93,7 +93,7 @@ const Archives: React.FC = () => {
         <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{ background: currentColorTheme.gradient }}
           >
             <CalendarOutlined className="text-3xl text-white" />
@@ -115,7 +115,7 @@ const Archives: React.FC = () => {
         </ScrollReveal>
 
         {/* 内容区域 - 玻璃拟态风格 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{
+        <div className="rounded-card-lg p-5 md:p-8 relative z-10" style={{
           minHeight: 300,
           background: themeBg(currentColorTheme.primary, 0.12),
           backdropFilter: 'blur(20px)',
@@ -186,7 +186,7 @@ const Archives: React.FC = () => {
                                 <Link
                                 key={articleId}
                                 to={`/article/${articleId}`}
-                                className="flex items-center gap-3 py-2 px-3 rounded-lg transition-colors group"
+                                className="flex items-center gap-3 py-2 px-3 rounded-card-sm transition-colors group"
                                 style={{ background: 'transparent' }}
                                 onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}

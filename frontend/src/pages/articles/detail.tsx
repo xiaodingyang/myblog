@@ -28,6 +28,7 @@ import ArticleReactions from '@/components/article/ArticleReactions';
 import RelatedArticles from '@/components/article/RelatedArticles';
 import SeriesNav from '@/components/article/SeriesNav';
 import ArticleDetailSkeleton from '@/components/layout/Skeleton/ArticleDetailSkeleton';
+import ArticleNavigation from '@/components/article/ArticleNavigation';
 import Breadcrumb from '@/components/layout/Breadcrumb';
 import { addReadingHistory } from '@/components/reading/ReadingHistory';
 import { checkAchievements } from '@/utils/achievements';
@@ -59,6 +60,7 @@ const ArticleDetailPage: React.FC = () => {
   const { data: commentsData, isLoading: commentLoading } = useComments(id!, commentPage);
   const comments = commentsData?.list ?? [];
   const commentTotal = commentsData?.total ?? 0;
+  const [adjacentArticles, setAdjacentArticles] = useState<{ prev: any; next: any }>({ prev: null, next: null });
 
   // Lightbox for article images
   const lightbox = useLightbox('.markdown-body', [article]);
@@ -139,6 +141,23 @@ const ArticleDetailPage: React.FC = () => {
   useEffect(() => {
     if (id) {
       request(`/api/articles/${id}/view`).catch(() => {});
+    }
+  }, [id]);
+
+  // Fetch adjacent articles
+  useEffect(() => {
+    if (id) {
+      request(`/api/articles/${id}/adjacent`)
+        .then((res: any) => {
+          console.log('Adjacent articles response:', res);
+          if (res.code === 0 && res.data) {
+            console.log('Setting adjacent articles:', res.data);
+            setAdjacentArticles(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch adjacent articles:', err);
+        });
     }
   }, [id]);
 
@@ -483,7 +502,7 @@ const ArticleDetailPage: React.FC = () => {
                   onClick={() =>
                     openAssistant({ id: String(article._id), title: article.title })
                   }
-                  className="!rounded-lg"
+                  className="!rounded-card-sm"
                 >
                   {ARTICLE_AI_ASSISTANT_NAME}
                 </Button>
@@ -505,6 +524,9 @@ const ArticleDetailPage: React.FC = () => {
 
           {/* 评论区 + 相关推荐：lg 下为 fixed 目录预留与上方 flex（w-56 + gap-8）同宽的右侧空间，避免白底卡片盖住目录 */}
           <div className="lg:pr-[calc(14rem+2rem)]">
+          {/* 上一篇 / 下一篇：放在评论模块前 */}
+          <ArticleNavigation prev={adjacentArticles.prev} next={adjacentArticles.next} />
+
           {/* 评论区：ref 挂在原生 div 上（Card 不保证 forwardRef） */}
           <div id="article-comments-section">
           <Card
@@ -556,7 +578,7 @@ const ArticleDetailPage: React.FC = () => {
                 </div>
               ) : (
                 <div
-                  className="text-center py-6 rounded-xl cursor-pointer transition-all hover:shadow-md"
+                  className="text-center py-6 rounded-card-lg cursor-pointer transition-all hover:shadow-md"
                   style={{ background: '#f8f9fa', border: '1px dashed #d9d9d9' }}
                   onClick={() => requireAuth()}
                 >

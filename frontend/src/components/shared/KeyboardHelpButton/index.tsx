@@ -18,7 +18,7 @@ const KeyboardHelpButton: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           type="button"
           aria-label="键盘快捷键"
           onClick={() => setVisible(true)}
-          className={`rounded-xl shadow-lg transition-transform duration-300 hover:scale-105 ${embedded ? '' : 'fixed z-40'}`}
+          className={`rounded-card-lg shadow-lg transition-transform duration-300 hover:scale-105 ${embedded ? '' : 'fixed z-40'}`}
           style={{
             ...(embedded
               ? { position: 'relative' }

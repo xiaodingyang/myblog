@@ -5,6 +5,7 @@ import { getReadingStats, getUnlockedAchievements, getAllMilestones } from '@/ut
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
+import { BORDER_RADIUS, SPACING, FONT_SIZE } from '@/styles/designTokens';
 
 dayjs.extend(relativeTime);
 dayjs.locale('zh-cn');
@@ -28,7 +29,7 @@ const ReadingStatsModal: React.FC<ReadingStatsProps> = ({ open, onClose }) => {
       onCancel={onClose}
       footer={null}
       title={
-        <span style={{ fontSize: 16, fontWeight: 600 }}>
+        <span style={{ fontSize: FONT_SIZE.ICON_MEDIUM, fontWeight: 600 }}>
           <TrophyOutlined style={{ marginRight: 8, color: '#f59e0b' }} />
           阅读统计
         </span>
@@ -38,20 +39,20 @@ const ReadingStatsModal: React.FC<ReadingStatsProps> = ({ open, onClose }) => {
     >
       {/* Stats cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
-        <div style={{ textAlign: 'center', padding: 16, background: '#f0f9ff', borderRadius: 12 }}>
+        <div style={{ textAlign: 'center', padding: 16, background: '#f0f9ff', borderRadius: BORDER_RADIUS.CARD_LARGE }}>
           <ReadOutlined style={{ fontSize: 24, color: '#3b82f6', marginBottom: 4 }} />
           <div style={{ fontSize: 28, fontWeight: 700, color: '#1e40af' }}>{stats.totalArticles}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>已读文章</Text>
+          <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>已读文章</Text>
         </div>
-        <div style={{ textAlign: 'center', padding: 16, background: '#fef3c7', borderRadius: 12 }}>
+        <div style={{ textAlign: 'center', padding: 16, background: '#fef3c7', borderRadius: BORDER_RADIUS.CARD_LARGE }}>
           <FireOutlined style={{ fontSize: 24, color: '#f59e0b', marginBottom: 4 }} />
           <div style={{ fontSize: 28, fontWeight: 700, color: '#92400e' }}>{stats.streakDays}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>连续天数</Text>
+          <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>连续天数</Text>
         </div>
-        <div style={{ textAlign: 'center', padding: 16, background: '#f0fdf4', borderRadius: 12 }}>
+        <div style={{ textAlign: 'center', padding: 16, background: '#f0fdf4', borderRadius: BORDER_RADIUS.CARD_LARGE }}>
           <TrophyOutlined style={{ fontSize: 24, color: '#22c55e', marginBottom: 4 }} />
           <div style={{ fontSize: 28, fontWeight: 700, color: '#166534' }}>{unlocked.length}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>已解锁</Text>
+          <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>已解锁</Text>
         </div>
       </div>
 
@@ -72,7 +73,7 @@ const ReadingStatsModal: React.FC<ReadingStatsProps> = ({ open, onClose }) => {
                   alignItems: 'center',
                   gap: 12,
                   padding: '10px 14px',
-                  borderRadius: 10,
+                  borderRadius: BORDER_RADIUS.CARD_MEDIUM,
                   background: isUnlocked ? '#fefce8' : '#f9fafb',
                   border: `1px solid ${isUnlocked ? '#fde68a' : '#f3f4f6'}`,
                   opacity: isUnlocked ? 1 : 0.5,
@@ -80,16 +81,16 @@ const ReadingStatsModal: React.FC<ReadingStatsProps> = ({ open, onClose }) => {
               >
                 <span style={{ fontSize: 24 }}>{(m as any).icon || '🏅'}</span>
                 <div style={{ flex: 1 }}>
-                  <Text strong style={{ fontSize: 14 }}>{m.title}</Text>
+                  <Text strong style={{ fontSize: FONT_SIZE.HEADING_SMALL }}>{m.title}</Text>
                   <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>{m.desc}</Text>
+                  <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>{m.desc}</Text>
                 </div>
                 {isUnlocked ? (
-                  <Text style={{ fontSize: 11, color: '#16a34a' }}>
+                  <Text style={{ fontSize: FONT_SIZE.CAPTION, color: '#16a34a' }}>
                     ✅ {dayjs(unlockedItem!.unlockedAt).fromNow()}
                   </Text>
                 ) : (
-                  <Text type="secondary" style={{ fontSize: 11 }}>🔒 未解锁</Text>
+                  <Text type="secondary" style={{ fontSize: FONT_SIZE.CAPTION }}>🔒 未解锁</Text>
                 )}
               </div>
             );

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, Input, List, Tag, Typography, Empty, Space } from 'antd';
 import { SearchOutlined, ClockCircleOutlined, CloseOutlined, EnterOutlined } from '@ant-design/icons';
 import { request, history } from 'umi';
+import { BORDER_RADIUS, FONT_SIZE, TRANSITION } from '@/styles/designTokens';
 
 const { Text, Paragraph } = Typography;
 
@@ -37,7 +38,7 @@ function highlightText(text: string, keyword: string) {
   const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
   return parts.map((part, i) =>
     part.toLowerCase() === keyword.toLowerCase() ? (
-      <mark key={i} style={{ background: '#ffe58f', padding: 0, borderRadius: 2 }}>{part}</mark>
+      <mark key={i} style={{ background: '#ffe58f', padding: 0, borderRadius: BORDER_RADIUS.TAG }}>{part}</mark>
     ) : (
       part
     ),
@@ -144,7 +145,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose }) => {
       open={open}
       onCancel={onClose}
       footer={
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', opacity: 0.45, fontSize: 12 }}>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', opacity: 0.45, fontSize: FONT_SIZE.BODY_SMALL }}>
           <span>↑↓ 选择</span>
           <span><EnterOutlined /> 打开</span>
           <span>Esc 关闭</span>
@@ -180,12 +181,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose }) => {
         {showHistory && (
           <div style={{ padding: '0 12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>
                 <ClockCircleOutlined /> 搜索历史
               </Text>
               <a
                 onClick={() => { clearHistory(); setHistoryList([]); }}
-                style={{ fontSize: 12, color: '#525252' }}
+                style={{ fontSize: FONT_SIZE.BODY_SMALL, color: '#525252' }}
               >
                 清除
               </a>
@@ -219,27 +220,27 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onClose }) => {
                   style={{
                     cursor: 'pointer',
                     padding: '10px 12px',
-                    borderRadius: 8,
+                    borderRadius: BORDER_RADIUS.CARD_SMALL,
                     background: index === activeIndex ? 'rgba(0,0,0,0.04)' : 'transparent',
-                    transition: 'background 0.2s',
+                    transition: `background ${TRANSITION.FAST}`,
                     border: 'none',
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
                   <List.Item.Meta
                     title={
-                      <Text strong style={{ fontSize: 14 }}>
+                      <Text strong style={{ fontSize: FONT_SIZE.HEADING_SMALL }}>
                         {highlightText(item.title || '', keyword)}
                       </Text>
                     }
                     description={
                       <div>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
+                        <Text type="secondary" style={{ fontSize: FONT_SIZE.BODY_SMALL }}>
                           {(item.summary || '').slice(0, 80)}
                           {(item.summary || '').length > 80 ? '...' : ''}
                         </Text>
                         {item.category && (
-                          <Tag color="blue" style={{ marginLeft: 8, fontSize: 11 }}>
+                          <Tag color="blue" style={{ marginLeft: 8, fontSize: FONT_SIZE.CAPTION }}>
                             {typeof item.category === 'object' ? item.category.name : item.category}
                           </Tag>
                         )}

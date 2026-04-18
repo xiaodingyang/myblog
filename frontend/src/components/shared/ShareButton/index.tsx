@@ -3,6 +3,7 @@ import { Popover, message } from 'antd';
 import { ShareAltOutlined, LinkOutlined, QqOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { QRCodeSVG } from 'qrcode.react';
 import { useModel } from 'umi';
+import { BORDER_RADIUS, FONT_SIZE, TRANSITION } from '@/styles/designTokens';
 
 interface ShareButtonProps {
   title: string;
@@ -109,7 +110,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     <div style={{ width: 220 }}>
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <QRCodeSVG value={shareUrl} size={140} level="M" />
-        <div style={{ color: '#525252', fontSize: 12, marginTop: 6 }}>
+        <div style={{ color: '#525252', fontSize: FONT_SIZE.BODY_SMALL, marginTop: 6 }}>
           微信扫码分享
         </div>
       </div>
@@ -121,13 +122,13 @@ const ShareButton: React.FC<ShareButtonProps> = ({
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
               background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px',
-              borderRadius: 8, transition: 'background 0.2s',
+              borderRadius: BORDER_RADIUS.CARD_SMALL, transition: `background ${TRANSITION.FAST}`,
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
           >
             <ShareAltOutlined style={{ fontSize: 22, color: '#1677ff' }} />
-            <span style={{ fontSize: 11, color: '#666' }}>分享</span>
+            <span style={{ fontSize: FONT_SIZE.CAPTION, color: '#666' }}>分享</span>
           </button>
         )}
         <button
@@ -135,39 +136,39 @@ const ShareButton: React.FC<ShareButtonProps> = ({
           style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
             background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px',
-            borderRadius: 8, transition: 'background 0.2s',
+            borderRadius: BORDER_RADIUS.CARD_SMALL, transition: `background ${TRANSITION.FAST}`,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
         >
           <QqOutlined style={{ fontSize: 22, color: '#12B7F5' }} />
-          <span style={{ fontSize: 11, color: '#666' }}>QQ空间</span>
+          <span style={{ fontSize: FONT_SIZE.CAPTION, color: '#666' }}>QQ空间</span>
         </button>
         <button
           onClick={() => { shareToWeibo(title, shareUrl, cover); setOpen(false); }}
           style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
             background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px',
-            borderRadius: 8, transition: 'background 0.2s',
+            borderRadius: BORDER_RADIUS.CARD_SMALL, transition: `background ${TRANSITION.FAST}`,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
         >
           <WeiboCircleOutlined style={{ fontSize: 22, color: '#E6162D' }} />
-          <span style={{ fontSize: 11, color: '#666' }}>微博</span>
+          <span style={{ fontSize: FONT_SIZE.CAPTION, color: '#666' }}>微博</span>
         </button>
         <button
           onClick={() => { copyLink(shareUrl); setOpen(false); }}
           style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
             background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px',
-            borderRadius: 8, transition: 'background 0.2s',
+            borderRadius: BORDER_RADIUS.CARD_SMALL, transition: `background ${TRANSITION.FAST}`,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
         >
           <LinkOutlined style={{ fontSize: 22, color: '#666' }} />
-          <span style={{ fontSize: 11, color: '#666' }}>复制</span>
+          <span style={{ fontSize: FONT_SIZE.CAPTION, color: '#666' }}>复制</span>
         </button>
       </div>
     </div>
@@ -188,11 +189,11 @@ const ShareButton: React.FC<ShareButtonProps> = ({
           style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           onClick={(e) => e.preventDefault()}
         >
-          <ShareAltOutlined style={{ fontSize: 14 }} />
+          <ShareAltOutlined style={{ fontSize: FONT_SIZE.HEADING_SMALL }} />
         </button>
       ) : (
         <button
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-card-sm text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
           style={{ background: 'none', border: '1px solid #e5e7eb', cursor: 'pointer' }}
         >
           <ShareAltOutlined />

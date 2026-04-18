@@ -6,6 +6,7 @@ import { request } from 'umi';
 import { getColorThemeById } from '@/config/colorThemes';
 import { useModel } from 'umi';
 import { getReadArticleIds } from '@/utils/recommend';
+import { BORDER_RADIUS, FONT_SIZE, BOX_SHADOW } from '@/styles/designTokens';
 
 const { Title, Text } = Typography;
 
@@ -108,9 +109,9 @@ const RelatedArticles: React.FC<RelatedArticlesProps> = ({
       <Card
         className="mt-8"
         style={{
-          borderRadius: 16,
+          borderRadius: BORDER_RADIUS.CARD_LARGE,
           border: 'none',
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+          boxShadow: BOX_SHADOW.SMALL,
         }}
       >
         <Title level={4} className="!mb-6">📋 相关推荐</Title>
@@ -134,7 +135,7 @@ const RelatedArticles: React.FC<RelatedArticlesProps> = ({
     <Card
       className="mt-8"
       style={{
-        borderRadius: 16,
+        borderRadius: BORDER_RADIUS.CARD_LARGE,
         border: 'none',
         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
       }}
@@ -164,7 +165,7 @@ const RelatedArticles: React.FC<RelatedArticlesProps> = ({
           >
             <Card
               hoverable
-              className="h-full !rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-lg"
+              className="h-full !rounded-card-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg"
               cover={
                 article.cover ? (
                   <img
@@ -191,7 +192,7 @@ const RelatedArticles: React.FC<RelatedArticlesProps> = ({
               <Text
                 strong
                 className="block mb-2 line-clamp-2 transition-colors group-hover:text-blue-500"
-                style={{ fontSize: 14 }}
+                style={{ fontSize: FONT_SIZE.HEADING_SMALL }}
               >
                 {article.title}
               </Text>

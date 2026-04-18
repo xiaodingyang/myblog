@@ -56,7 +56,7 @@ const ReadingHistory: React.FC = () => {
   if (history.length === 0) return null;
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-lg">
+    <div className="bg-white/95 backdrop-blur-sm rounded-card-lg p-4 md:p-6 shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ClockCircleOutlined style={{ color: '#8b5cf6' }} />
@@ -72,9 +72,9 @@ const ReadingHistory: React.FC = () => {
       <div className="space-y-2 max-h-[300px] overflow-y-auto">
         {history.slice(0, 10).map(item => (
           <Link key={item.articleId} to={`/article/${item.articleId}`} className="block group">
-            <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex items-start gap-3 p-2 rounded-card-sm hover:bg-gray-50 transition-colors">
               {item.cover && (
-                <img src={item.cover} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                <img src={item.cover} alt="" className="w-12 h-12 rounded-card-sm object-cover flex-shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <Text className="!text-sm font-medium block truncate group-hover:text-blue-500 transition-colors">

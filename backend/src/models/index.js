@@ -10,6 +10,7 @@ const Follow = require('./Follow');
 const Notification = require('./Notification');
 const Series = require('./Series');
 const Visit = require('./Visit');
+const AiNews = require('./AiNews');
 
 module.exports = {
   User,
@@ -24,4 +25,5 @@ module.exports = {
   Notification,
   Series,
   Visit,
+  AiNews,
 };

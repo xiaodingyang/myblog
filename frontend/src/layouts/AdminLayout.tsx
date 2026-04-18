@@ -167,7 +167,7 @@ const AdminLayout: React.FC = () => {
         <div className="h-16 flex items-center justify-center border-b border-gray-700">
           <Link to="/admin/dashboard" className="flex items-center gap-3 no-underline">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
+              className="w-8 h-8 rounded-card-sm flex items-center justify-center text-white font-bold"
               style={{
                 background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)',
               }}
@@ -227,7 +227,7 @@ const AdminLayout: React.FC = () => {
           />
 
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Space className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded-lg transition-colors">
+            <Space className="cursor-pointer hover:bg-gray-100 px-3 py-1 rounded-card-sm transition-colors">
               <Avatar 
                 size={36}
                 icon={<UserOutlined />}

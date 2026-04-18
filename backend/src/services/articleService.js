@@ -297,6 +297,29 @@ async function findPublishedInCategoryExcept(categoryId, excludeArticleId, limit
   return Article.find(query).select('title content').sort({ updatedAt: -1 }).limit(lim).lean();
 }
 
+/**
+ * 获取上一篇和下一篇文章
+ */
+async function getAdjacentArticles(id) {
+  const currentArticle = await Article.findOne({ _id: id, status: 'published' }).select('createdAt').lean();
+  if (!currentArticle) return { prev: null, next: null };
+
+  const [prev, next] = await Promise.all([
+    // 上一篇：比当前文章更早发布的文章（按发布时间降序，取第一篇）
+    Article.findOne({ status: 'published', createdAt: { $lt: currentArticle.createdAt } })
+      .select('_id title cover summary')
+      .sort({ createdAt: -1 })
+      .lean(),
+    // 下一篇：比当前文章更晚发布的文章（按发布时间升序，取第一篇）
+    Article.findOne({ status: 'published', createdAt: { $gt: currentArticle.createdAt } })
+      .select('_id title cover summary')
+      .sort({ createdAt: 1 })
+      .lean(),
+  ]);
+
+  return { prev, next };
+}
+
 module.exports = {
   getArticles,
   getArticlesWithCache,
@@ -311,4 +334,5 @@ module.exports = {
   deleteArticle,
   clearArticleListCache,
   findPublishedInCategoryExcept,
+  getAdjacentArticles,
 };

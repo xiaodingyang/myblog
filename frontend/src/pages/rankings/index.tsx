@@ -32,7 +32,7 @@ const getRankIcon = (rank: number) => {
 const RankingSkeleton: React.FC = () => (
   <div className="space-y-3">
     {[1, 2, 3, 4, 5, 6].map((i) => (
-      <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
+      <div key={i} className="flex items-center gap-4 p-4 rounded-card-lg">
         <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
         <div className="flex-1 space-y-2">
           <div className="h-5 w-32 rounded bg-white/10 animate-pulse" />
@@ -112,7 +112,7 @@ const Rankings: React.FC = () => {
         <ScrollReveal direction="up">
         <div className="text-center mb-12">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{ background: currentColorTheme.gradient }}
           >
             <TrophyOutlined className="text-3xl text-white" />
@@ -135,7 +135,7 @@ const Rankings: React.FC = () => {
 
         {/* 内容区域 */}
         <div
-          className="p-5 md:p-8 rounded-2xl relative z-10"
+          className="p-5 md:p-8 rounded-card-lg relative z-10"
           style={{
             minHeight: 300,
             background: themeBg(currentColorTheme.primary, 0.12),
@@ -157,7 +157,7 @@ const Rankings: React.FC = () => {
                   <ScrollReveal key={item.userId} direction="up" delay={index * 0.06}>
                   <div
                     key={item.userId}
-                    className="flex items-center gap-4 p-4 rounded-xl transition-colors hover:bg-white/8"
+                    className="flex items-center gap-4 p-4 rounded-card-lg transition-colors hover:bg-white/8"
                     style={
                       isTop3
                         ? { background: `${currentColorTheme.primary}10`, border: `1px solid ${currentColorTheme.primary}18` }

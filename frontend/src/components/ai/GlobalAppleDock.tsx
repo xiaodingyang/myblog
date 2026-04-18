@@ -52,7 +52,7 @@ export function GlobalAppleFabButton() {
       <button
         type="button"
         onClick={() => openAssistant()}
-        className={`rounded-xl shadow-lg transition-all duration-300 hover:scale-105 ${pulse ? 'animate-pulse' : ''}`}
+        className={`rounded-card-lg shadow-lg transition-all duration-300 hover:scale-105 ${pulse ? 'animate-pulse' : ''}`}
         style={{
           position: 'relative',
           width: FAB_SIZE_PX,

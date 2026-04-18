@@ -5,6 +5,7 @@ import { Link, request, useModel } from 'umi';
 import { RobotOutlined, CloseOutlined } from '@ant-design/icons';
 import { getColorThemeById } from '@/config/colorThemes';
 import { ARTICLE_AI_ASSISTANT_NAME } from '@/components/shared/floatingActionsConstants';
+import { BORDER_RADIUS, FONT_SIZE } from '@/styles/designTokens';
 
 const LazyMarkdownArticleBody = lazy(() => import('@/components/article/MarkdownArticleBody'));
 
@@ -176,7 +177,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
         id="blog-ai-assistant-dialog"
         className="relative z-10 w-full max-w-[min(52rem,calc(100vw-1.5rem))] max-h-[min(90vh,800px)] flex flex-col overflow-hidden pointer-events-auto"
         style={{
-          borderRadius: 16,
+          borderRadius: BORDER_RADIUS.CARD_LARGE,
           background:
             'linear-gradient(165deg, rgba(28,32,42,0.98) 0%, rgba(18,21,30,0.98) 42%, rgba(14,16,24,0.99) 100%)',
           border: '1px solid rgba(255,255,255,0.1)',
@@ -192,9 +193,9 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
         >
           <div className="flex items-center gap-3.5 min-w-0 pr-2">
             <div
-              className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
+              className="w-11 h-11 rounded-card-sm flex items-center justify-center shrink-0"
               style={{
-                borderRadius: 10,
+                borderRadius: BORDER_RADIUS.CARD_MEDIUM,
                 backgroundImage: theme.gradient,
                 boxShadow: `inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 20px ${theme.primary}40`,
               }}
@@ -228,7 +229,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                 onClick={onClose}
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 text-white/90 hover:text-white hover:scale-105 active:scale-95"
                 style={{
-                  borderRadius: 9999,
+                  borderRadius: BORDER_RADIUS.BUTTON_PILL,
                   background: `${theme.primary}22`,
                   border: `1px solid ${theme.primary}55`,
                   boxShadow: `0 0 0 1px rgba(0,0,0,0.2), 0 4px 14px ${theme.primary}35`,
@@ -244,9 +245,9 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
           {step === 'disclaimer' ? (
             <Space direction="vertical" size="large" className="w-full">
               <div
-                className="ai-assistant-disclaimer-box rounded-lg p-4 border"
+                className="ai-assistant-disclaimer-box rounded-card-sm p-4 border"
                 style={{
-                  borderRadius: 10,
+                  borderRadius: BORDER_RADIUS.CARD_MEDIUM,
                   borderColor: 'rgba(255,255,255,0.1)',
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                   color: 'rgba(255,255,255,0.88)',
@@ -266,9 +267,9 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                   type="primary"
                   size="large"
                   onClick={acceptDisclaimer}
-                  className="ai-assistant-disclaimer-continue !rounded-lg !h-10 !px-6 !font-medium !border-0 min-w-[200px]"
+                  className="ai-assistant-disclaimer-continue !rounded-card-sm !h-10 !px-6 !font-medium !border-0 min-w-[200px]"
                   style={{
-                    borderRadius: 8,
+                    borderRadius: BORDER_RADIUS.BUTTON,
                     backgroundImage: theme.gradient,
                     boxShadow: `0 6px 22px ${theme.primary}45, inset 0 1px 0 rgba(255,255,255,0.2)`,
                     textShadow: '0 1px 2px rgba(0,0,0,0.35)',
@@ -299,7 +300,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                     autoSize={{ minRows: 4, maxRows: 10 }}
                     maxLength={2000}
                     disabled={loading}
-                    className="ai-assistant-q-textarea !rounded-lg !text-[13px] !leading-relaxed !border-white/[0.12] [&_textarea]:!min-h-[120px] [&_textarea]:!text-[rgba(255,255,255,0.92)] [&_textarea]:!caret-white !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
+                    className="ai-assistant-q-textarea !rounded-card-sm !text-[13px] !leading-relaxed !border-white/[0.12] [&_textarea]:!min-h-[120px] [&_textarea]:!text-[rgba(255,255,255,0.92)] [&_textarea]:!caret-white !shadow-inner transition-[box-shadow,border-color] duration-200 [&:focus-within]:!border-white/[0.2] [&:focus-within]:!shadow-[inset_0_1px_2px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(255,255,255,0.04)]"
                     styles={{
                       textarea: {
                         color: 'rgba(255,255,255,0.92)',
@@ -307,7 +308,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                       },
                     }}
                     style={{
-                      borderRadius: 8,
+                      borderRadius: BORDER_RADIUS.BUTTON,
                       color: 'rgba(255,255,255,0.92)',
                       background: 'rgba(10,12,18,0.55)',
                       boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.35)',
@@ -325,9 +326,9 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                   onClick={submit}
                   loading={loading}
                   disabled={question.trim().length < 2}
-                  className="!rounded-lg !h-10 !px-8 !font-semibold !border-0 w-full sm:w-auto sm:min-w-[132px] !text-white hover:!text-white"
+                  className="!rounded-card-sm !h-10 !px-8 !font-semibold !border-0 w-full sm:w-auto sm:min-w-[132px] !text-white hover:!text-white"
                   style={{
-                    borderRadius: 8,
+                    borderRadius: BORDER_RADIUS.BUTTON,
                     backgroundImage: theme.gradient,
                     boxShadow: `0 6px 22px ${theme.primary}48, inset 0 1px 0 rgba(255,255,255,0.22)`,
                   }}
@@ -340,18 +341,18 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                   type="error"
                   message={<span className="whitespace-pre-line">{errText}</span>}
                   showIcon
-                  className="!text-[13px] !rounded-lg !bg-rose-950/45 !border-rose-500/25 [&_.ant-alert-message]:!text-rose-50 [&_.ant-alert-icon]:!text-rose-300"
+                  className="!text-[13px] !rounded-card-sm !bg-rose-950/45 !border-rose-500/25 [&_.ant-alert-message]:!text-rose-50 [&_.ant-alert-icon]:!text-rose-300"
                 />
               )}
               {loading && (
-                <div className="flex justify-center py-10 rounded-lg border border-white/[0.06] bg-black/20">
+                <div className="flex justify-center py-10 rounded-card-sm border border-white/[0.06] bg-black/20">
                   <Spin tip="小苹果正在思考…" className="[&_.ant-spin-text]:!text-[13px] [&_.ant-spin-text]:!text-white/65" />
                 </div>
               )}
               {result && !loading && (
                 <Suspense
                   fallback={
-                    <div className="flex justify-center py-12 rounded-lg border border-white/[0.06] bg-black/20">
+                    <div className="flex justify-center py-12 rounded-card-sm border border-white/[0.06] bg-black/20">
                       <Spin tip="加载正文排版…" className="[&_.ant-spin-text]:!text-[13px] [&_.ant-spin-text]:!text-white/65" />
                     </div>
                   }
@@ -366,7 +367,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                             : '全站通用模式：回答基于通用技术知识，与站内单篇正文无绑定。'
                         }
                         showIcon
-                        className="!text-[13px] !rounded-lg !bg-sky-950/30 !border-sky-500/20 [&_.ant-alert-message]:!text-sky-50"
+                        className="!text-[13px] !rounded-card-sm !bg-sky-950/30 !border-sky-500/20 [&_.ant-alert-message]:!text-sky-50"
                       />
                     )}
                     {result.meta?.retrievalEmpty &&
@@ -376,7 +377,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                           type="warning"
                           message="当前正文未匹配到强相关段落，已结合同分类其它文章摘录生成下列回答"
                           showIcon
-                          className="!text-[13px] !rounded-lg !bg-amber-950/35 !border-amber-400/20 [&_.ant-alert-message]:!text-amber-50"
+                          className="!text-[13px] !rounded-card-sm !bg-amber-950/35 !border-amber-400/20 [&_.ant-alert-message]:!text-amber-50"
                         />
                       )}
                     {result.meta?.categoryBoostUsed && !result.meta?.retrievalEmpty && (
@@ -384,13 +385,13 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
                         type="info"
                         message="已在当前正文基础上补充同分类下的参考摘录"
                         showIcon
-                        className="!text-[13px] !rounded-lg !bg-sky-950/30 !border-sky-500/20 [&_.ant-alert-message]:!text-sky-50"
+                        className="!text-[13px] !rounded-card-sm !bg-sky-950/30 !border-sky-500/20 [&_.ant-alert-message]:!text-sky-50"
                       />
                     )}
                     <div
-                      className="markdown-body markdown-body--dark-panel rounded-lg border p-4 sm:p-5 min-h-0"
+                      className="markdown-body markdown-body--dark-panel rounded-card-sm border p-4 sm:p-5 min-h-0"
                       style={{
-                        borderRadius: 10,
+                        borderRadius: BORDER_RADIUS.CARD_MEDIUM,
                         borderColor: 'rgba(255,255,255,0.08)',
                         background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(8,10,15,0.45) 100%)',
                       }}

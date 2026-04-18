@@ -43,7 +43,7 @@ const HeroArticle: React.FC<{ article: API.Article; colorTheme: ReturnType<typeo
       className="block no-underline group mb-10 md:mb-14"
       onMouseEnter={() => id && fetchArticleDetail(id)}
     >
-      <div className="relative h-[260px] sm:h-[340px] md:h-[420px] rounded-2xl overflow-hidden shadow-lg">
+      <div className="relative h-[260px] sm:h-[340px] md:h-[420px] rounded-card-lg overflow-hidden shadow-lg">
         {article.cover ? (
           <OptimizedImage
             src={article.cover}
@@ -159,7 +159,7 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ article, colorTheme }) => {
       <div
         ref={tiltRef}
         {...tiltHandlers}
-        className="rounded-xl overflow-hidden"
+        className="rounded-card-lg overflow-hidden"
         style={{
           ...tiltStyle,
           background: themeBg(colorTheme.primary, 0.15),
@@ -457,7 +457,7 @@ const ArticlesPage: React.FC = () => {
         </ScrollReveal>
 
         {/* ── 内容容器 ── */}
-        <div className="rounded-2xl p-4 md:p-8 relative z-10" style={{
+        <div className="rounded-card-lg p-4 md:p-8 relative z-10" style={{
           minHeight: 400,
           background: themeBg(colorTheme.primary, 0.12),
           backdropFilter: 'blur(20px)',
@@ -466,7 +466,7 @@ const ArticlesPage: React.FC = () => {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
         }}>
           {/* ── 搜索筛选栏 ── */}
-          <div className="flex flex-wrap items-center gap-3 mb-6 md:mb-8 p-4 md:p-5 rounded-xl" style={{
+          <div className="flex flex-wrap items-center gap-3 mb-6 md:mb-8 p-4 md:p-5 rounded-card-lg" style={{
             background: 'rgba(255, 255, 255, 0.08)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
@@ -479,7 +479,7 @@ const ArticlesPage: React.FC = () => {
               onChange={(e) => updateParams('keyword', e.target.value)}
               onPressEnter={(e) => updateParams('keyword', (e.target as HTMLInputElement).value)}
               allowClear
-              className="!rounded-lg !flex-1 !min-w-[160px]"
+              className="!rounded-card-sm !flex-1 !min-w-[160px]"
               style={{
                 maxWidth: 280,
               }}
@@ -555,7 +555,7 @@ const ArticlesPage: React.FC = () => {
 
           {/* 标签云快速筛选 */}
           {!loading && tags.length > 0 && (
-            <div className="mb-6 p-4 md:p-5 rounded-xl" style={{
+            <div className="mb-6 p-4 md:p-5 rounded-card-lg" style={{
               background: 'rgba(255, 255, 255, 0.06)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',

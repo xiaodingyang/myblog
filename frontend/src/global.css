@@ -33,7 +33,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -106,7 +106,7 @@ body {
   margin: 0;
   font-size: 85%;
   background-color: #f1f5f9;
-  border-radius: 6px;
+  border-radius: 3px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
@@ -116,7 +116,7 @@ body {
   font-size: 85%;
   line-height: 1.45;
   background-color: #1e293b;
-  border-radius: 8px;
+  border-radius: 4px;
   margin-bottom: 16px;
 }
 
@@ -135,12 +135,12 @@ body {
   border-left: 4px solid var(--theme-primary, #ffb3d9);
   /* 主题色 */
   background: #f8fafc;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 4px 4px 0;
 }
 
 .markdown-body img {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
@@ -337,7 +337,7 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  border-radius: 16px !important;
+  border-radius: 8px !important;
 }
 
 /* 毛玻璃卡片 - 移动端优化 */
@@ -345,9 +345,9 @@ body {
   .glass-card {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 12px !important;
+    border-radius: 6px !important;
   }
-  
+
   .card-hover:hover {
     transform: translateY(-2px);
   }
@@ -462,7 +462,7 @@ body {
   background: rgba(15, 23, 42, 0.96) !important;
   backdrop-filter: blur(16px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border-radius: 12px !important;
+  border-radius: 8px !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   padding: 6px !important;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35) !important;
@@ -472,7 +472,7 @@ body {
 .front-header-dark-submenu .ant-menu-item a,
 .front-header-dark-submenu .ant-menu-item .anticon {
   color: rgba(248, 250, 252, 0.92) !important;
-  border-radius: 8px !important;
+  border-radius: 4px !important;
 }
 
 .front-header-dark-submenu .ant-menu-item:hover,
@@ -504,7 +504,7 @@ body {
 .header-search.ant-input-affix-wrapper {
   width: 100% !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 20px !important;
+  border-radius: 8px !important;
   background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
@@ -688,19 +688,19 @@ body {
 .ant-modal-content {
   background: #ffffff !important;
   border: none !important;
-  border-radius: 16px !important;
+  border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* 统一圆角 */
 .ant-btn {
-  border-radius: 8px !important;
+  border-radius: 4px !important;
 }
 
 .ant-input,
 .ant-input-affix-wrapper,
 .ant-input-textarea textarea {
-  border-radius: 8px !important;
+  border-radius: 4px !important;
 }
 
 .ant-tag {
@@ -1019,7 +1019,7 @@ body .ant-select-dropdown .ant-select-item-option-selected {
 .header-search-glass.ant-input-affix-wrapper {
   width: 100% !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 20px !important;
+  border-radius: 8px !important;
   background: rgba(255, 255, 255, 0.1) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -1104,4 +1104,45 @@ textarea.ai-assistant-q-textarea {
 .ai-assistant-disclaimer-continue.ant-btn-primary:focus,
 .ai-assistant-disclaimer-continue.ant-btn-primary span {
   color: #fff !important;
+}
+
+/* ========== 自定义圆角类（基于设计规范） ========== */
+/* 使用 @layer utilities 确保可以被 Tailwind 的 important 覆盖 */
+@layer utilities {
+  /* 卡片圆角 */
+  .rounded-card-lg {
+    border-radius: 8px !important;
+  }
+
+  .rounded-card-md {
+    border-radius: 6px !important;
+  }
+
+  .rounded-card-sm {
+    border-radius: 4px !important;
+  }
+
+  /* 按钮圆角 */
+  .rounded-btn {
+    border-radius: 4px !important;
+  }
+
+  .rounded-btn-pill {
+    border-radius: 9999px !important;
+  }
+
+  /* 标签圆角 */
+  .rounded-tag {
+    border-radius: 3px !important;
+  }
+
+  /* 输入框圆角 */
+  .rounded-input {
+    border-radius: 4px !important;
+  }
+
+  /* 徽章圆角 */
+  .rounded-badge {
+    border-radius: 2px !important;
+  }
 }

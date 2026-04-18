@@ -62,7 +62,7 @@ const TagsPage: React.FC = () => {
 
   // 骨架屏
   const TagsSkeleton = () => (
-    <div className="p-6 rounded-2xl border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+    <div className="p-6 rounded-card-lg border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
       <div className="flex flex-wrap justify-center gap-4 py-8">
         {[80, 60, 100, 50, 70, 90, 55, 85, 65, 75, 45, 95].map((w, i) => (
           <div
@@ -83,7 +83,7 @@ const TagsPage: React.FC = () => {
         <ScrollReveal direction="up">
         <div className="text-center mb-10 md:mb-14">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{
               background: currentColorTheme.gradient,
             }}
@@ -112,7 +112,7 @@ const TagsPage: React.FC = () => {
 
         {/* 内容区域 - 玻璃态卡片 */}
         <div
-          className="rounded-2xl p-5 md:p-8 relative z-10"
+          className="rounded-card-lg p-5 md:p-8 relative z-10"
           style={{
             minHeight: 300,
             background: 'rgba(255, 255, 255, 0.08)',

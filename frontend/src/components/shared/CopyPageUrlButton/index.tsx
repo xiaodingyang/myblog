@@ -49,7 +49,7 @@ const CopyPageUrlButton: React.FC<CopyPageUrlButtonProps> = ({ className }) => {
       onClick={handleClick}
       className={
         className ||
-        'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm transition-all duration-200'
+        'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-card-sm text-sm transition-all duration-200'
       }
       style={{
         border: copied ? '1px solid #52c41a' : '1px solid #e5e7eb',

@@ -24,6 +24,7 @@
     "@tsparticles/react": "3.0.0",
     "@tsparticles/slim": "^3.9.1",
     "@xdy-npm/react-particle-backgrounds": "1.4.0",
+    "@xdy-npm/realtime-rss-hub-react": "^0.1.0",
     "antd": "^5.29.3",
     "antd-img-crop": "^4.30.0",
     "dayjs": "^1.11.20",

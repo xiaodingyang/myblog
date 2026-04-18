@@ -57,9 +57,9 @@ const CategoriesPage: React.FC = () => {
     <Row gutter={[24, 24]}>
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <Col xs={24} sm={12} lg={8} key={i}>
-          <div className="p-5 rounded-2xl border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+          <div className="p-5 rounded-card-lg border border-white/10" style={{ boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-white/10 animate-pulse flex-shrink-0" />
+              <div className="w-14 h-14 rounded-card-lg bg-white/10 animate-pulse flex-shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-6 w-24 rounded bg-white/10 animate-pulse" />
                 <div className="h-4 w-full rounded bg-white/6 animate-pulse" />
@@ -79,7 +79,7 @@ const CategoriesPage: React.FC = () => {
         {/* 页面标题 - 透明背景，显示粒子 */}
         <ScrollReveal direction="up">
         <div className="text-center mb-10 md:mb-14">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4" style={{
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4" style={{
             background: currentColorTheme.gradient,
           }}>
             <FolderOutlined className="text-3xl text-white" />
@@ -105,7 +105,7 @@ const CategoriesPage: React.FC = () => {
         </ScrollReveal>
 
         {/* 内容区域 - 深色毛玻璃 */}
-        <div className="rounded-2xl p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+        <div className="rounded-card-lg p-5 md:p-8 relative z-10" style={{ minHeight: 300, background: themeBg(currentColorTheme.primary, 0.12), backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${themeBg(currentColorTheme.primary, 0.18)}`, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
         {/* 分类列表 */}
         {loading ? (
           <CategoriesSkeleton />
@@ -116,7 +116,7 @@ const CategoriesPage: React.FC = () => {
                 <ScrollReveal direction="up" delay={index * 0.08}>
                 <Link to={`/category/${category._id}`}>
                   <div
-                    className="card-hover h-full rounded-2xl cursor-pointer"
+                    className="card-hover h-full rounded-card-lg cursor-pointer"
                     style={{
                       background: themeBg(currentColorTheme.primary, 0.10),
                       boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -125,7 +125,7 @@ const CategoriesPage: React.FC = () => {
                   >
                     <div className="flex items-start gap-4 p-6">
                       <div
-                        className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                        className="w-14 h-14 rounded-card-lg flex items-center justify-center flex-shrink-0"
                         style={{
                           background: `linear-gradient(135deg, hsl(${(index * 40) % 360}, 70%, 50%) 0%, hsl(${(index * 40 + 20) % 360}, 70%, 60%) 100%)`,
                         }}

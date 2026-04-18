@@ -18,6 +18,7 @@ const seriesRoutes = require('./series');
 const visitRoutes = require('./visits');
 const statsRoutes = require('./stats');
 const aiRoutes = require('./ai');
+const aiNewsRoutes = require('./aiNews');
 
 // 公开路由
 router.use('/auth', authRoutes);
@@ -47,5 +48,6 @@ router.use('/series', seriesRoutes);
 router.use('/visits', visitRoutes);
 router.use('/stats', statsRoutes);
 router.use('/ai', aiRoutes);
+router.use('/ai-news', aiNewsRoutes);
 
 module.exports = router;

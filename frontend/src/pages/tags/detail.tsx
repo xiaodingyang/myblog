@@ -42,7 +42,7 @@ const ArticleRow: React.FC<{
       onMouseEnter={() => id && fetchArticleDetail(id)}
     >
       <div
-        className="flex gap-5 md:gap-6 rounded-xl p-4 md:p-5 transition-all duration-300 hover:-translate-y-0.5 animate-slide-up"
+        className="flex gap-5 md:gap-6 rounded-card-lg p-4 md:p-5 transition-all duration-300 hover:-translate-y-0.5 animate-slide-up"
         style={{
           background: themeBg(colorTheme.primary, 0.15),
           backdropFilter: 'blur(16px)',
@@ -65,7 +65,7 @@ const ArticleRow: React.FC<{
         }}
       >
         {article.cover && (
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0">
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-card-sm overflow-hidden flex-shrink-0">
             <OptimizedImage
               src={article.cover}
               alt={article.title}
@@ -201,7 +201,7 @@ const TagDetailPage: React.FC = () => {
 
           {/* 标签图标 */}
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-card-lg mb-4"
             style={{ background: colorTheme.gradient, boxShadow: `0 8px 24px ${colorTheme.primary}44` }}
           >
             <TagOutlined className="text-3xl text-white" />
@@ -229,7 +229,7 @@ const TagDetailPage: React.FC = () => {
 
         {/* ── 内容容器（深色毛玻璃） ── */}
         <div
-          className="rounded-2xl p-4 md:p-8 relative z-10"
+          className="rounded-card-lg p-4 md:p-8 relative z-10"
           style={{
             minHeight: 300,
             background: themeBg(colorTheme.primary, 0.12),

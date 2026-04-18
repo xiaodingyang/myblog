@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as Sentry from '@sentry/react';
+import { BORDER_RADIUS, FONT_SIZE } from '@/styles/designTokens';
 
 interface Props {
   children: React.ReactNode;
@@ -45,7 +46,7 @@ class ErrorBoundary extends Component<Props, State> {
         }}>
           <div style={{
             background: '#fff',
-            borderRadius: 16,
+            borderRadius: BORDER_RADIUS.CARD_LARGE,
             padding: '48px 40px',
             maxWidth: 480,
             width: '100%',
@@ -65,7 +66,7 @@ class ErrorBoundary extends Component<Props, State> {
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 8,
+                borderRadius: BORDER_RADIUS.BUTTON,
                 padding: '10px 32px',
                 fontSize: 15,
                 cursor: 'pointer',
@@ -82,7 +83,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <pre style={{
                   background: '#f8fafc',
                   padding: 12,
-                  borderRadius: 8,
+                  borderRadius: BORDER_RADIUS.BUTTON,
                   fontSize: 11,
                   color: '#ef4444',
                   overflow: 'auto',

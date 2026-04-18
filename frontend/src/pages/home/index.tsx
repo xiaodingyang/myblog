@@ -18,11 +18,13 @@ import {
 } from '@ant-design/icons';
 import DailyQuote from '@/components/shared/DailyQuote';
 import OptimizedImage from '@/components/shared/OptimizedImage';
+import AiNewsCard from '@/components/shared/AiNewsCard';
 import { getReadArticleIds, sortByPopularity } from '@/utils/recommend';
 import useSEO from '@/hooks/useSEO';
 import { useArticles, useCategories, useTags } from '@/hooks/useQueries';
 import MotionButton from '@/components/visual/MotionButton';
 import { LazyMotionDiv, LazyMotionH1 } from '@/utils/lazyMotion';
+import { BORDER_RADIUS, SPACING, FONT_SIZE, BOX_SHADOW, TRANSITION } from '@/styles/designTokens';
 
 /* 首屏内容元素列表 - 用于 stagger 动画 */
 const sectionVariants = {
@@ -424,8 +426,12 @@ const HomePage: React.FC = () => {
             <div className="relative">
               {/* 代码块装饰 */}
               <div
-                className="relative bg-gray-900/80 rounded-2xl p-8 backdrop-blur-sm border border-white/10"
-                style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.5)' }}
+                className="relative bg-gray-900/80 backdrop-blur-sm border border-white/10"
+                style={{
+                  borderRadius: BORDER_RADIUS.CARD_LARGE,
+                  padding: SPACING.CARD_PADDING_LARGE,
+                  boxShadow: BOX_SHADOW.SMALL
+                }}
               >
                 <div className="flex gap-2 mb-6">
                   <div className="w-3.5 h-3.5 rounded-full bg-red-500" />
@@ -453,10 +459,12 @@ const HomePage: React.FC = () => {
               </div>
               {/* 浮动卡片 */}
               <div
-                className="absolute -top-6 -right-6 rounded-2xl p-5 text-white"
+                className="absolute -top-6 -right-6 text-white"
                 style={{
                   background: currentColorTheme.gradient,
-                  boxShadow: `0 15px 50px ${currentColorTheme.primary}66`,
+                  boxShadow: `0 4px 16px ${currentColorTheme.primary}66`,
+                  borderRadius: BORDER_RADIUS.CARD_LARGE,
+                  padding: SPACING.CARD_PADDING_MEDIUM,
                 }}
               >
                 <FireOutlined className="text-3xl" />
@@ -487,7 +495,7 @@ const HomePage: React.FC = () => {
                 backdropFilter: 'blur(8px)',
               }}
             >
-              <ArrowDownOutlined style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 14 }} />
+              <ArrowDownOutlined style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: FONT_SIZE.TITLE_MEDIUM }} />
             </div>
           </div>
         </div>
@@ -499,18 +507,27 @@ const HomePage: React.FC = () => {
         style={{ background: 'transparent', position: 'relative', zIndex: 10 }}
       >
         <LazyMotionDiv
-          className="home-fullscreen-section-inner w-full flex flex-col py-6 md:py-10"
+          className="home-fullscreen-section-inner w-full flex flex-col py-4 md:py-6"
           variants={sectionVariants}
           initial="hidden"
           animate={currentSection === 1 ? 'visible' : 'hidden'}
         >
         <div className="max-w-6xl mx-auto px-4 md:px-6 w-full">
+          {/* AI 资讯区域 */}
+          <LazyMotionDiv className="mb-4 md:mb-5" variants={itemVariants}>
+            <AiNewsCard />
+          </LazyMotionDiv>
+
           {/* 标题行 */}
-          <LazyMotionDiv className="flex items-center justify-between mb-6 md:mb-8" variants={itemVariants}>
+          <LazyMotionDiv className="flex items-center justify-between mb-4 md:mb-5" variants={itemVariants}>
             <div className="flex items-center gap-3">
               <div
-                className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-sm"
-                style={{ background: `${currentColorTheme.primary}22`, color: currentColorTheme.primary }}
+                className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center text-sm"
+                style={{
+                  background: `${currentColorTheme.primary}22`,
+                  color: currentColorTheme.primary,
+                  borderRadius: '8px'
+                }}
               >
                 <FireOutlined />
               </div>
@@ -535,9 +552,11 @@ const HomePage: React.FC = () => {
               <div className="lg:col-span-7">
                 <Link to={`/article/${featuredArticles[0]?._id}`} className="block group h-full">
                   <div
-                    className="relative overflow-hidden rounded-2xl h-full min-h-[240px] md:min-h-[360px]"
+                    className="relative overflow-hidden h-full min-h-[240px] md:min-h-[360px]"
                     style={{
                       background: featuredArticles[0]?.cover ? undefined : currentColorTheme.gradient,
+                      borderRadius: BORDER_RADIUS.CARD_LARGE,
+                      boxShadow: BOX_SHADOW.SMALL,
                     }}
                   >
                     {featuredArticles[0]?.cover && (
@@ -585,12 +604,14 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* 右侧文章列表 */}
-              <div className="lg:col-span-5 flex flex-col">
+              <div className="lg:col-span-5 flex flex-col gap-5">
                 <div
-                  className="rounded-2xl flex-1 flex flex-col"
+                  className="flex-1 flex flex-col"
                   style={{
                     background: 'rgba(255, 255, 255, 0.04)',
                     border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: BORDER_RADIUS.CARD_LARGE,
+                    boxShadow: BOX_SHADOW.SMALL,
                   }}
                 >
                   {sideArticles.map((article, index) => (
@@ -603,17 +624,18 @@ const HomePage: React.FC = () => {
                       >
                         {/* 序号 */}
                         <div
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
+                          className="w-7 h-7 flex items-center justify-center text-xs font-bold flex-shrink-0"
                           style={{
                             background: index < 2 ? `${currentColorTheme.primary}22` : 'rgba(255,255,255,0.06)',
                             color: index < 2 ? currentColorTheme.primary : 'rgba(255,255,255,0.4)',
+                            borderRadius: '8px',
                           }}
                         >
                           {String(index + 1).padStart(2, '0')}
                         </div>
                         {/* 缩略图 */}
                         {article.cover && (
-                          <div className="w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
+                          <div className="w-16 h-12 md:w-20 md:h-14 overflow-hidden flex-shrink-0" style={{ borderRadius: '8px' }}>
                             <img
                               src={article.cover}
                               alt=""
@@ -647,7 +669,7 @@ const HomePage: React.FC = () => {
           )}
 
           {/* 底部引用点缀 */}
-          <LazyMotionDiv className="mt-6 md:mt-8 flex items-center justify-center gap-3 px-4" variants={itemVariants}>
+          <LazyMotionDiv className="mt-4 md:mt-5 flex items-center justify-center gap-3 px-4" variants={itemVariants}>
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
             <DailyQuote />
             <div className="h-px flex-1 max-w-[60px]" style={{ background: 'rgba(255,255,255,0.1)' }} />
@@ -671,19 +693,20 @@ const HomePage: React.FC = () => {
           {/* 分类区块：栏目 + 标签同一卡片、纵向层级（标签在分类下） */}
           <LazyMotionDiv className="mb-8 md:mb-10" variants={itemVariants}>
             <div
-              className="rounded-2xl p-5 md:p-7"
               style={{
                 background: 'rgba(255, 255, 255, 0.06)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(20px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+                boxShadow: BOX_SHADOW.SMALL,
+                borderRadius: BORDER_RADIUS.CARD_LARGE,
+                padding: SPACING.CARD_PADDING_LARGE,
               }}
             >
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-5">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <FolderOutlined style={{ color: currentColorTheme.primary, fontSize: 16 }} />
+                    <FolderOutlined style={{ color: currentColorTheme.primary, fontSize: FONT_SIZE.ICON_MEDIUM }} />
                     <span className="text-white font-semibold text-base md:text-lg tracking-tight">内容分类</span>
                   </div>
                   <p className="text-gray-500 text-xs md:text-sm m-0 pl-0.5">
@@ -705,25 +728,30 @@ const HomePage: React.FC = () => {
                   return (
                     <Link key={cat._id} to={`/category/${cat._id}`}>
                       <div
-                        className="group rounded-xl p-4 md:p-5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+                        className="group p-4 md:p-5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
                         style={{
                           background: 'rgba(255, 255, 255, 0.04)',
                           border: '1px solid rgba(255, 255, 255, 0.06)',
+                          borderRadius: BORDER_RADIUS.CARD_LARGE,
+                          boxShadow: BOX_SHADOW.SMALL,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = `rgba(255, 255, 255, 0.08)`;
                           e.currentTarget.style.borderColor = `hsl(${hue}, 70%, 55%, 0.3)`;
+                          e.currentTarget.style.boxShadow = BOX_SHADOW.MEDIUM;
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
                           e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                          e.currentTarget.style.boxShadow = BOX_SHADOW.SMALL;
                         }}
                       >
                         <div
-                          className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white text-sm mb-2.5"
+                          className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center text-white text-sm mb-2.5"
                           style={{
                             background: `linear-gradient(135deg, hsl(${hue}, 70%, 55%) 0%, hsl(${hue + 30}, 70%, 45%) 100%)`,
                             boxShadow: `0 4px 12px hsl(${hue}, 70%, 45%, 0.3)`,
+                            borderRadius: BORDER_RADIUS.CARD_SMALL,
                           }}
                         >
                           <FolderOutlined />
@@ -815,11 +843,16 @@ const HomePage: React.FC = () => {
 
           {/* 下半部分：CTA */}
           <LazyMotionDiv
-            className="rounded-2xl p-6 md:p-8 text-center relative overflow-hidden"
             variants={itemVariants}
             style={{
               background: 'rgba(255, 255, 255, 0.03)',
               border: '1px solid rgba(255, 255, 255, 0.06)',
+              borderRadius: BORDER_RADIUS.CARD_LARGE,
+              padding: SPACING.CTA_PADDING,
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: BOX_SHADOW.SMALL,
             }}
           >
             {/* 光晕装饰 */}
@@ -865,7 +898,7 @@ const HomePage: React.FC = () => {
 
           {/* 底部备案信息 */}
           <LazyMotionDiv className="text-center mt-6 md:mt-8" variants={itemVariants}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.35)', fontSize: 12 }}>
+            <Text style={{ color: 'rgba(255, 255, 255, 0.35)', fontSize: FONT_SIZE.BODY_SMALL }}>
               © {new Date().getFullYear()} 个人博客. All rights reserved.{' '}
               <a
                 href="https://beian.miit.gov.cn/"

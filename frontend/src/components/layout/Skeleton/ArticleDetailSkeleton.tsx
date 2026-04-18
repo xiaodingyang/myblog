@@ -1,4 +1,5 @@
 import React from 'react';
+import { BORDER_RADIUS } from '@/styles/designTokens';
 
 /** Reusable shimmer block */
 const S = ({ w, h, r = 'rounded', dark = false, className = '' }: { w?: string; h?: string; r?: string; dark?: boolean; className?: string }) => (
@@ -19,7 +20,7 @@ const ArticleDetailSkeleton: React.FC = () => (
         {/* Back button capsule */}
         <S w="100px" h="36px" r="rounded-full" dark />
         {/* Title */}
-        <S w="80%" h="44px" r="rounded-lg" dark />
+        <S w="80%" h="44px" r="rounded-card-sm" dark />
         {/* Reading time */}
         <S w="140px" h="20px" r="rounded" dark />
         {/* Author row: avatar + name + date + views */}
@@ -45,7 +46,7 @@ const ArticleDetailSkeleton: React.FC = () => (
           {/* Main content card */}
           <div
             className="flex-1 min-w-0 w-full bg-white p-6 md:p-8"
-            style={{ borderRadius: 16, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+            style={{ borderRadius: BORDER_RADIUS.CARD_LARGE, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
           >
             {/* 5 paragraphs: heading + 3 lines each */}
             <div className="space-y-8">
@@ -64,17 +65,17 @@ const ArticleDetailSkeleton: React.FC = () => (
 
             {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-3">
-              <S w="128px" h="40px" r="rounded-lg" />
-              <S w="96px" h="40px" r="rounded-lg" />
-              <S w="40px" h="40px" r="rounded-lg" />
-              <S w="40px" h="40px" r="rounded-lg" />
+              <S w="128px" h="40px" r="rounded-card-sm" />
+              <S w="96px" h="40px" r="rounded-card-sm" />
+              <S w="40px" h="40px" r="rounded-card-sm" />
+              <S w="40px" h="40px" r="rounded-card-sm" />
             </div>
           </div>
 
           {/* TOC sidebar */}
           <div
             className="hidden lg:block w-64 bg-white p-5"
-            style={{ borderRadius: 16, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+            style={{ borderRadius: BORDER_RADIUS.CARD_LARGE, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
           >
             <S w="80px" h="22px" r="rounded" className="mb-5" />
             {[85, 60, 75, 50, 70].map((pct, i) => (
@@ -86,12 +87,12 @@ const ArticleDetailSkeleton: React.FC = () => (
         {/* ===== Comments ===== */}
         <div
           className="mt-8 bg-white p-6 md:p-8"
-          style={{ borderRadius: 16, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+          style={{ borderRadius: BORDER_RADIUS.CARD_LARGE, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
         >
           {/* Title */}
           <S w="120px" h="28px" r="rounded" className="mb-6" />
           {/* Comment input box */}
-          <S w="100%" h="96px" r="rounded-lg" className="mb-6" />
+          <S w="100%" h="96px" r="rounded-card-sm" className="mb-6" />
           {/* 3 comments */}
           {[1, 2, 3].map(i => (
             <div key={i} className="flex gap-3 mb-5 pb-5 border-b border-gray-100 last:border-0">
@@ -110,7 +111,7 @@ const ArticleDetailSkeleton: React.FC = () => (
           <S w="140px" h="28px" r="rounded" className="mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-md">
+              <div key={i} className="rounded-card-lg overflow-hidden bg-white shadow-md">
                 <S w="100%" h="160px" r="rounded-none" />
                 <div className="p-4 space-y-2">
                   <S w="80%" h="18px" r="rounded" />

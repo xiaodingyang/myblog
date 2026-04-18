@@ -132,7 +132,7 @@ const ArticleToc: React.FC<ArticleTocProps> = ({
   if (!items.length) return null;
 
   const panelClass =
-    'rounded-xl border py-3 px-3 backdrop-blur-md shadow-lg border-white/15 bg-slate-900/78';
+    'rounded-card-lg border py-3 px-3 backdrop-blur-md shadow-lg border-white/15 bg-slate-900/78';
 
   return (
     <>

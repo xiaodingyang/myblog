@@ -33,7 +33,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={`rounded-xl shadow-lg transition-transform duration-300 hover:scale-105 group ${
+          className={`rounded-card-lg shadow-lg transition-transform duration-300 hover:scale-105 group ${
             embedded ? '' : 'fixed z-50'
           }`}
           style={{
@@ -99,7 +99,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
                     changeTheme(theme.id);
                   }}
                   className={`
-                    p-4 rounded-xl cursor-pointer transition-all duration-300
+                    p-4 rounded-card-lg cursor-pointer transition-all duration-300
                     ${isActive 
                       ? 'border-2' 
                       : 'bg-gray-50 border-2 border-transparent hover:border-gray-200'
@@ -113,7 +113,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
                   <div className="flex items-center gap-3">
                   <div
                     className={`
-                      w-12 h-12 rounded-xl flex items-center justify-center text-2xl
+                      w-12 h-12 rounded-card-lg flex items-center justify-center text-2xl
                       ${isActive ? '' : 'bg-gray-200'}
                     `}
                     style={isActive ? {
@@ -168,7 +168,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
                     changeColorTheme(colorTheme.id);
                   }}
                   className={`
-                    relative p-4 rounded-xl cursor-pointer transition-all duration-300
+                    relative p-4 rounded-card-lg cursor-pointer transition-all duration-300
                     ${isActive ? '' : 'hover:ring-1 hover:ring-gray-300'}
                   `}
                   style={{
@@ -201,7 +201,7 @@ const ParticleThemeSelector: React.FC<ParticleThemeSelectorProps> = ({
         </div>
 
         {/* 提示文字 */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+        <div className="mt-6 p-4 bg-gray-50 rounded-card-lg">
           <p className="text-sm text-gray-500 leading-relaxed">
             💡 <strong>提示：</strong>选择的主题会自动保存，下次访问时会记住您的选择。
           </p>

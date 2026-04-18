@@ -37,7 +37,7 @@ const CodeBlockWithCopy: React.FC<{
   }, [code]);
 
   return (
-    <div className="relative group/code my-4 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20">
+    <div className="relative group/code my-4 rounded-card-sm overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20">
       {/* 语言标签 */}
       <div className="absolute top-2 left-3 z-20 px-2 py-0.5 text-xs font-medium rounded bg-slate-700/90 text-slate-300 border border-slate-600/50">
         {language}
@@ -112,7 +112,7 @@ const MarkdownArticleBody: React.FC<MarkdownArticleBodyProps> = ({
             alt={alt || ''}
             loading="lazy"
             decoding="async"
-            className="rounded-lg max-w-full h-auto"
+            className="rounded-card-sm max-w-full h-auto"
             {...props}
           />
         ),
