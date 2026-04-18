@@ -138,7 +138,7 @@ const AiNewsCard: React.FC = () => {
         className="text-xs text-gray-400 mt-4 text-center"
         style={{ color: 'rgba(255, 255, 255, 0.4)' }}
       >
-        数据来源：InfoQ · 每10分钟更新
+        数据来源：RSS（InfoQ 优先，Solidot 备用）· 每10分钟更新
       </div>
     </Card>
   );

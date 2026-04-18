@@ -7,9 +7,12 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 const parser = new rssParser({
-  timeout: 10000,
+  timeout: 20000,
   headers: {
-    'User-Agent': 'Mozilla/5.0 (compatible; RealtimeRSSHub/1.0)',
+    // InfoQ 等对「爬虫式 UA」常返回 404/451 或非 RSS；需接近浏览器
+    'User-Agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
   },
 });
 
@@ -121,8 +124,11 @@ async function saveNews(articles) {
   return result;
 }
 
-/** InfoQ 主站 RSS（与定时脚本一致） */
+/** InfoQ 主站 RSS（官方 feed；需配合浏览器 UA 才能稳定解析） */
 const INFOQ_FEED_URL = 'https://www.infoq.cn/feed';
+
+/** 备用：奇客资讯（国内可解析性较好，minifeed 存在非法 XML 实体导致 rss-parser 报错故不用） */
+const SOLIDOT_FEED_URL = 'https://www.solidot.org/index.rss';
 
 /**
  * 稍宽的关键词：仅拉丁词时中文标题容易全被过滤，导致「有 RSS 但 0 条入库」
@@ -134,14 +140,27 @@ const INFOQ_KEYWORDS_WIDE = [
 ];
 
 /**
- * 抓取 InfoQ 条目：先带关键词，若全被过滤则退回「RSS 前若干条全要」
+ * 抓取 AI/技术资讯：InfoQ 优先；解析或过滤为空时用 Solidot 兜底，避免首页一直空
  */
 async function fetchInfoqArticlesForIngest() {
-  const base = { id: 'infoq', name: 'InfoQ', url: INFOQ_FEED_URL };
-  let articles = await fetchFromRSS({ ...base, limit: 40, keywords: INFOQ_KEYWORDS_WIDE });
+  const infoqBase = { id: 'infoq', name: 'InfoQ', url: INFOQ_FEED_URL };
+  let articles = await fetchFromRSS({ ...infoqBase, limit: 40, keywords: INFOQ_KEYWORDS_WIDE });
   if (articles.length === 0) {
-    console.warn('[AiNews] 关键词过滤后无条目，改为无关键词取 RSS 前 30 条');
-    articles = await fetchFromRSS({ ...base, limit: 30, keywords: [] });
+    console.warn('[AiNews] InfoQ 关键词过滤后无条目，改为无关键词取 RSS 前 30 条');
+    articles = await fetchFromRSS({ ...infoqBase, limit: 30, keywords: [] });
+  }
+  if (articles.length > 0) {
+    return articles;
+  }
+
+  const solidot = { id: 'solidot', name: 'Solidot', url: SOLIDOT_FEED_URL };
+  articles = await fetchFromRSS({ ...solidot, limit: 25, keywords: INFOQ_KEYWORDS_WIDE });
+  if (articles.length === 0) {
+    console.warn('[AiNews] Solidot 关键词过滤后无条目，改为无关键词取前 20 条');
+    articles = await fetchFromRSS({ ...solidot, limit: 20, keywords: [] });
+  }
+  if (articles.length > 0) {
+    console.log(`[AiNews] InfoQ 无可用条目，已使用 Solidot 备用源: ${articles.length} 条`);
   }
   return articles;
 }
