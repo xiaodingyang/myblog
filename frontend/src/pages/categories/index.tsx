@@ -5,7 +5,7 @@ import { getColorThemeById } from '@/config/colorThemes';
 import { Typography, Row, Col, Tag, Divider } from 'antd';
 import { FolderOutlined, FileTextOutlined, TagsOutlined } from '@ant-design/icons';
 import Empty from '@/components/shared/Empty';
-import useSEO from '@/hooks/useSEO';
+import useSEO, { SITE_ORIGIN } from '@/hooks/useSEO';
 import { useCategories, useTags } from '@/hooks/useQueries';
 import { themeBg } from '@/utils/themeHelpers';
 import ScrollReveal from '@/components/visual/ScrollReveal';
@@ -17,6 +17,7 @@ const CategoriesPage: React.FC = () => {
     title: '分类',
     description: '按分类浏览若风技术博客的所有文章，快速找到感兴趣的内容。',
     keywords: '文章分类,技术博客,前端,后端',
+    ogUrl: `${SITE_ORIGIN}/categories`,
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',

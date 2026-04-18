@@ -6,6 +6,11 @@ import { request } from 'umi';
 interface PageResult<T> { list: T[]; total: number; page: number; pageSize: number; }
 interface ApiResponse<T> { code: number; message: string; data: T; }
 
+/** 接口 `data` 可能为 `null` 或非数组；解构默认值无法覆盖 `null`，否则页面 `.map` / 展开会白屏 */
+function safeList<T>(data: unknown): T[] {
+  return Array.isArray(data) ? data : [];
+}
+
 // ============ Query Key 工厂 ============
 
 export const queryKeys = {
@@ -83,7 +88,9 @@ export function useCategories() {
   return useQuery({
     queryKey: queryKeys.categories(),
     queryFn: () =>
-      request<ApiResponse<API.Category[]>>('/api/categories').then(r => r.data),
+      request<ApiResponse<API.Category[]>>('/api/categories').then((r) =>
+        safeList<API.Category>(r?.data),
+      ),
     staleTime: 60 * 60 * 1000,
   });
 }
@@ -118,7 +125,7 @@ export function useTags() {
   return useQuery({
     queryKey: queryKeys.tags(),
     queryFn: () =>
-      request<ApiResponse<API.Tag[]>>('/api/tags').then(r => r.data),
+      request<ApiResponse<API.Tag[]>>('/api/tags').then((r) => safeList<API.Tag>(r?.data)),
     staleTime: 60 * 60 * 1000,
   });
 }

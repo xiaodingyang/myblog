@@ -84,8 +84,15 @@ export const LazyMotionButton = createLazyMotionComponent('button');
 export const LazyMotionH1 = createLazyMotionComponent('h1');
 
 /**
- * 懒加载 AnimatePresence
- *
+ * 懒加载 AnimatePresence（必须在模块顶层 `lazy` 一次，禁止在函数体内每次 render 再 `lazy`，
+ * 否则每次渲染都是新的组件类型，会导致非首页路由白屏/崩溃；首页因 PageTransition 跳过动画而不触发）
+ */
+const LazyAnimatePresenceInner = lazy(async () => {
+  const { AnimatePresence } = await getFramerMotion();
+  return { default: AnimatePresence as ComponentType<any> };
+});
+
+/**
  * @example
  * <LazyAnimatePresence mode="wait">
  *   <LazyMotionDiv key="page" ... />
@@ -96,18 +103,11 @@ export const LazyAnimatePresence: React.FC<{
   mode?: 'sync' | 'wait' | 'popLayout';
   initial?: boolean;
   onExitComplete?: () => void;
-}> = ((props: any) => {
-  const LazyPresence = lazy(async () => {
-    const { AnimatePresence } = await getFramerMotion();
-    return { default: AnimatePresence as ComponentType<any> };
-  });
-
-  return (
-    <Suspense fallback={<DefaultFallback />}>
-      <LazyPresence {...props} />
-    </Suspense>
-  );
-}) as any;
+}> = (props) => (
+  <Suspense fallback={<DefaultFallback />}>
+    <LazyAnimatePresenceInner {...props} />
+  </Suspense>
+);
 
 /**
  * 懒加载 motion 组件（通用）
