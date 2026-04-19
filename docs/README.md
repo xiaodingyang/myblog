@@ -26,11 +26,6 @@ docs/
 
 | 文档 | 说明 | 重要性 |
 |------|------|--------|
-| [deployment-summary.md](./deployment/deployment-summary.md) | 当前部署状态总览（前端 Vercel + 后端腾讯云） | ⭐⭐⭐ 必读 |
-| [new-backend-deployment-guide.md](./deployment/new-backend-deployment-guide.md) | 新后端服务部署完整指南（端口规划、API 规范、7 步部署） | ⭐⭐⭐ 新后端必读 |
-| [vercel-deployment-plan.md](./deployment/vercel-deployment-plan.md) | Vercel 前后端分离部署计划 | ⭐⭐ |
-| [scalability-analysis.md](./deployment/scalability-analysis.md) | Nginx 扩展性问题分析与优化方案 | ⭐⭐ |
-| [migration-guide.md](./deployment/migration-guide.md) | Nginx 配置迁移指南（自动化脚本） | ⭐⭐ |
 | [nginx-scalable-config.conf](./deployment/nginx-scalable-config.conf) | 优化后的 Nginx 配置模板 | ⭐⭐ |
 | [CI-CD自动化部署总结.md](./deployment/CI-CD自动化部署总结.md) | GitHub Actions 自动化部署 | ⭐ |
 
@@ -85,18 +80,15 @@ docs/
 ## 🎯 快速导航
 
 ### 我是新开发者，想了解项目
-1. 先读 → [deployment/deployment-summary.md](./deployment/deployment-summary.md) - 了解当前部署状态
-2. 再读 → [feature-design/PRJ-博客需求总览.md](./feature-design/PRJ-博客需求总览.md) - 了解项目需求
-3. 最后读 → [architecture/架构优化方案.md](./architecture/架构优化方案.md) - 了解技术架构
+1. 先读 → [feature-design/PRJ-博客需求总览.md](./feature-design/PRJ-博客需求总览.md) - 了解项目需求
+2. 再读 → [architecture/架构优化方案.md](./architecture/架构优化方案.md) - 了解技术架构
 
-### 我要部署新后端服务
-1. 必读 → [deployment/new-backend-deployment-guide.md](./deployment/new-backend-deployment-guide.md)
-2. 参考 → [deployment/deployment-summary.md](./deployment/deployment-summary.md) - 查看当前端口占用
+### 我要部署服务
+1. 参考 → [deployment/nginx-scalable-config.conf](./deployment/nginx-scalable-config.conf) - Nginx 配置模板
+2. 参考 → [deployment/CI-CD自动化部署总结.md](./deployment/CI-CD自动化部署总结.md) - CI/CD 配置
 
 ### 我要优化 Nginx 配置
-1. 先读 → [deployment/scalability-analysis.md](./deployment/scalability-analysis.md) - 了解为什么要优化
-2. 再读 → [deployment/migration-guide.md](./deployment/migration-guide.md) - 了解如何迁移
-3. 参考 → [deployment/nginx-scalable-config.conf](./deployment/nginx-scalable-config.conf) - 配置模板
+1. 参考 → [deployment/nginx-scalable-config.conf](./deployment/nginx-scalable-config.conf) - 配置模板
 
 ### 我要做性能优化
 1. 前端性能 → [technical/首屏性能优化总结.md](./technical/首屏性能优化总结.md)
@@ -114,23 +106,23 @@ docs/
 
 | 类别 | 文档数量 | 总大小 |
 |------|---------|--------|
-| 部署运维类 | 6 | ~70 KB |
+| 部署运维类 | 2 | ~20 KB |
 | 功能设计类 | 6 | ~110 KB |
 | 技术实现类 | 5 | ~90 KB |
 | 架构设计类 | 1 | ~25 KB |
 | 测试相关 | 1 目录 | - |
-| **总计** | **19** | **~295 KB** |
+| **总计** | **15** | **~245 KB** |
 
 ---
 
 ## 🔄 文档更新记录
 
+### 2026-04-19
+- ✅ 清理所有 Vercel 相关文档和引用
+- ✅ 删除过时的部署文档
+
 ### 2026-04-13
-- ✅ 新增 `deployment-summary.md` - 部署完成总结
-- ✅ 新增 `scalability-analysis.md` - 扩展性分析
-- ✅ 新增 `migration-guide.md` - Nginx 迁移指南
 - ✅ 新增 `nginx-scalable-config.conf` - 优化配置模板
-- ✅ 新增 `new-backend-deployment-guide.md` - 新后端部署指南
 - ✅ 新增 `README.md` - 文档索引（本文件）
 
 ### 2026-04-09

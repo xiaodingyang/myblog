@@ -46,35 +46,60 @@ export default defineConfig({
     // 版本检测：构建时写入唯一号。优先 GitHub Actions 的 RUN_ID（每次部署必变），避免仅 Date.now() 与 CDN/浏览器旧 index 对齐失败导致 chunk 与 HTML 不一致
     `(function(){
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
-      var BUILD_VERSION = '${process.env.GITHUB_RUN_ID || process.env.GITHUB_SHA || Date.now()}';
-      var STORAGE_KEY = 'app_build_version';
-      var stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
-      } else if (stored !== BUILD_VERSION) {
-        // 检测到新版本，清除缓存并刷新
-        localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            names.forEach(function(name) { caches.delete(name); });
-          });
+      try {
+        var BUILD_VERSION = '${process.env.GITHUB_RUN_ID || process.env.GITHUB_SHA || Date.now()}';
+        var STORAGE_KEY = 'app_build_version';
+        var RELOAD_COUNT_KEY = 'app_reload_count';
+        var MAX_RELOAD = 3;
+
+        var stored = localStorage.getItem(STORAGE_KEY);
+        var reloadCount = parseInt(localStorage.getItem(RELOAD_COUNT_KEY) || '0', 10);
+
+        if (!stored) {
+          localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
+          localStorage.setItem(RELOAD_COUNT_KEY, '0');
+        } else if (stored !== BUILD_VERSION && reloadCount < MAX_RELOAD) {
+          // 检测到新版本，清除缓存并刷新
+          localStorage.setItem(STORAGE_KEY, BUILD_VERSION);
+          localStorage.setItem(RELOAD_COUNT_KEY, String(reloadCount + 1));
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              names.forEach(function(name) { caches.delete(name); });
+            });
+          }
+          window.location.reload();
+        } else if (reloadCount >= MAX_RELOAD) {
+          // 超过最大刷新次数，重置计数器，避免无限循环
+          localStorage.setItem(RELOAD_COUNT_KEY, '0');
         }
-        window.location.reload();
+      } catch (e) {
+        // localStorage 不可用（隐私模式/存储已满），静默失败
+        console.warn('Version check failed:', e);
       }
     })();`,
     // 异步 chunk 加载失败时自动刷新页面（仅生产；开发环境 HMR/偶发脚本错误易误判，避免「一开弹窗就整页 reload」）
     `(function(){
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
-      window.addEventListener('error', function(e) {
-        var target = e.target || e.srcElement;
-        if (target && target.tagName === 'SCRIPT' && /\\.async\\.js/.test(target.src || '')) {
-          var key = 'chunk_retry_' + target.src;
-          if (!sessionStorage.getItem(key)) {
-            sessionStorage.setItem(key, '1');
-            window.location.reload();
+      try {
+        var MAX_CHUNK_RETRY = 2;
+        window.addEventListener('error', function(e) {
+          var target = e.target || e.srcElement;
+          if (target && target.tagName === 'SCRIPT' && /\\.async\\.js/.test(target.src || '')) {
+            var key = 'chunk_retry_' + target.src;
+            var retryCount = parseInt(sessionStorage.getItem(key) || '0', 10);
+            if (retryCount < MAX_CHUNK_RETRY) {
+              sessionStorage.setItem(key, String(retryCount + 1));
+              window.location.reload();
+            } else {
+              // 超过重试次数，上报错误而不是无限刷新
+              console.error('Chunk load failed after ' + MAX_CHUNK_RETRY + ' retries:', target.src);
+            }
           }
-        }
-      }, true);
+        }, true);
+      } catch (e) {
+        // sessionStorage 不可用，静默失败
+        console.warn('Chunk retry setup failed:', e);
+      }
     })();`,
     // 百度自动推送 - 使用 requestIdleCallback 延迟到浏览器空闲时执行，不阻塞首屏
     `(function(){

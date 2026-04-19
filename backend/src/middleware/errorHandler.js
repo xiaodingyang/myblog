@@ -1,0 +1,107 @@
+// 错误日志中间件 - 避免泄露敏感信息
+
+const sanitizeError = (err) => {
+  // 移除敏感字段
+  const sanitized = { ...err };
+
+  // 删除可能包含敏感信息的字段
+  delete sanitized.config;
+  delete sanitized.request;
+  delete sanitized.response;
+
+  // 如果是 MongoDB 错误，清理堆栈信息
+  if (err.name === 'MongoError' || err.name === 'MongoServerError') {
+    sanitized.stack = undefined;
+  }
+
+  return sanitized;
+};
+
+const errorLogger = (err, req, res, next) => {
+  const isProd = process.env.NODE_ENV === 'production';
+
+  // 构建日志对象
+  const logData = {
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.originalUrl,
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+    error: {
+      name: err.name,
+      message: err.message,
+      code: err.code,
+    }
+  };
+
+  // 非生产环境记录完整堆栈
+  if (!isProd) {
+    logData.error.stack = err.stack;
+  }
+
+  // 记录错误（生产环境应使用专业日志服务）
+  console.error('[ERROR]', JSON.stringify(logData, null, 2));
+
+  next(err);
+};
+
+const errorHandler = (err, req, res, next) => {
+  const isProd = process.env.NODE_ENV === 'production';
+
+  // 默认错误响应
+  let statusCode = err.statusCode || 500;
+  let code = err.code || 10000;
+  let message = err.message || '服务器内部错误';
+
+  // 生产环境隐藏详细错误信息
+  if (isProd && statusCode === 500) {
+    message = '服务器内部错误，请稍后重试';
+  }
+
+  // MongoDB 错误处理
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    code = 10001;
+    message = '数据验证失败';
+  }
+
+  if (err.name === 'CastError') {
+    statusCode = 400;
+    code = 10001;
+    message = '无效的数据格式';
+  }
+
+  if (err.code === 11000) {
+    statusCode = 400;
+    code = 10002;
+    message = '数据已存在';
+  }
+
+  // JWT 错误处理
+  if (err.name === 'JsonWebTokenError') {
+    statusCode = 401;
+    code = 10003;
+    message = '无效的认证令牌';
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    statusCode = 401;
+    code = 10004;
+    message = '认证令牌已过期';
+  }
+
+  // 响应错误
+  res.status(statusCode).json({
+    code,
+    message,
+    data: null,
+    // 非生产环境返回堆栈信息
+    ...((!isProd && err.stack) && { stack: err.stack })
+  });
+};
+
+module.exports = {
+  errorLogger,
+  errorHandler,
+  sanitizeError
+};

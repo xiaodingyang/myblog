@@ -372,7 +372,12 @@ const ArticleDetailPage: React.FC = () => {
         }}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <Breadcrumb />
+          <Breadcrumb
+            showVisual={false}
+            articleTitle={article.title}
+            categoryName={article.category?.name}
+            categorySlug={article.category?._id}
+          />
 
           {/* 返回按钮 - 玻璃质感 */}
           <button

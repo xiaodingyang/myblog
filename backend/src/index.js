@@ -17,7 +17,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const connectDB = require('./config/database');
-const errorHandler = require('./middlewares/errorHandler');
+const { errorLogger, errorHandler } = require('./middleware/errorHandler');
 const routes = require('./routes');
 
 const app = express();
@@ -35,17 +35,38 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS：允许任意来源（origin: '*' 与 credentials: true 不能同时使用）
+// CORS：开发环境宽松，生产环境严格
+const isProdEnv = process.env.NODE_ENV === 'production';
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : ['http://localhost:8080'];
+
 app.use(cors({
-  origin: '*',
-  credentials: false,
+  origin: (origin, callback) => {
+    // 开发环境：允许所有 localhost 和无 origin 的请求
+    if (!isProdEnv) {
+      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+
+    // 生产环境或非 localhost：检查白名单
+    if (!origin) return callback(null, true); // 允许无 origin（Postman、curl）
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(morgan('dev'));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // 响应压缩
 const compression = require('compression');
@@ -80,8 +101,10 @@ const apiLimiter = rateLimit({
     try {
       const jwt = require('jsonwebtoken');
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-      // 管理员用户 ruofeng 不受限制
-      return decoded.username === 'ruofeng';
+
+      // 从环境变量读取白名单（逗号分隔）
+      const whitelist = (process.env.RATE_LIMIT_WHITELIST || '').split(',').map(u => u.trim()).filter(Boolean);
+      return whitelist.includes(decoded.username);
     } catch (err) {
       return false;
     }
@@ -115,6 +138,7 @@ app.use((req, res) => {
 });
 
 // 错误处理
+app.use(errorLogger);
 app.use(errorHandler);
 
 // 启动服务器

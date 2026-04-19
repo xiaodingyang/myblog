@@ -120,6 +120,20 @@ const schemas = {
     }),
   }),
 
+  // 创建评论
+  comment: Joi.object({
+    articleId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required().messages({
+      'any.required': '文章 ID 不能为空',
+      'string.pattern.base': '无效的文章 ID',
+    }),
+    content: Joi.string().min(1).max(1000).required().messages({
+      'any.required': '评论内容不能为空',
+      'string.min': '评论内容不能为空',
+      'string.max': '评论内容不能超过1000个字符',
+    }),
+    parentId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null, ''),
+  }),
+
   // 审核留言
   reviewMessage: Joi.object({
     status: Joi.string().valid('approved', 'rejected').required().messages({

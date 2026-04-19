@@ -55,8 +55,8 @@ frontend/
 ```
 
 **部署信息**:
-- 生产环境: Vercel
-- 域名: https://frontend-ary348pbe-xiaodingyangs-projects.vercel.app
+- 生产环境: 腾讯云服务器
+- 域名: https://www.xiaodingyang.art
 
 ---
 
@@ -86,7 +86,7 @@ backend/
 **部署信息**:
 - 生产环境: 腾讯云服务器（162.14.83.58）
 - 端口: 8081
-- API 地址: https://www.xiaodingyang.art/vercel-api
+- API 地址: https://www.xiaodingyang.art/api
 - 进程管理: PM2
 
 ---
@@ -102,7 +102,6 @@ docs/
 ├── deployment/                  # 🚀 部署运维类
 │   ├── deployment-summary.md          # 当前部署状态
 │   ├── new-backend-deployment-guide.md # 新后端部署指南
-│   ├── vercel-deployment-plan.md
 │   ├── scalability-analysis.md
 │   ├── migration-guide.md
 │   ├── nginx-scalable-config.conf
@@ -159,13 +158,11 @@ scripts/
 
 ```
 config/
-├── nginx.conf                   # Nginx 配置（参考）
-└── vercel.json                  # Vercel 部署配置
+└── nginx.conf                   # Nginx 配置（参考）
 ```
 
 **注意**: 
 - `nginx.conf` 仅供参考，实际生产配置在服务器 `/etc/nginx/conf.d/myblog.conf`
-- `vercel.json` 用于 Vercel 前端部署
 
 ---
 
@@ -238,7 +235,7 @@ API_BASE_URL=http://localhost:8081
 
 **生产环境** (`frontend/.env.production`):
 ```env
-API_BASE_URL=https://www.xiaodingyang.art/vercel-api
+API_BASE_URL=https://www.xiaodingyang.art/api
 ```
 
 ### 后端环境变量
@@ -258,7 +255,7 @@ PORT=8081
 NODE_ENV=production
 MONGODB_URI=mongodb://localhost:27017/blog
 JWT_SECRET=your-secret-key
-FRONTEND_URL=https://frontend-ary348pbe-xiaodingyangs-projects.vercel.app
+FRONTEND_URL=https://www.xiaodingyang.art
 ```
 
 ---
@@ -301,9 +298,10 @@ pnpm test
 
 ### 部署命令
 ```bash
-# 前端部署到 Vercel
+# 前端部署到腾讯云
 cd frontend
-vercel --prod
+npm run build
+# 上传 dist 目录到服务器
 
 # 后端部署到服务器
 # 参考 docs/deployment/new-backend-deployment-guide.md
@@ -320,7 +318,7 @@ vercel --prod
 - **状态管理**: React Query
 - **测试**: Playwright + Jest
 - **构建**: Webpack 5
-- **部署**: Vercel
+- **部署**: 腾讯云服务器
 
 ### 后端
 - **框架**: Express.js
@@ -352,8 +350,7 @@ vercel --prod
 
 ### 部署指南
 1. [新后端部署](./docs/deployment/new-backend-deployment-guide.md)
-2. [Vercel 部署](./docs/deployment/vercel-deployment-plan.md)
-3. [Nginx 配置](./docs/deployment/scalability-analysis.md)
+2. [Nginx 配置](./docs/deployment/scalability-analysis.md)
 
 ---
 
@@ -372,7 +369,6 @@ vercel --prod
 ## 📞 联系方式
 
 - 项目地址: https://www.xiaodingyang.art
-- 前端预览: https://frontend-ary348pbe-xiaodingyangs-projects.vercel.app
 - 问题反馈: [GitHub Issues](https://github.com/your-repo/issues)
 
 ---

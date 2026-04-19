@@ -11,6 +11,8 @@ interface BreadcrumbNavProps {
   categorySlug?: string;
   tagName?: string;
   tagSlug?: string;
+  /** 为 false 时不渲染可见面包屑，仅保留结构化数据（JSON-LD） */
+  showVisual?: boolean;
 }
 
 const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
@@ -19,6 +21,7 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
   categorySlug,
   tagName,
   tagSlug,
+  showVisual = true,
 }) => {
   const location = useLocation();
   const path = location.pathname;
@@ -83,14 +86,18 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
   }, [path, articleTitle, categoryName, tagName]);
 
   return (
-    <div className="mb-4">
+    <>
       {jsonLdString && (
         <Helmet>
           <script type="application/ld+json">{jsonLdString}</script>
         </Helmet>
       )}
-      <Breadcrumb items={items} />
-    </div>
+      {showVisual ? (
+        <div className="mb-4">
+          <Breadcrumb items={items} />
+        </div>
+      ) : null}
+    </>
   );
 };
 

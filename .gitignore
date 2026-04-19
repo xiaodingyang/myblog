@@ -36,3 +36,10 @@ CLAUDE.md
 
 # docs
 docs
+
+# Environment variables (IMPORTANT: Never commit these!)
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
