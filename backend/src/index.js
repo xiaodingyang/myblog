@@ -1,11 +1,14 @@
 const path = require('path');
 
 // 始终从 backend 根目录加载 .env（避免从 monorepo 根目录启动时 cwd 不对读不到变量）
-const envPath = path.join(__dirname, '../.env');
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+const envPath = path.join(__dirname, '..', envFile);
 try {
   const envResult = require('dotenv').config({ path: envPath });
   if (envResult.error) {
     console.log(`ℹ️  未加载 ${envPath}: ${envResult.error.message}`);
+  } else {
+    console.log(`✅ 已加载环境配置: ${envPath}`);
   }
 } catch (e) {
   console.log('ℹ️  dotenv 异常，使用进程已有环境变量');
@@ -23,8 +26,13 @@ const routes = require('./routes');
 const app = express();
 
 // 反向代理后正确识别客户端 IP（供 express-rate-limit 等使用）
-if (process.env.TRUST_PROXY === '1' || process.env.TRUST_PROXY === 'true') {
+const trustProxyValue = process.env.TRUST_PROXY;
+console.log(`🔍 TRUST_PROXY 环境变量: "${trustProxyValue}" (类型: ${typeof trustProxyValue})`);
+if (trustProxyValue === '1' || trustProxyValue === 'true') {
   app.set('trust proxy', 1);
+  console.log('✅ Express trust proxy 已启用');
+} else {
+  console.log('⚠️  Express trust proxy 未启用');
 }
 
 // 连接数据库
