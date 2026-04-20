@@ -25,14 +25,26 @@ const routes = require('./routes');
 
 const app = express();
 
-// 反向代理后正确识别客户端 IP（供 express-rate-limit 等使用）
-const trustProxyValue = process.env.TRUST_PROXY;
-console.log(`🔍 TRUST_PROXY 环境变量: "${trustProxyValue}" (类型: ${typeof trustProxyValue})`);
-if (trustProxyValue === '1' || trustProxyValue === 'true') {
+const isProdEnv = process.env.NODE_ENV === 'production';
+
+// 反向代理后正确识别客户端 IP（供 express-rate-limit v8+ 校验与限流 key 使用）
+// 生产环境默认开启一层 trust proxy（常见：前面只有 Nginx）；显式 TRUST_PROXY=0/false/off 可关闭
+const trustUnset =
+  process.env.TRUST_PROXY == null || String(process.env.TRUST_PROXY).trim() === '';
+const trustToken = trustUnset ? '' : String(process.env.TRUST_PROXY).trim().toLowerCase();
+const trustExplicitOff = ['0', 'false', 'off', 'no'].includes(trustToken);
+const trustExplicitOn = ['1', 'true', 'on', 'yes'].includes(trustToken);
+const trustProxyOn = trustExplicitOn || (isProdEnv && trustUnset && !trustExplicitOff);
+console.log(
+  `🔍 TRUST_PROXY: ${trustUnset ? '(未设置)' : `"${process.env.TRUST_PROXY}"`} → ${trustProxyOn ? '开启' : '关闭'} trust proxy`,
+);
+if (trustProxyOn) {
   app.set('trust proxy', 1);
-  console.log('✅ Express trust proxy 已启用');
+  console.log('✅ Express trust proxy 已启用（值为 1）');
 } else {
-  console.log('⚠️  Express trust proxy 未启用');
+  console.log(
+    '⚠️  Express trust proxy 未启用：若前有 Nginx 且出现 AI/限流异常，请在 .env.production 设置 TRUST_PROXY=1 后重启',
+  );
 }
 
 // 连接数据库
@@ -44,7 +56,6 @@ app.use(helmet({
 }));
 
 // CORS：开发环境宽松，生产环境严格
-const isProdEnv = process.env.NODE_ENV === 'production';
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
   : ['http://localhost:8080'];

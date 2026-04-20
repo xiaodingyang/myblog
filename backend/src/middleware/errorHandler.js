@@ -52,14 +52,15 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let code = err.code || 10000;
   let message = err.message || '服务器内部错误';
+  const origMsg = String(err.message || '');
 
   // 生产环境隐藏详细错误信息
   if (isProd && statusCode === 500) {
     message = '服务器内部错误，请稍后重试';
   }
 
-  // MongoDB 错误处理
-  if (err.name === 'ValidationError') {
+  // MongoDB 错误处理（勿与 express-rate-limit 的 ValidationError 混淆）
+  if (err.name === 'ValidationError' && !origMsg.includes('ERR_ERL_')) {
     statusCode = 400;
     code = 10001;
     message = '数据验证失败';
@@ -88,6 +89,14 @@ const errorHandler = (err, req, res, next) => {
     statusCode = 401;
     code = 10004;
     message = '认证令牌已过期';
+  }
+
+  // express-rate-limit v8+：存在 X-Forwarded-For 但未正确配置 trust proxy 时会抛 ERR_ERL_*
+  if (origMsg.includes('ERR_ERL_')) {
+    statusCode = 503;
+    code = 10007;
+    message =
+      '网关与 Node 之间的 IP 转发配置异常（常见于未启用 Express trust proxy）。请在服务器 backend/.env.production 设置 TRUST_PROXY=1 后执行 pm2 restart blog-backend';
   }
 
   // 响应错误
