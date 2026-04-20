@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Tooltip } from 'antd';
+import React, { useState, useCallback } from 'react';
+import { Tooltip, message } from 'antd';
+import { useModel, request } from 'umi';
 
-const EMOJIS = ['🔥', '👏', '🎉', '😢', '💡'];
+const EMOJIS = ['🔥', '👏', '🎉', '😢', '💡'] as const;
 
 const EMOJI_LABELS: Record<string, string> = {
   '🔥': '精彩',
@@ -11,150 +12,154 @@ const EMOJI_LABELS: Record<string, string> = {
   '💡': '有启发',
 };
 
-interface ReactionCount {
-  [emoji: string]: number;
+export interface ArticleReactionsProps {
+  articleId: string;
+  /** 评论发表成功后回调（如刷新列表、滚动到评论区） */
+  onPosted?: () => void;
 }
 
-const REACTION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+const ArticleReactions: React.FC<ArticleReactionsProps> = ({ articleId, onPosted }) => {
+  const { githubToken, requireAuth, isLoggedIn } = useModel('githubUserModel');
+  const [postingEmoji, setPostingEmoji] = useState<string | null>(null);
 
-const ArticleReactions: React.FC<{ articleId: string }> = ({ articleId }) => {
-  const [counts, setCounts] = useState<ReactionCount>({});
-  const [myReaction, setMyReaction] = useState<string | null>(null);
-  const [animatingEmoji, setAnimatingEmoji] = useState<string | null>(null);
-  const [shrinkingEmoji, setShrinkingEmoji] = useState<string | null>(null);
+  const postReactionAsComment = useCallback(
+    (emoji: string) => {
+      const label = EMOJI_LABELS[emoji] || '表情';
+      const content = `${emoji} ${label}`;
 
-  // Load from localStorage and server
-  useEffect(() => {
-    const key = `reactions_${articleId}`;
-    const stored = localStorage.getItem(key);
-    const now = Date.now();
-
-    let localCounts: ReactionCount = {};
-    let reactedEmoji: string | null = null;
-
-    if (stored) {
-      try {
-        const data = JSON.parse(stored);
-        if (data.expiry > now) {
-          localCounts = data.counts || {};
-          reactedEmoji = data.emoji || null;
-        } else {
-          localStorage.removeItem(key);
+      requireAuth(async () => {
+        if (!isLoggedIn || !githubToken) {
+          message.warning('请先登录后再发送');
+          return;
         }
-      } catch {
-        localStorage.removeItem(key);
-      }
-    }
-
-    setMyReaction(reactedEmoji);
-    setCounts(localCounts);
-  }, [articleId]);
-
-  const handleReact = useCallback((emoji: string) => {
-    const key = `reactions_${articleId}`;
-    const stored = localStorage.getItem(key);
-    const now = Date.now();
-
-    let data: { counts: ReactionCount; emoji: string | null; expiry: number } = {
-      counts: counts,
-      emoji: myReaction,
-      expiry: now + REACTION_EXPIRY_MS,
-    };
-
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.expiry > now) {
-          data = parsed;
+        setPostingEmoji(emoji);
+        try {
+          const res = await request('/api/comments', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${githubToken}` },
+            data: { articleId, content },
+          });
+          if (res.code === 0) {
+            message.success('已同步到评论区');
+            onPosted?.();
+          } else {
+            message.error(res.message || '发送失败');
+          }
+        } catch (err: any) {
+          const status = err?.response?.status;
+          const body = err?.response?.data || err?.data;
+          const code = body?.code;
+          if (status === 429 || code === 24003) {
+            message.warning(body?.message || '操作太频繁，请稍后再试');
+          } else {
+            message.error(body?.message || err?.message || '发送失败');
+          }
+        } finally {
+          setPostingEmoji(null);
         }
-      } catch {
-        // ignore
-      }
-    }
-
-    // Toggle reaction
-    if (data.emoji === emoji) {
-      // Remove reaction - shrink animation
-      setShrinkingEmoji(emoji);
-      setTimeout(() => setShrinkingEmoji(null), 200);
-      data.counts[emoji] = Math.max(0, (data.counts[emoji] || 0) - 1);
-      data.emoji = null;
-      setMyReaction(null);
-    } else {
-      // Add reaction - bounce animation
-      setAnimatingEmoji(emoji);
-      setTimeout(() => setAnimatingEmoji(null), 200);
-      // Remove old reaction count
-      if (data.emoji) {
-        data.counts[data.emoji] = Math.max(0, (data.counts[data.emoji] || 0) - 1);
-      }
-      // Add new reaction
-      data.counts[emoji] = (data.counts[emoji] || 0) + 1;
-      data.emoji = emoji;
-      setMyReaction(emoji);
-    }
-
-    data.expiry = now + REACTION_EXPIRY_MS;
-    localStorage.setItem(key, JSON.stringify(data));
-    setCounts({ ...data.counts });
-  }, [articleId, counts, myReaction]);
+      });
+    },
+    [articleId, githubToken, isLoggedIn, onPosted, requireAuth],
+  );
 
   return (
     <>
       <style>{`
-        @keyframes emoji-bounce {
+        /* 轻微错位，避免五个表情完全同相位 */
+        @keyframes article-reaction-float {
+          0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+          25% { transform: translate3d(0, -3px, 0) rotate(-5deg); }
+          50% { transform: translate3d(0, -1px, 0) rotate(0deg); }
+          75% { transform: translate3d(0, 2px, 0) rotate(5deg); }
+        }
+        @keyframes article-reaction-pop {
           0% { transform: scale(1); }
-          50% { transform: scale(1.3); }
+          35% { transform: scale(1.32); }
+          70% { transform: scale(0.96); }
           100% { transform: scale(1); }
         }
-        @keyframes emoji-shrink {
-          0% { transform: scale(1); }
-          50% { transform: scale(0.7); }
-          100% { transform: scale(1); }
+        @keyframes article-reaction-glow {
+          0%, 100% { filter: drop-shadow(0 0 0 rgb(0 0 0 / 0)); }
+          50% { filter: drop-shadow(0 2px 6px rgb(59 130 246 / 0.35)); }
+        }
+        .article-reaction-emoji {
+          display: inline-block;
+          line-height: 1;
+          transform-origin: 50% 80%;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .article-reaction-btn:not(:disabled) .article-reaction-emoji {
+            animation: article-reaction-float var(--reaction-dur, 2.6s) ease-in-out infinite;
+            animation-delay: var(--reaction-delay, 0s);
+          }
+          .article-reaction-btn:not(:disabled):hover .article-reaction-emoji {
+            --reaction-dur: 1.15s;
+            animation-name: article-reaction-float, article-reaction-glow;
+            animation-duration: var(--reaction-dur), 1.4s;
+            animation-timing-function: ease-in-out, ease-in-out;
+            animation-iteration-count: infinite, infinite;
+          }
+          .article-reaction-btn:not(:disabled).article-reaction-btn--posting .article-reaction-emoji {
+            animation: article-reaction-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1 both !important;
+            filter: none;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .article-reaction-emoji {
+            animation: none !important;
+            filter: none !important;
+          }
         }
       `}</style>
-      <div className="flex items-center gap-3">
-        {EMOJIS.map((emoji) => {
-          const count = counts[emoji] || 0;
-          const isActive = myReaction === emoji;
-          const isBouncing = animatingEmoji === emoji;
-          const isShrinking = shrinkingEmoji === emoji;
-          return (
-            <Tooltip key={emoji} title={EMOJI_LABELS[emoji]} placement="top">
-              <button
-                onClick={() => handleReact(emoji)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-card-sm transition-all duration-200 ${
-                  isActive ? 'bg-blue-50 scale-110' : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-                style={{
-                  border: isActive ? '2px solid #1677ff' : '2px solid transparent',
-                  cursor: 'pointer',
-                  minWidth: 48,
-                }}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          {EMOJIS.map((emoji, index) => {
+            const busy = postingEmoji !== null;
+            const isPosting = postingEmoji === emoji;
+            return (
+              <Tooltip
+                key={emoji}
+                title={`${EMOJI_LABELS[emoji]} · 点击发表为评论（需登录）`}
+                placement="top"
               >
-                <span
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => postReactionAsComment(emoji)}
+                  className={[
+                    'article-reaction-btn group flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-card-sm',
+                    'transition-[transform,box-shadow,background-color] duration-200',
+                    'bg-gray-50 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-md',
+                    'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none',
+                    isPosting ? 'article-reaction-btn--posting' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   style={{
-                    fontSize: 20,
-                    display: 'inline-block',
-                    animation: isBouncing
-                      ? 'emoji-bounce 200ms ease-in-out'
-                      : isShrinking
-                        ? 'emoji-shrink 200ms ease-in-out'
-                        : 'none',
+                    border: '2px solid transparent',
+                    cursor: busy ? 'wait' : 'pointer',
+                    minWidth: 48,
                   }}
+                  aria-label={`${EMOJI_LABELS[emoji]}，发表为评论`}
                 >
-                  {emoji}
-                </span>
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: isActive ? '#1677ff' : '#666' }}
-                >
-                  {count > 0 ? count : ''}
-                </span>
-              </button>
-            </Tooltip>
-          );
-        })}
+                  <span
+                    className="article-reaction-emoji"
+                    style={
+                      {
+                        fontSize: 22,
+                        ['--reaction-delay' as string]: `${index * 0.18}s`,
+                      } as React.CSSProperties
+                    }
+                    aria-hidden
+                  >
+                    {emoji}
+                  </span>
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+        <span className="text-xs text-gray-400 hidden sm:inline">快捷表情会作为一条评论发布，与正文评论一样展示</span>
       </div>
     </>
   );

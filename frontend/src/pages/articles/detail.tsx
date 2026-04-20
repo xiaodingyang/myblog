@@ -492,7 +492,15 @@ const ArticleDetailPage: React.FC = () => {
                 </Button>
               </Space>
               <Space wrap className="flex items-center">
-                <ArticleReactions articleId={article._id} />
+                <ArticleReactions
+                  articleId={String(article._id)}
+                  onPosted={() => {
+                    queryClient.invalidateQueries({ queryKey: ['comments', id!] });
+                    document
+                      .getElementById('article-comments-section')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                />
                 <Divider type="vertical" style={{ height: 24, margin: '0 4px' }} />
                 <CopyPageUrlButton />
                 <ShareButton
