@@ -122,10 +122,28 @@ jobs:
 
             pm2 save
 
-            echo "🔄 Reloading Nginx..."
-            nginx -t && nginx -s reload
+            echo "🔧 对齐 Nginx：在含 xiaodingyang.art 或 /var/www/myblog 的站点配置中，将 127.0.0.1:3000 改为 8081（与 PM2 blog-backend 一致）"
+            for dir in /etc/nginx/sites-enabled /etc/nginx/conf.d; do
+              [ -d "$dir" ] || continue
+              for f in "$dir"/*; do
+                [ -f "$f" ] || continue
+                grep -qE 'xiaodingyang\.art|/var/www/myblog' "$f" 2>/dev/null || continue
+                grep -q '127\.0\.0\.1:3000' "$f" 2>/dev/null || continue
+                echo "  → patch $f"
+                ts=$(date +%s)
+                if [ "$(id -u)" -eq 0 ]; then
+                  cp -a "$f" "${f}.bak-autopatch-$ts" 2>/dev/null || true
+                  sed -i 's/127\.0\.0\.1:3000/127.0.0.1:8081/g' "$f" || true
+                else
+                  sudo cp -a "$f" "${f}.bak-autopatch-$ts" 2>/dev/null && sudo sed -i 's/127\.0\.0\.1:3000/127.0.0.1:8081/g' "$f" || echo "  ⚠️ 无权限自动改 $f（需 root 或 sudo），请手动将 proxy_pass 改为 8081"
+                fi
+              done
+            done
 
-            echo "ℹ️  GitHub 登录依赖 Nginx 将 /api 反代到 PM2 blog-backend 端口（见 backend/ecosystem.config.js，默认 8081；参考仓库 config/nginx.conf）。若仍 404 请核对线上 Nginx 与仓库示例是否一致。"
+            echo "🔄 Reloading Nginx..."
+            ( nginx -t && nginx -s reload ) 2>/dev/null || ( sudo nginx -t && sudo nginx -s reload )
+
+            echo "ℹ️  参考配置已同步到 ${{ env.REMOTE_DIR }}/config/nginx.conf.from-repo"
             echo "✅ Remote operations complete"
           REMOTE
 
@@ -137,11 +155,12 @@ jobs:
           for i in 1 2 3 4 5; do
             HOME=$(curl -sf -o /dev/null -w "%{http_code}" https://www.xiaodingyang.art/ || true)
             API=$(curl -sf -o /dev/null -w "%{http_code}" "https://www.xiaodingyang.art/api/articles?page=1&pageSize=1" || true)
-            if [ "$HOME" = "200" ] && [ "$API" = "200" ]; then
-              echo "✅ Health check passed (home HTTP $HOME, api HTTP $API)"
+            GH=$(curl -sI -o /dev/null -w "%{http_code}" "https://www.xiaodingyang.art/api/github/login" || true)
+            if [ "$HOME" = "200" ] && [ "$API" = "200" ] && { [ "$GH" = "302" ] || [ "$GH" = "301" ] || [ "$GH" = "307" ]; }; then
+              echo "✅ Health check passed (home=$HOME api=$API github_login=$GH)"
               exit 0
             fi
-            echo "⏳ Attempt $i: home=$HOME api=$API, retrying in 5s..."
+            echo "⏳ Attempt $i: home=$HOME api=$API github_login=$GH (OAuth 入口期望 301/302/307)"
             sleep 5
           done
           echo "❌ Health check failed after 5 attempts"
