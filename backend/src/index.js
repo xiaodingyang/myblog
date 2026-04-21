@@ -56,44 +56,73 @@ app.use(helmet({
 }));
 
 // CORS：开发环境宽松，生产环境严格
+/** 与浏览器 Origin 对齐：去掉尾部 /，用 URL.host 统一含默认端口的形式 */
+function normalizeBrowserOrigin(raw) {
+  const s = String(raw || '').trim().replace(/\/+$/, '');
+  if (!s) return null;
+  try {
+    const u = new URL(s);
+    return `${u.protocol}//${u.host}`;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * 在 FRONTEND_URL 白名单基础上，为「仅两段式主域」自动补齐 www ⇄ 裸域，避免只配其一导致浏览器报 CORS。
- * 不处理多级子域（如 blog.example.com），以免误放行。
+ * 在白名单基础上为「仅两段式主域」自动补齐 www ⇄ 裸域；并合并 GITHUB_CALLBACK_URL 的站点来源（常见：只配了回调未配 FRONTEND_URL）。
  */
 function expandAllowedOrigins(urls) {
-  const out = new Set((urls || []).map((u) => String(u || '').trim()).filter(Boolean));
-  for (const raw of [...out]) {
+  const out = new Set();
+  const add = (x) => {
+    const n = normalizeBrowserOrigin(x);
+    if (n) out.add(n);
+  };
+
+  (urls || []).forEach((r) => add(r));
+
+  for (const origin of [...out]) {
     try {
-      const u = new URL(raw);
+      const u = new URL(origin);
       const proto = u.protocol;
       const host = u.hostname.toLowerCase();
-      const portSuffix = u.port ? `:${u.port}` : '';
+      const port = u.port;
 
       if (host.startsWith('www.')) {
         const apex = host.slice(4);
-        if (apex) out.add(`${proto}//${apex}${portSuffix}`);
+        if (apex) add(`${proto}//${apex}${port ? `:${port}` : ''}`);
         continue;
       }
 
       const labels = host.split('.').filter(Boolean);
       if (labels.length === 2) {
-        out.add(`${proto}//www.${host}${portSuffix}`);
+        add(`${proto}//www.${host}${port ? `:${port}` : ''}`);
       }
     } catch {
-      /* ignore invalid URL entries */
+      /* ignore */
     }
   }
   return [...out];
 }
 
-const allowedOrigins = expandAllowedOrigins(
-  process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(',').map((url) => url.trim())
-    : ['http://localhost:8080'],
-);
+const rawFrontendList = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map((url) => url.trim())
+  : ['http://localhost:8080'];
 
-if (isProdEnv && process.env.FRONTEND_URL) {
-  console.log(`🌐 CORS 允许来源（含 www/裸域自动补齐）: ${allowedOrigins.join(', ')}`);
+const corsSeedList = [...rawFrontendList];
+if (isProdEnv && process.env.GITHUB_CALLBACK_URL) {
+  try {
+    const u = new URL(process.env.GITHUB_CALLBACK_URL);
+    corsSeedList.push(`${u.protocol}//${u.host}`);
+  } catch {
+    /* ignore */
+  }
+}
+
+const allowedOrigins = expandAllowedOrigins(corsSeedList);
+const allowedOriginSet = new Set(allowedOrigins);
+
+if (isProdEnv) {
+  console.log(`🌐 CORS 允许来源（规范化 + www/裸域 + 回调推导）: ${allowedOrigins.join(', ')}`);
 }
 
 app.use(cors({
@@ -108,7 +137,8 @@ app.use(cors({
     // 生产环境或非 localhost：检查白名单
     if (!origin) return callback(null, true); // 允许无 origin（Postman、curl）
 
-    if (allowedOrigins.includes(origin)) {
+    const normalized = normalizeBrowserOrigin(origin);
+    if (normalized && allowedOriginSet.has(normalized)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

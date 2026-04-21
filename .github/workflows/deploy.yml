@@ -76,6 +76,22 @@ jobs:
           ssh -i ~/.ssh/id_deploy ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'REMOTE'
             set -e
 
+            echo "🔐 合并 FRONTEND_URL 到 .env.production（默认含 HTTPS www/裸域，避免浏览器 Origin 被拒）"
+            ENV_F="${{ env.REMOTE_DIR }}/backend/.env.production"
+            mkdir -p "$(dirname "$ENV_F")"
+            touch "$ENV_F"
+            DEFAULT_BLOG="https://www.xiaodingyang.art,https://xiaodingyang.art"
+            CUR=""
+            if grep -q '^[[:space:]]*FRONTEND_URL=' "$ENV_F" 2>/dev/null; then
+              CUR=$(grep '^[[:space:]]*FRONTEND_URL=' "$ENV_F" | tail -n1 | cut -d= -f2- | tr -d '"' | tr -d "'")
+            fi
+            MERGED=$(printf '%s,%s\n' "$DEFAULT_BLOG" "$CUR" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;/^$/d' | sort -u | paste -sd, -)
+            TMP="${ENV_F}.deploy.$$"
+            (grep -v '^[[:space:]]*FRONTEND_URL=' "$ENV_F" || true) > "$TMP"
+            echo "FRONTEND_URL=$MERGED" >> "$TMP"
+            mv "$TMP" "$ENV_F"
+            echo "   -> $(grep '^FRONTEND_URL=' "$ENV_F" | tail -n1)"
+
             echo "📦 Installing backend dependencies..."
             cd ${{ env.REMOTE_DIR }}/backend
             pnpm install --frozen-lockfile 2>/dev/null || pnpm install --no-optional
