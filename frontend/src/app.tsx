@@ -89,7 +89,11 @@ let _isRedirectingToLogin = false;
 export const request = {
     timeout: 10000,
     errorConfig: {
-        errorHandler: (error: any) => {
+        errorHandler: (error: any, opts: any) => {
+            // 业务内已自行展示错误（如小苹果弹窗），避免再弹全局 message 造成「服务器错误」重复误导
+            if (opts?.skipErrorHandler) {
+                return;
+            }
             if (error.response) {
                 const { status, data } = error.response;
 

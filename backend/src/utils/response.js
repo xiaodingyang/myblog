@@ -78,7 +78,10 @@ function error(res, httpStatus, errorCode, message) {
 class ApiError extends Error {
   constructor(httpStatus, errorCode, message) {
     super(message);
+    this.name = 'ApiError';
     this.statusCode = httpStatus;
+    /** Express 惯例字段，便于中间件与日志统一识别 */
+    this.status = httpStatus;
     this.code = typeof errorCode === 'string' ? ErrorCode[errorCode] : errorCode;
   }
 }

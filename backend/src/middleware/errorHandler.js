@@ -1,5 +1,7 @@
 // 错误日志中间件 - 避免泄露敏感信息
 
+const { ApiError } = require('../utils/response');
+
 const sanitizeError = (err) => {
   // 移除敏感字段
   const sanitized = { ...err };
@@ -48,8 +50,18 @@ const errorLogger = (err, req, res, next) => {
 const errorHandler = (err, req, res, next) => {
   const isProd = process.env.NODE_ENV === 'production';
 
-  // 默认错误响应
-  let statusCode = err.statusCode || 500;
+  // 业务层显式抛出的 API 错误：固定 HTTP/业务码与文案，不走下方泛化分支（避免与 Mongo 等 err.code 混淆）
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      code: err.code,
+      message: err.message,
+      data: null,
+      ...(!isProd && err.stack ? { stack: err.stack } : {}),
+    });
+  }
+
+  // 默认错误响应（兼容 Express 常用的 err.status）
+  let statusCode = err.status || err.statusCode || 500;
   let code = err.code || 10000;
   let message = err.message || '服务器内部错误';
   const origMsg = String(err.message || '');
