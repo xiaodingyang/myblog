@@ -56,9 +56,45 @@ app.use(helmet({
 }));
 
 // CORS：开发环境宽松，生产环境严格
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-  : ['http://localhost:8080'];
+/**
+ * 在 FRONTEND_URL 白名单基础上，为「仅两段式主域」自动补齐 www ⇄ 裸域，避免只配其一导致浏览器报 CORS。
+ * 不处理多级子域（如 blog.example.com），以免误放行。
+ */
+function expandAllowedOrigins(urls) {
+  const out = new Set((urls || []).map((u) => String(u || '').trim()).filter(Boolean));
+  for (const raw of [...out]) {
+    try {
+      const u = new URL(raw);
+      const proto = u.protocol;
+      const host = u.hostname.toLowerCase();
+      const portSuffix = u.port ? `:${u.port}` : '';
+
+      if (host.startsWith('www.')) {
+        const apex = host.slice(4);
+        if (apex) out.add(`${proto}//${apex}${portSuffix}`);
+        continue;
+      }
+
+      const labels = host.split('.').filter(Boolean);
+      if (labels.length === 2) {
+        out.add(`${proto}//www.${host}${portSuffix}`);
+      }
+    } catch {
+      /* ignore invalid URL entries */
+    }
+  }
+  return [...out];
+}
+
+const allowedOrigins = expandAllowedOrigins(
+  process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',').map((url) => url.trim())
+    : ['http://localhost:8080'],
+);
+
+if (isProdEnv && process.env.FRONTEND_URL) {
+  console.log(`🌐 CORS 允许来源（含 www/裸域自动补齐）: ${allowedOrigins.join(', ')}`);
+}
 
 app.use(cors({
   origin: (origin, callback) => {
