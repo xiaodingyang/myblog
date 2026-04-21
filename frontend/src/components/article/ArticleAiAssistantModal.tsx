@@ -124,7 +124,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
         const msg = res?.message || '请求失败';
         setErrText(
           res?.code === 27001
-            ? `${msg}\n\n（站长）用 SSH 登录服务器，编辑 /var/www/myblog/backend/.env，填好上述三项后执行：pm2 restart blog-backend`
+            ? `${msg}\n\n（站长）生产环境请编辑 /var/www/myblog/backend/.env.production（或仓库 Settings → Secrets 配置 AI_API_BASE / AI_API_KEY / AI_CHAT_MODEL 后重新部署），填好后执行：pm2 restart blog-backend`
             : msg,
         );
       }
@@ -146,7 +146,7 @@ const ArticleAiAssistantModal: React.FC<Props> = ({
           e?.info?.errorMessage ||
           'AI 答疑未配置：请设置 AI_API_BASE、AI_API_KEY、AI_CHAT_MODEL';
         setErrText(
-          `${base}\n\n（站长）用 SSH 登录服务器，编辑 /var/www/myblog/backend/.env，填好上述三项后执行：pm2 restart blog-backend`,
+          `${base}\n\n（站长）生产环境请编辑 /var/www/myblog/backend/.env.production（或仓库 Settings → Secrets 配置 AI_API_BASE / AI_API_KEY / AI_CHAT_MODEL 后重新部署），填好后执行：pm2 restart blog-backend`,
         );
       } else {
         setErrText(

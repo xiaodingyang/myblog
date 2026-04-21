@@ -70,6 +70,40 @@ jobs:
             config/nginx.conf \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/config/nginx.conf.from-repo
 
+      # 可选：在 GitHub 仓库 Settings → Secrets 配置 AI_API_BASE、AI_API_KEY、AI_CHAT_MODEL，部署时写入服务器 .env.production（勿把密钥提交进仓库）
+      - name: Merge AI_* from GitHub Secrets (optional)
+        env:
+          AI_API_BASE: ${{ secrets.AI_API_BASE }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_CHAT_MODEL: ${{ secrets.AI_CHAT_MODEL }}
+        run: |
+          if [ -z "${AI_API_BASE}${AI_API_KEY}${AI_CHAT_MODEL}" ]; then
+            echo "ℹ️  未配置仓库 Secrets：AI_API_BASE / AI_API_KEY / AI_CHAT_MODEL — 请在服务器 ${{ env.REMOTE_DIR }}/backend/.env.production 手写，或添加 Secrets 后重新部署"
+            exit 0
+          fi
+          umask 077
+          frag=$(mktemp)
+          {
+            [ -n "$AI_API_BASE" ] && printf '%s\n' "AI_API_BASE=$AI_API_BASE"
+            [ -n "$AI_API_KEY" ] && printf '%s\n' "AI_API_KEY=$AI_API_KEY"
+            [ -n "$AI_CHAT_MODEL" ] && printf '%s\n' "AI_CHAT_MODEL=$AI_CHAT_MODEL"
+          } > "$frag"
+          scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$frag" \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/myblog-ai.env.fragment
+          rm -f "$frag"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          set -e
+          ENV_F="/var/www/myblog/backend/.env.production"
+          mkdir -p "$(dirname "$ENV_F")"
+          touch "$ENV_F"
+          TMP="${ENV_F}.strip.$$"
+          (grep -vE '^[[:space:]]*(AI_API_BASE|AI_API_KEY|AI_CHAT_MODEL)=' "$ENV_F" || true) > "$TMP"
+          mv "$TMP" "$ENV_F"
+          cat /tmp/myblog-ai.env.fragment >> "$ENV_F"
+          rm -f /tmp/myblog-ai.env.fragment
+          echo "✅ 已从 GitHub Secrets 合并 AI_* 到 $ENV_F"
+          EOF
+
       # ── Remote: 安装依赖 + 重启服务（一次 SSH） ──
       - name: Install deps & restart services
         run: |
