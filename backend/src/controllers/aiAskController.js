@@ -3,9 +3,28 @@
  */
 const mongoose = require('mongoose');
 const aiAskService = require('../services/aiAskService');
-const { success, error } = require('../utils/response');
+const ErrorCode = require('../config/errorCode');
+const { success, error, ApiError } = require('../utils/response');
 
 const MAX_Q = Math.min(Math.max(parseInt(process.env.AI_MAX_QUESTION_CHARS, 10) || 800, 200), 4000);
+
+function isKnownApiError(err) {
+  if (!err) return false;
+  if (err instanceof ApiError) return true;
+  return err.name === 'ApiError' && typeof err.statusCode === 'number';
+}
+
+function nextAiUnexpected(err, next, label) {
+  if (isKnownApiError(err)) return next(err);
+  console.error(`[${label}] unexpected`, err);
+  return next(
+    new ApiError(
+      503,
+      ErrorCode.AI_UPSTREAM_ERROR,
+      'AI 答疑暂时不可用，请稍后重试。若持续出现，请查看服务器日志或联系站长。',
+    ),
+  );
+}
 
 exports.askArticle = async (req, res, next) => {
   try {
@@ -35,7 +54,7 @@ exports.askArticle = async (req, res, next) => {
     });
     return success(res, data);
   } catch (err) {
-    next(err);
+    nextAiUnexpected(err, next, 'ai/ask');
   }
 };
 
@@ -56,6 +75,6 @@ exports.askGeneral = async (req, res, next) => {
     const data = await aiAskService.askGeneral({ question: q });
     return success(res, data);
   } catch (err) {
-    next(err);
+    nextAiUnexpected(err, next, 'ai/chat');
   }
 };
