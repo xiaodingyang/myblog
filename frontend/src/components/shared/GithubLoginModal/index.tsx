@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { message } from 'antd';
 import { useModel } from 'umi';
 import { getOAuthReturnPath } from '@/utils/runtimePath';
+import { buildApiUrl } from '@/utils/apiBase';
 
 const GithubLoginModal: React.FC = () => {
   const { loginModalVisible, setLoginModalVisible } = useModel('githubUserModel');
@@ -53,7 +54,8 @@ const GithubLoginModal: React.FC = () => {
       });
       const returnUrl = encodeURIComponent(getOAuthReturnPath());
       setTimeout(() => {
-        window.location.href = `/api/github/login?returnUrl=${returnUrl}`;
+        const loginUrl = buildApiUrl('/api/github/login');
+        window.location.href = `${loginUrl}?returnUrl=${returnUrl}`;
       }, 300);
       setLoginModalVisible(false);
     }

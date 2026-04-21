@@ -62,6 +62,14 @@ jobs:
             backend/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/backend/
 
+      - name: Upload nginx reference (compare on server; do not auto-overwrite system nginx)
+        run: |
+          ssh -i ~/.ssh/id_deploy ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ env.REMOTE_DIR }}/config"
+          rsync -avz \
+            -e "ssh -i ~/.ssh/id_deploy" \
+            config/nginx.conf \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.REMOTE_DIR }}/config/nginx.conf.from-repo
+
       # ── Remote: 安装依赖 + 重启服务（一次 SSH） ──
       - name: Install deps & restart services
         run: |
@@ -117,6 +125,7 @@ jobs:
             echo "🔄 Reloading Nginx..."
             nginx -t && nginx -s reload
 
+            echo "ℹ️  GitHub 登录依赖 Nginx 将 /api 反代到 PM2 blog-backend 端口（见 backend/ecosystem.config.js，默认 8081；参考仓库 config/nginx.conf）。若仍 404 请核对线上 Nginx 与仓库示例是否一致。"
             echo "✅ Remote operations complete"
           REMOTE
 
